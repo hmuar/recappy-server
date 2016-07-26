@@ -1,0 +1,21 @@
+{
+  "name": "synapse-hapi",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "tap test/*.js",
+    "watch": "nodemon -q -x 'npm test'"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "good": "^7.0.1",
+    "good-console": "^6.1.2",
+    "good-squeeze": "^4.0.0",
+    "hapi": "^13.5.0"
+  },
+  "devDependencies": {
+    "tap": "^6.2.0"
+  }
+}
