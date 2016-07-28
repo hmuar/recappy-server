@@ -1,1 +1,2 @@
-startup: npm run watch
+start server: nodemon app.js
+start test: npm run watch

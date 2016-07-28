@@ -4,19 +4,23 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "tap test/*.test.js",
+    "test": "blue-tape test/*.test.js",
     "watch": "nodemon -q -x 'npm test'"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bluebird": "^3.4.1",
     "good": "^7.0.1",
     "good-console": "^6.1.2",
     "good-squeeze": "^4.0.0",
     "hapi": "^13.5.0",
-    "mongojs": "^2.4.0"
+    "mongojs": "^2.4.0",
+    "mongoose": "^4.5.7",
+    "promised-mongo": "^1.2.0"
   },
   "devDependencies": {
+    "blue-tape": "^0.2.0",
     "tap": "^6.2.0"
   }
 }

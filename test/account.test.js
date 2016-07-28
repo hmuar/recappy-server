@@ -1,35 +1,27 @@
-var tap = require('tap');
-// var server = require('./test_server').server;
+var test = require('blue-tape');
+var before = test;
+var after = test;
+
 var TestDatabase = require('./test_database');
 
 // ------ Server and database setup --------------------
 var db = new TestDatabase();
-// server.register([], (err) => {
-//     if (err) {
-//       throw err; // something bad happened loading the plugin
-//     }
-//     console.log("trying to start test server.........." + server.info.uri);
-//     server.start((err) => {
-//       if (err) {
-//         throw err;
-//       }
-//       server.log('info', 'Test server running at: ' + server.info.uri);
-//     });
-// });
-db.setup();
-// -----------------------------------------------------
 
 var Account = require('../account/account');
 var account = new Account(db);
 
-db.loadUserFixtures();
+// ----------------------
+before("before", function(t) {
+  return db.setup().then(() => db.loadUserFixtures());
+});
 
-tap.test("FBMessenger getUserByFacebookMsgID", function(t) {
-  var testID = "1028279607252642"
+test("Get user using FacebookID", function(t) {
+  var testID = "1028279607252642";
   return account.getUserByFacebookMsgID(testID).then(function (result) {
     t.ok(result);
-    t.end();
   });
 });
 
-db.tearDown();
+after("after", function() {
+  db.teardown();
+});
