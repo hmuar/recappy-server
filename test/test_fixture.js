@@ -1,21 +1,22 @@
-const mongojs = require('mongojs');
 const SessionState = require('../core/session').SessionState
 const Schema = require('../db/schema');
+
+var ObjectID = Schema.ObjectID;
 
 var SRCore = require('../core/spaced_repetition');
 
 // ******* User *******************************
-var testUserFBMessenger = {_id: new mongojs.ObjectID("5716893a8c8aff3221812148"),
+var testUserFBMessenger = {_id: ObjectID("5716893a8c8aff3221812148"),
                    name: "Homer",
                    email: "homerjsimpson@faketestemail.com",
                    facebookMessageID: "1028279607252642"};
-var testUserFBMessenger2 = {_id: new mongojs.ObjectID("6716893a8c8aff3221812148"),
+var testUserFBMessenger2 = {_id: ObjectID("6716893a8c8aff3221812148"),
                    name: "Apu",
                    email: "apu@faketestemail.com"};
 
 // ******* Category ***************************
 var defaultSubject = {
-  _id: new mongojs.ObjectID("f64c57184a4ef7f0357f9cd6"),
+  _id: ObjectID("f64c57184a4ef7f0357f9cd6"),
   createdAt : new Date(),
   order : 1,
   ctype : "subject",
@@ -24,53 +25,53 @@ var defaultSubject = {
 };
 
 var defaultUnit = {
-  _id : new mongojs.ObjectID("0850e4270c2aadd7ccdc1ca1"),
+  _id : ObjectID("0850e4270c2aadd7ccdc1ca1"),
   createdAt : new Date(),
   order : 1,
   ctype : "unit",
   ckey : "episode-1-carbon",
   parent : [
-    new mongojs.ObjectID("f64c57184a4ef7f0357f9cd6")
+    ObjectID("f64c57184a4ef7f0357f9cd6")
   ],
   weight : 1
 };
 
 var defaultTopic = {
-  _id : new mongojs.ObjectID("5e28c07bb4d307d667fe83e8"),
+  _id : ObjectID("5e28c07bb4d307d667fe83e8"),
   createdAt : new Date(),
   order : 1,
   ctype : "topic",
   ckey : "basic",
   parent : [
-    new mongojs.ObjectID("f64c57184a4ef7f0357f9cd6"),
-    new mongojs.ObjectID("0850e4270c2aadd7ccdc1ca1")
+    ObjectID("f64c57184a4ef7f0357f9cd6"),
+    ObjectID("0850e4270c2aadd7ccdc1ca1")
   ],
   weight : 1
 };
 
 var defaultConcept = {
-  _id : new mongojs.ObjectID("7980227254feb46736ca47fd"),
+  _id : ObjectID("7980227254feb46736ca47fd"),
   createdAt : new Date(),
   order : 1,
   ctype : "concept",
   ckey : "carbon-atomic-weight",
   parent : [
-    new mongojs.ObjectID("f64c57184a4ef7f0357f9cd6"),
-    new mongojs.ObjectID("0850e4270c2aadd7ccdc1ca1"),
-    new mongojs.ObjectID("5e28c07bb4d307d667fe83e8")
+    ObjectID("f64c57184a4ef7f0357f9cd6"),
+    ObjectID("0850e4270c2aadd7ccdc1ca1"),
+    ObjectID("5e28c07bb4d307d667fe83e8")
   ],
   weight : 1,
   globalIndex: 0,
   subjectParent: defaultSubject._id
 };
 
-var noteParent = [new mongojs.ObjectID("f64c57184a4ef7f0357f9cd6"),
-    new mongojs.ObjectID("0850e4270c2aadd7ccdc1ca1"),
-    new mongojs.ObjectID("5e28c07bb4d307d667fe83e8"),
-    new mongojs.ObjectID("7980227254feb46736ca47fd")];
+var noteParent = [ObjectID("f64c57184a4ef7f0357f9cd6"),
+    ObjectID("0850e4270c2aadd7ccdc1ca1"),
+    ObjectID("5e28c07bb4d307d667fe83e8"),
+    ObjectID("7980227254feb46736ca47fd")];
 
 var defaultNote = {
-  _id : new mongojs.ObjectID("9e16c772556579bd6fc6c222"),
+  _id : ObjectID("9e16c772556579bd6fc6c222"),
   createdAt : new Date(),
   ctype : "note",
   order : 1,
@@ -88,7 +89,7 @@ var defaultNote = {
 };
 
 var defaultNote2 = {
-  _id : new mongojs.ObjectID("987e8177faf2c2f03c974482"),
+  _id : ObjectID("987e8177faf2c2f03c974482"),
   createdAt : new Date(),
   ctype : "note",
   order : 2,
@@ -150,7 +151,7 @@ var defaultNote4Ids = [];
 // ******************** StudentSession ******************
 
 var defaultSession = {
-  userID: new mongojs.ObjectID("5716893a8c8aff3221812148"),
+  userID: ObjectID("5716893a8c8aff3221812148"),
   subjects: {
     "f64c57184a4ef7f0357f9cd6": {
       noteID: defaultNote._id,

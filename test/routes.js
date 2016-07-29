@@ -1,24 +1,12 @@
-var tap = require('tap');
-var server = require('./test_server').server;
-var TestDatabase = require('./test_database');
+const test = require('blue-tape');
+const before = test;
+const after = test;
 
-// ------ Server and database setup --------------------
-var db = new TestDatabase();
-server.register([], (err) => {
-    if (err) {
-      throw err; // something bad happened loading the plugin
-    }
-    console.log("trying to start test server.........." + server.info.uri);
-    server.start((err) => {
-      if (err) {
-        throw err;
-      }
-      server.log('info', 'Test server running at: ' + server.info.uri);
-    });
-});
-db.setup();
-// -----------------------------------------------------
-var FBmessage = require("../resource/fbmessage");
+const TestDatabase = require('./test_database');
+const db = new TestDatabase();
+
+const FBmessage = require("../resource/fbmessage");
+
 tap.test("FBmessage route GET", function(t) {
     var options = {
         method: "GET",

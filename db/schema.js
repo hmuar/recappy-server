@@ -8,7 +8,8 @@ var userSchema = new mongoose.Schema({
 var User = mongoose.model('User', userSchema);
 
 var Schema = {
-  User: User
+  User: User,
+  ObjectID: mongoose.Types.ObjectId
 }
 
 module.exports = Schema
