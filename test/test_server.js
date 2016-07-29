@@ -1,4 +1,6 @@
 var Server = require("../server");
-Server.setup(5001);
 
-module.exports = Server;
+var server = new Server();
+server.setup(5001);
+
+module.exports = server;

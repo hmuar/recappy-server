@@ -16,4 +16,20 @@ Server.prototype.setup = function(port) {
   });
 }
 
-module.exports = new Server();
+// returns Promise
+Server.prototype.start = function() {
+  return this.server.register([]).then(() => {
+    return this.server.start();
+  });
+}
+
+// returns Promise
+Server.prototype.stop = function() {
+  return this.server.stop();
+}
+
+Server.prototype.inject = function(options) {
+  return this.server.inject(options);
+}
+
+module.exports = Server;

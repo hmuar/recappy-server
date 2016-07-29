@@ -4,24 +4,32 @@ const after = test;
 
 const TestDatabase = require('./test_database');
 const db = new TestDatabase();
-
 const FBmessage = require("../resource/fbmessage");
 
-tap.test("FBmessage route GET", function(t) {
-    var options = {
-        method: "GET",
-        url: FBmessage.getRoutePath("/api/v1") + "?hub.challenge=35",
-    };
+var server = require('./test_server');
 
-    // server.inject lets you similate an http request
-    server.inject(options, function(response) {
-        t.equal(response.statusCode, 200);  //  Expect http response status code to be 200 ("Ok")
-        t.equal(response.result, 35); // Expect result to be "Hello Timmy!" (12 chars long)
-        server.stop(t.end); // t.end() callback is required to end the test in tape
-    });
+// Server setup
+before("before", function(t) {
+  return server.start();
 });
 
-tap.test("FBmessage route POST", function(t) {
+// FBMessenger will hit this route with a GET request
+// with a hub.challenge that must be responded to when
+// first registering the webhook address.
+test("FBmessage route GET", function(t) {
+  var options = {
+      method: "GET",
+      url: FBmessage.getRoutePath("/api/v1") + "?hub.challenge=35",
+  };
+
+  return server.inject(options).then((response) => {
+    t.equal(response.statusCode, 200);
+    t.equal(response.result, 35);
+  });
+});
+
+// Main POST route which receives all incoming messages
+test("FBmessage route POST", function(t) {
 
     var msg = {
       "object":"page",
@@ -55,13 +63,12 @@ tap.test("FBmessage route POST", function(t) {
         payload: msg
     };
 
-    server.inject(options, function(response) {
-        t.equal(response.statusCode, 200);
-        server.stop(t.end);
+    return server.inject(options).then((response) => {
+      t.equal(response.statusCode, 200);
     });
+
 });
 
-
-// ----------- Database teardown ----------
-
-db.tearDown();
+after("after", function(t) {
+  return server.stop();
+});
