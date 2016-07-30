@@ -1,3 +1,4 @@
+'use strict';
 var AdapterFBMessenger = {};
 
 AdapterFBMessenger.handleRequest = function(request) {

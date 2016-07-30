@@ -1,19 +1,18 @@
-// const mongojs = require('mongojs');
-// const pmongo = require('promised-mongo');
+'use strict';
+
 const mongoose = require('mongoose');
 const fixture = require('./test_fixture');
-const Schema = require('../db/schema');
+const Collection = require('../db/collection');
 
-var Promise = require("bluebird");
+const Promise = require("bluebird");
 Promise.promisifyAll(mongoose);
 
 var TestDatabase = function() {
   this.loaded = null;
-  this.db = null;
 }
 
 TestDatabase.prototype.createObjectID = function(idString) {
-  return Schema.ObjectID(idString);
+  return Collection.ObjectID(idString);
 }
 
 TestDatabase.prototype.initialize = function() {
@@ -37,34 +36,53 @@ TestDatabase.prototype.setup = function() {
 }
 
 TestDatabase.prototype.clean = function() {
-  if(this.loaded) {
-    return Schema.User.remove({}).then(() => {
-      console.log("User collection cleaned");
+  if(!this.loaded) {
+    return Promise.reject(new Error("DB not loaded"));
+  }
+
+  return Collection.User.remove({}).then(() => {
+    console.log("User collection cleaned");
+    return Collection.StudentSession.remove({}).then(() => {
+      console.log("StudentSession collection cleaned");
+    }).then(() => {
+      return Collection.Category.remove({}).then(() => {
+        console.log("Category collection cleaned");
+      });
     });
-  }
-  else {
-    return Promise.resolve();
-  }
+  });
 }
 
 TestDatabase.prototype.close = function() {
-  if(this.loaded){
-    mongoose.connection.close();
+  if(!this.loaded) {
+    return Promise.reject(new Error("DB not loaded"));
   }
+  return mongoose.connection.close();
 }
 
 TestDatabase.prototype.teardown = function() {
-  console.log("trying to teardown...");
+  if(!this.loaded) {
+    return Promise.reject(new Error("DB not loaded"));
+  }
+
   return this.clean();
+
 }
 
 TestDatabase.prototype.loadAllFixtures = function() {
-
+  return fixture.addAll();
 }
 
 TestDatabase.prototype.loadUserFixtures = function() {
-  return fixture.addUsers(this.db);
+  if(!this.loaded) {
+    return Promise.reject(new Error("DB not loaded"));
+  }
+
+  return fixture.addUsers();
+
 }
 
+TestDatabase.prototype.getStaticIDs = function() {
+  return fixture.getStaticIDs();
+}
 
 module.exports = TestDatabase;

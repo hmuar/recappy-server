@@ -1,3 +1,4 @@
+'use strict';
 var Server = require("./server");
 const Good = require('good');
 const mongojs = require('mongojs');

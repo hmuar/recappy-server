@@ -1,3 +1,4 @@
+'use strict';
 var Eval = {};
 
 Eval.minResponseQuality = 0.0;

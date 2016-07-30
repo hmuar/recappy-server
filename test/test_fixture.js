@@ -1,21 +1,33 @@
-const SessionState = require('../core/session').SessionState
-const Schema = require('../db/schema');
+'use strict';
+const SessionState = require('../study/session_state').SessionState;
+const Collection = require('../db/collection');
+const SRSCore = require('../core/spaced_repetition');
 
-var ObjectID = Schema.ObjectID;
+let ObjectID = Collection.ObjectID;
 
-var SRCore = require('../core/spaced_repetition');
+let SRCore = require('../core/spaced_repetition');
 
 // ******* User *******************************
-var testUserFBMessenger = {_id: ObjectID("5716893a8c8aff3221812148"),
-                   name: "Homer",
-                   email: "homerjsimpson@faketestemail.com",
-                   facebookMessageID: "1028279607252642"};
-var testUserFBMessenger2 = {_id: ObjectID("6716893a8c8aff3221812148"),
-                   name: "Apu",
-                   email: "apu@faketestemail.com"};
+let testUserFBMessenger = {
+       _id: ObjectID("5716893a8c8aff3221812148"),
+       name: "Homer",
+       email: "homerjsimpson@faketestemail.com",
+       facebookMessageID: "1028279607252642"
+     };
+let testUserFBMessenger2 = {
+       _id: ObjectID("6716893a8c8aff3221812148"),
+       name: "Apu",
+       email: "apu@faketestemail.com",
+       facebookMessageID: "1028279607252619"
+     };
+
+let testUser = {
+      name: "John Doe",
+      email: "john@faketestemail.com"
+    };
 
 // ******* Category ***************************
-var defaultSubject = {
+let defaultSubject = {
   _id: ObjectID("f64c57184a4ef7f0357f9cd6"),
   createdAt : new Date(),
   order : 1,
@@ -24,7 +36,7 @@ var defaultSubject = {
   weight : 1
 };
 
-var defaultUnit = {
+let defaultUnit = {
   _id : ObjectID("0850e4270c2aadd7ccdc1ca1"),
   createdAt : new Date(),
   order : 1,
@@ -36,7 +48,7 @@ var defaultUnit = {
   weight : 1
 };
 
-var defaultTopic = {
+let defaultTopic = {
   _id : ObjectID("5e28c07bb4d307d667fe83e8"),
   createdAt : new Date(),
   order : 1,
@@ -49,7 +61,7 @@ var defaultTopic = {
   weight : 1
 };
 
-var defaultConcept = {
+let defaultConcept = {
   _id : ObjectID("7980227254feb46736ca47fd"),
   createdAt : new Date(),
   order : 1,
@@ -60,17 +72,17 @@ var defaultConcept = {
     ObjectID("0850e4270c2aadd7ccdc1ca1"),
     ObjectID("5e28c07bb4d307d667fe83e8")
   ],
-  weight : 1,
-  globalIndex: 0,
-  subjectParent: defaultSubject._id
+  weight : 1
+// globalIndex: 0,
+  // subjectParent: defaultSubject._id
 };
 
-var noteParent = [ObjectID("f64c57184a4ef7f0357f9cd6"),
+let noteParent = [ObjectID("f64c57184a4ef7f0357f9cd6"),
     ObjectID("0850e4270c2aadd7ccdc1ca1"),
     ObjectID("5e28c07bb4d307d667fe83e8"),
     ObjectID("7980227254feb46736ca47fd")];
 
-var defaultNote = {
+let defaultNote = {
   _id : ObjectID("9e16c772556579bd6fc6c222"),
   createdAt : new Date(),
   ctype : "note",
@@ -88,7 +100,7 @@ var defaultNote = {
   directParent: noteParent[noteParent.length - 1]
 };
 
-var defaultNote2 = {
+let defaultNote2 = {
   _id : ObjectID("987e8177faf2c2f03c974482"),
   createdAt : new Date(),
   ctype : "note",
@@ -107,7 +119,7 @@ var defaultNote2 = {
   directParent: noteParent[noteParent.length - 1]
 };
 
-var defaultNote3 = {
+let defaultNote3 = {
   createdAt : new Date(),
   ctype : "note",
   order : 2,
@@ -125,7 +137,7 @@ var defaultNote3 = {
   directParent: noteParent[noteParent.length - 1]
 };
 
-var defaultNote4 = {
+let defaultNote4 = {
   createdAt : new Date(),
   ctype : "note",
   order : 2,
@@ -145,12 +157,12 @@ var defaultNote4 = {
 
 // Need to store ids of notes that were cloned and inserted.
 // These will be referenced later in studentNotes.
-var defaultNote3Ids = [];
-var defaultNote4Ids = [];
+let defaultNote3Ids = [];
+let defaultNote4Ids = [];
 
 // ******************** StudentSession ******************
 
-var defaultSession = {
+let defaultSession = {
   userID: ObjectID("5716893a8c8aff3221812148"),
   subjects: {
     "f64c57184a4ef7f0357f9cd6": {
@@ -171,11 +183,11 @@ var defaultSession = {
 // - interval (float)
 // - count (int)
 
-var dueDate = new Date();
-var lastDoneDate = new Date(dueDate);
+let dueDate = new Date();
+let lastDoneDate = new Date(dueDate);
 lastDoneDate.setHours(dueDate.getHours() - 1);
 
-var defaultStudentNote = {
+let defaultStudentNote = {
   userID: testUserFBMessenger._id,
   noteID: defaultNote3._id,
   noteType: defaultNote3.type,
@@ -187,7 +199,7 @@ var defaultStudentNote = {
   subjectParent: defaultNote3.parent[0]
 };
 
-var defaultStudentNote2 = {
+let defaultStudentNote2 = {
   userID: testUserFBMessenger._id,
   noteID: defaultNote4._id,
   noteType: defaultNote4.type,
@@ -199,99 +211,146 @@ var defaultStudentNote2 = {
   subjectParent: defaultNote4.parent[0]
 };
 
-function addUsers(db) {
-  // console.log("adding users in test database");
-  // db.user.insert(testUserFBMessenger);
-  // db.user.insert(testUserFBMessenger2);
-  var testUser = new Schema.User(testUserFBMessenger);
-  return testUser.save().then(() => {
-    var testUser2 = new Schema.User(testUserFBMessenger2);
-    return testUser2.save();
+function addUsers() {
+  return (new Collection.User(testUserFBMessenger)).save()
+  .then(function(doc) {
+    return (new Collection.User(testUserFBMessenger2)).save();
+  }).then(function(doc) {
+    return (new Collection.User(testUser)).save();
   });
 }
 
-function cloneObjForBulkWrite(note, num) {
+function cloneNote(noteData, num) {
   return Array(num).fill().map( () => {
-    return { insertOne: {"document": note} };
+    return (new Collection.Note(noteData));
   });
 }
 
-function addNotes(db) {
-  db.category.insert(defaultSubject);
-  db.category.insert(defaultUnit);
-  db.category.insert(defaultTopic);
-  db.category.insert(defaultConcept);
+// return two lists of ids of cloned notes
+function addNotes() {
+  console.log("addNotes....");
+  let defNoteIds = [];
+  // return (new Collection.Category(defaultSubject)).save();
+  let subj = new Collection.Category(defaultSubject);
+  return subj.save()
+    .then(function(doc) {
+      console.log("save unit...");
+      return (new Collection.Category(defaultUnit)).save();
+    }).then(function(doc) {
+      console.log("save topic...");
+      return (new Collection.Category(defaultTopic)).save();
+    }).then(function(doc) {
+      return (new Collection.Category(defaultConcept)).save();
+    }).then(() => {
+      return (new Collection.Note(defaultNote)).save();
+    }).then(() => {
+      return (new Collection.Note(defaultNote2)).save();
+    }).then(() => {
+      let defNote3ListIds = [];
+      let defNote3List = cloneNote(defaultNote3, 10);
+      return Collection.Note.create(defNote3List).then((docs) => {
+        let defNote3ListIds = defNote3List.map(defNote => defNote._id);
+        defNoteIds.push(defNote3ListIds);
 
-  db.category.insert(defaultNote);
-  db.category.insert(defaultNote2);
-
-  var defNote3Op = db.category.bulkWrite( cloneObjForBulkWrite(defaultNote3, 10) );
-  if(defNote3Op.acknowledged) {
-    var ids = defNote3Op.insertedIds;
-    defaultNote3Ids = Object.keys(ids).map(key => ids[key]);
-  }
-
-
-  var defNote4Op = db.category.bulkWrite( cloneObjForBulkWrite(defaultNote4, 10) );
-  if(defNote4Op.acknowledged) {
-    var ids = defNote4Op.insertedIds;
-    defaultNote4Ids = Object.keys(ids).map(key => ids[key]);
-  }
-
+        let defNote4ListIds = [];
+        let defNote4List = cloneNote(defaultNote4, 10);
+        return Collection.Note.create(defNote4List).then((docs) => {
+          let defNote4ListIds = defNote4List.map(defNote => defNote._id);
+          defNoteIds.push(defNote4ListIds);
+          return defNoteIds;
+        });
+      });
+    });
 }
 
-function addSessions(db) {
-  db.studentsession.insert(defaultSession);
+function addSessions() {
+  let session = new Collection.StudentSession(defaultSession);
+  return session.save();
 }
 
-function addStudentNotes(db) {
+// defNoteIds should be an array with two elems.
+// Each elem is a list of ids
+function addStudentNotes(defNoteIds) {
 
-  function getDefaultStudentNote(note, noteID, dueDate) {
+  function getDefStudentNoteData(note, noteID, dueDate) {
     return {
       userID: testUserFBMessenger._id,
       noteID: noteID,
       noteType: note.type,
       lastDone: lastDoneDate,
       due: dueDate,
-      factor: Modules.SRCore.defaultFactor,
-      interval: Modules.SRCore.defaultInterval,
+      factor: SRCore.defaultFactor,
+      interval: SRCore.defaultInterval,
       count: 1,
       subjectParent: note.parent[0]
     }
   }
 
-  var minToMillisecFactor = 60000;
-  for(var i=0; i<10; i++) {
-    var newDueDate = new Date(dueDate.getTime() + (i-5) * minToMillisecFactor);
-    var newStudentNote = getDefaultStudentNote(defaultNote3,
+  let minToMillisecFactor = 60000;
+  let pChain = null;
+
+  let defaultNote3Ids = defNoteIds[0];
+
+  for(let i=0; i<10; i++) {
+    let newDueDate = new Date(dueDate.getTime() + (i-5) * minToMillisecFactor);
+    let newStudentNote = getDefStudentNoteData(defaultNote3,
                                                defaultNote3Ids[i],
                                                newDueDate);
-    db.studentnote.insert(newStudentNote);
+    let snote = new Collection.StudentNote(newStudentNote);
+    if(!pChain) {
+      pChain = snote.save();
+    }
+    else {
+      pChain = pChain.then(() => snote.save());
+    }
   }
 
-  for(var i=0; i<10; i++) {
-    var newDueDate = new Date(dueDate.getTime() + (i-5) * minToMillisecFactor);
-    var newStudentNote = getDefaultStudentNote(defaultNote4,
+  let defaultNote4Ids = defNoteIds[0];
+
+  for(let i=0; i<10; i++) {
+    let newDueDate = new Date(dueDate.getTime() + (i-5) * minToMillisecFactor);
+    let newStudentNote = getDefStudentNoteData(defaultNote4,
                                                defaultNote4Ids[i],
                                                newDueDate);
-    db.studentnote.insert(newStudentNote);
+    let snote = new Collection.StudentNote(newStudentNote);
+    if(!pChain) {
+      pChain = snote.save();
+    }
+    else {
+      pChain = pChain.then(() => snote.save());
+    }
   }
+
+  return pChain;
 
 }
 
-var Fixture = {
+let Fixture = {
 
-  addAll: function(db) {
-    addUsers(db),
-    addNotes(db),
-    addSessions(db),
-    addStudentNotes(db)
+  addAll: function() {
+    return addUsers().then(() => {
+      return addNotes();
+    }).then((defNoteIds) => {
+      return addStudentNotes(defNoteIds);
+    }).then(() => {
+      return addSessions();
+    });
   },
 
   addUsers: addUsers,
   addNotes: addNotes,
   addSessions: addSessions,
-  addStudentNotes, addStudentNotes
+  addStudentNotes, addStudentNotes,
+
+  getStaticIDs: function() {
+    return {
+      userFB: testUserFBMessenger._id,
+      userFB2: testUserFBMessenger2._id,
+      subject: defaultSubject._id,
+      note: defaultNote._id,
+      note2: defaultNote2._id
+    }
+  }
 
 };
 

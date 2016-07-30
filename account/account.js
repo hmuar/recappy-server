@@ -1,10 +1,11 @@
-const Schema = require('../db/schema');
-const User = Schema.User;
+'use strict';
 
-// database param should be instance of Database or TestDatabase
+const Collection = require('../db/collection');
+const User = Collection.User;
+
 var _Account = function() {}
 
-// fbMsgID is string used by facebook to identify users
+// `fbMsgID` is string used by Facebook to identify users
 _Account.prototype.getUserByFacebookMsgID = function(fbMsgID, cb) {
   return User.findOne({facebookMessageID: fbMsgID});
 }
@@ -20,7 +21,7 @@ _Account.prototype.getFacebookMsgID = function(userID) {
              });
 }
 
-// Create new user and associate facebook string ID.
+// Create new user and associate Facebook string ID.
 _Account.prototype.createUserWithFacebookMsgID = function(fbMsgID) {
   var user = new User({
     name: '',

@@ -1,3 +1,5 @@
+'use strict';
+
 const test = require('blue-tape');
 var Know = require('../core/knowledge');
 

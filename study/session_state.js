@@ -1,3 +1,5 @@
+'use strict';
+
 const SessionState = {
   INIT: 'init',
   RECALL: 'recall',
