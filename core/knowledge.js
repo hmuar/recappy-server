@@ -1,17 +1,16 @@
 'use strict';
-var kCore = {};
 
-kCore.defaultWeight = 0;
-
-kCore.calcWeight = function(prevWeight, level, responseQuality) {
+function calcWeight(prevWeight, level, responseQuality) {
+	let weightFactor = 0;
+	let weightDelta = 0;
 	if(responseQuality < 4) {
-		var weightFactor = (1.1 - level) * (1.1 - level)
- 		var weightDelta = (responseQuality - 5) / 5
+		weightFactor = (1.1 - level) * (1.1 - level)
+ 		weightDelta = (responseQuality - 5) / 5
 	} else {
-		var weightFactor = level * level
- 		var weightDelta = responseQuality / 5
+		weightFactor = level * level
+ 		weightDelta = responseQuality / 5
 	}
-	var finalWeight = prevWeight + weightFactor * weightDelta * 0.2
+	let finalWeight = prevWeight + weightFactor * weightDelta * 0.2
 
 	finalWeight = Math.min(finalWeight, 1.0);
 	finalWeight = Math.max(finalWeight, 0.0);
@@ -19,4 +18,9 @@ kCore.calcWeight = function(prevWeight, level, responseQuality) {
 	return finalWeight;
 }
 
-module.exports = kCore;
+let Know = {
+	defaultWeight: 0,
+	calcWeight: calcWeight
+}
+
+module.exports = Know;

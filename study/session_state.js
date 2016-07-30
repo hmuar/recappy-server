@@ -13,7 +13,7 @@ const SessionState = {
   UNKNOWN: 'unknown'
 }
 
-var Session = {
+let Session = {
   SessionState: SessionState
 }
 

@@ -1,13 +1,12 @@
 'use strict';
 exports = module.exports = {};
 
-var DBError = {}
-DBError.NotConnectedError = function() {
+function NotConnectedError() {
   this.name = "NotConnectedError"
   this.message = "Not connected to database instance."
 }
 
-var Database = function() {
+let Database = function() {
   this.db = null;
 };
 
@@ -17,7 +16,7 @@ Database.prototype.connect = function(connection) {
 
 Database.prototype.getOneCat = function(errorCallback, successCallback) {
   if(!this.db) {
-    throw new DBError.NotConnectedError();
+    throw new NotConnectedError();
     return;
   }
   this.db.collection('category').findOne(function(err, result) {

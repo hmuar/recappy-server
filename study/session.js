@@ -1,14 +1,14 @@
 'use strict';
 const Collection = require('../db/collection');
 const StudentSession = Collection.StudentSession;
-let StudySession = {};
 
 // Return a session if user exists and they have a session already for
 // `subjectID` subject.
 // --------------------------------
 // TODO: need to handle case where user exists, but subject does not better.
 // Right now we are hitting the db more than we need to.
-StudySession.getSessionForUserAndSubject = function(userID, subjectID) {
+
+function getSessionForUserAndSubject(userID, subjectID) {
   return StudentSession.findOne({userID: userID}).then((session) => {
     if(session) {
       var subjects = session['subjects'];
@@ -30,13 +30,14 @@ StudySession.getSessionForUserAndSubject = function(userID, subjectID) {
 }
 
 // return Promise
-StudySession.updateSessionForUser = function(userID,
-                                             subjectID,
-                                             noteID,
-                                             queueIndex,
-                                             noteQueue,
-                                             state,
-                                             conceptGlobalIndex) {
+function updateSessionForUser(userID,
+                              subjectID,
+                              noteID,
+                              queueIndex,
+                              noteQueue,
+                              state,
+                              conceptGlobalIndex) {
+
   return StudentSession.findOne({userID: userID}).then((session) => {
     let subjectIDString = subjectID.valueOf();
     let subjects = session['subjects'];
@@ -52,18 +53,16 @@ StudySession.updateSessionForUser = function(userID,
     return StudentSession.findByIdAndUpdate(session._id, {
       $set: {subjects: subjects}
     });
-
   });
-
 }
 
-StudySession.createSession = function(userID,
-                                      subjectID,
-                                      noteID,
-                                      queueIndex,
-                                      noteQueue,
-                                      state,
-                                      conceptGlobalIndex) {
+function createSession(userID,
+                        subjectID,
+                        noteID,
+                        queueIndex,
+                        noteQueue,
+                        state,
+                        conceptGlobalIndex) {
 
   return StudentSession.findOne({userID: userID}).then((session) => {
     var subjectIDString = subjectID.valueOf();
@@ -104,10 +103,13 @@ StudySession.createSession = function(userID,
         });
       }
     }
-
-
   });
+}
 
+let StudySession = {
+  getSessionForUserAndSubject: getSessionForUserAndSubject,
+  updateSessionForUser: updateSessionForUser,
+  createSession: createSession
 }
 
 module.exports = StudySession;

@@ -1,5 +1,4 @@
 'use strict';
-exports = module.exports = {};
 
 function getRoutePath(apiVersionPath) {
   return apiVersionPath + '/fbmessage';
@@ -7,29 +6,29 @@ function getRoutePath(apiVersionPath) {
 
 function routes(apiVersionPath) {
 
-  var routePath = getRoutePath(apiVersionPath);
+  let routePath = getRoutePath(apiVersionPath);
 
   // When initially setting up the webhook for messenger platform,
   // Facebook sends a GET request with challenge text that must
   // be responded with a parseInt version of that text.
-  var routeGET = {
+  let routeGET = {
     method: 'GET',
     path: routePath,
     handler: function(request, reply) {
-      var challengeText = request.query['hub.challenge'];
+      let challengeText = request.query['hub.challenge'];
       reply(parseInt(challengeText, 10));
     }
   };
 
   // All chat messages from Facebook Messenger arrive as POST requests.
-  var routePOST = {
+  let routePOST = {
     method: 'POST',
     path: routePath,
     handler: function(request, reply) {
-      var dbAdapter = require("../db/db");
+      let dbAdapter = require("../db/db");
       if(request.server.plugins.hasOwnProperty('hapi-mongodb')) {
         dbAdapter.connect(request.server.plugins['hapi-mongodb'].db);
-        var db = dbAdapter.db;
+        let db = dbAdapter.db;
         db.getOneCat(null, (result) => {
           console.log("received results!");
           console.log(result);
@@ -43,7 +42,7 @@ function routes(apiVersionPath) {
 
 }
 
-var FBMessage = {
+let FBMessage = {
   routes: routes,
   getRoutePath: getRoutePath
 };

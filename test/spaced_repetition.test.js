@@ -3,54 +3,54 @@
 const test = require('blue-tape');
 var Know = require('../core/knowledge');
 
-var SRSCore = require('../core/spaced_repetition');
+var SRCore = require('../core/spaced_repetition');
 
 test('Schedule Core Factor Calculation', function(t) {
-	t.equal(SRSCore.calcFactor(2, 0), 1.3);
-	t.equal(SRSCore.calcFactor(2, 1), 1.46);
-	t.equal(SRSCore.calcFactor(2, 2), 1.68);
-	t.equal(SRSCore.calcFactor(2, 3), 1.86);
-	t.equal(SRSCore.calcFactor(2, 4), 2);
-	t.equal(SRSCore.calcFactor(2, 5), 2.1);
-	t.equal(SRSCore.calcFactor(2.2, 8), SRSCore.calcFactor(2.2, 5));
-	t.equal(SRSCore.calcFactor(2.2, -2), SRSCore.calcFactor(2.2, 0));
+	t.equal(SRCore.calcFactor(2, 0), 1.3);
+	t.equal(SRCore.calcFactor(2, 1), 1.46);
+	t.equal(SRCore.calcFactor(2, 2), 1.68);
+	t.equal(SRCore.calcFactor(2, 3), 1.86);
+	t.equal(SRCore.calcFactor(2, 4), 2);
+	t.equal(SRCore.calcFactor(2, 5), 2.1);
+	t.equal(SRCore.calcFactor(2.2, 8), SRCore.calcFactor(2.2, 5));
+	t.equal(SRCore.calcFactor(2.2, -2), SRCore.calcFactor(2.2, 0));
   t.end();
 });
 
 test('should calculate correct interval', function(t) {
-	t.equal(SRSCore.calcInterval(2, 2, 0, 5), 0);
-	t.equal(SRSCore.calcInterval(2, 2.1, 1, 5), 1);
-	t.equal(SRSCore.calcInterval(2, 2.2, 2, 5), 2);
-	t.equal(SRSCore.calcInterval(2, 2.3, 3, 5), 4);
-	t.equal(SRSCore.calcInterval(2, 2.4, 4, 5), 4);
-	t.equal(SRSCore.calcInterval(2, 2.5, 5, 5), 5);
-	t.equal(SRSCore.calcInterval(2, 2.6, 6, 5), 5);
-	t.equal(SRSCore.calcInterval(2, 2.7, 7, 5), 5);
+	t.equal(SRCore.calcInterval(2, 2, 0, 5), 0);
+	t.equal(SRCore.calcInterval(2, 2.1, 1, 5), 1);
+	t.equal(SRCore.calcInterval(2, 2.2, 2, 5), 2);
+	t.equal(SRCore.calcInterval(2, 2.3, 3, 5), 4);
+	t.equal(SRCore.calcInterval(2, 2.4, 4, 5), 4);
+	t.equal(SRCore.calcInterval(2, 2.5, 5, 5), 5);
+	t.equal(SRCore.calcInterval(2, 2.6, 6, 5), 5);
+	t.equal(SRCore.calcInterval(2, 2.7, 7, 5), 5);
   t.end();
 });
 
 test('should calculate correct interval for initial count cases', function(t) {
-	t.equal(SRSCore.calcInterval(2, 2, 0, 5), SRSCore.calcInterval(5, 3, 0));
-	t.equal(SRSCore.calcInterval(2, 2, 0, 5), SRSCore.calcInterval(6, 2, 0));
-	t.equal(SRSCore.calcInterval(2, 2, 1, 5), SRSCore.calcInterval(5, 3, 1));
-	t.equal(SRSCore.calcInterval(2, 2, 1, 5), SRSCore.calcInterval(6, 2, 1));
-	t.equal(SRSCore.calcInterval(2, 2, 2, 5), SRSCore.calcInterval(5, 3, 2));
-	t.equal(SRSCore.calcInterval(2, 2, 2, 5), SRSCore.calcInterval(6, 2, 2));
+	t.equal(SRCore.calcInterval(2, 2, 0, 5), SRCore.calcInterval(5, 3, 0));
+	t.equal(SRCore.calcInterval(2, 2, 0, 5), SRCore.calcInterval(6, 2, 0));
+	t.equal(SRCore.calcInterval(2, 2, 1, 5), SRCore.calcInterval(5, 3, 1));
+	t.equal(SRCore.calcInterval(2, 2, 1, 5), SRCore.calcInterval(6, 2, 1));
+	t.equal(SRCore.calcInterval(2, 2, 2, 5), SRCore.calcInterval(5, 3, 2));
+	t.equal(SRCore.calcInterval(2, 2, 2, 5), SRCore.calcInterval(6, 2, 2));
   t.end();
 });
 
 test('should calculate interval for wrong response', function(t) {
-  // _SRSCore.calcInterval = function(prevInterval, factor, count, responseQuality)
-  t.equal(SRSCore.calcInterval(2, 2.1, 0, 0), SRSCore.calcInterval(2, 2, 0, 0));
+  // _SRCore.calcInterval = function(prevInterval, factor, count, responseQuality)
+  t.equal(SRCore.calcInterval(2, 2.1, 0, 0), SRCore.calcInterval(2, 2, 0, 0));
   // the rest interval calculations should be equal to calculating the interval
   // as if the count = 1. This is because when response quality is bad, system
   // should treat interval calc as if this were the first time user saw information
-  t.equal(SRSCore.calcInterval(2, 2.2, 1, 0), SRSCore.calcInterval(2, 2.2, 1, 1));
-  t.equal(SRSCore.calcInterval(2, 2.3, 2, 0), SRSCore.calcInterval(2, 2.3, 2, 1));
-  t.equal(SRSCore.calcInterval(2, 2.4, 3, 0), SRSCore.calcInterval(2, 2.4, 3, 1));
-  t.equal(SRSCore.calcInterval(2, 2.5, 4, 0), SRSCore.calcInterval(2, 2.5, 4, 1));
-  t.equal(SRSCore.calcInterval(2, 2.6, 5, 0), SRSCore.calcInterval(2, 2.6, 5, 1));
-  t.equal(SRSCore.calcInterval(2, 2.7, 6, 0), SRSCore.calcInterval(2, 2.7, 6, 1));
+  t.equal(SRCore.calcInterval(2, 2.2, 1, 0), SRCore.calcInterval(2, 2.2, 1, 1));
+  t.equal(SRCore.calcInterval(2, 2.3, 2, 0), SRCore.calcInterval(2, 2.3, 2, 1));
+  t.equal(SRCore.calcInterval(2, 2.4, 3, 0), SRCore.calcInterval(2, 2.4, 3, 1));
+  t.equal(SRCore.calcInterval(2, 2.5, 4, 0), SRCore.calcInterval(2, 2.5, 4, 1));
+  t.equal(SRCore.calcInterval(2, 2.6, 5, 0), SRCore.calcInterval(2, 2.6, 5, 1));
+  t.equal(SRCore.calcInterval(2, 2.7, 6, 0), SRCore.calcInterval(2, 2.7, 6, 1));
   t.end();
 });
 

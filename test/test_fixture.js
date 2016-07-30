@@ -1,11 +1,9 @@
 'use strict';
 const SessionState = require('../study/session_state').SessionState;
 const Collection = require('../db/collection');
-const SRSCore = require('../core/spaced_repetition');
+const SRCore = require('../core/spaced_repetition');
 
 let ObjectID = Collection.ObjectID;
-
-let SRCore = require('../core/spaced_repetition');
 
 // ******* User *******************************
 let testUserFBMessenger = {
