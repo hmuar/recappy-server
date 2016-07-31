@@ -3,16 +3,16 @@
 const Collection = require('../db/collection');
 const User = Collection.User;
 
-var _Account = function() {}
+var Account = function() {}
 
 // `fbMsgID` is string used by Facebook to identify users
-_Account.prototype.getUserByFacebookMsgID = function(fbMsgID, cb) {
+Account.prototype.getUserByFacebookMsgID = function(fbMsgID, cb) {
   return User.findOne({facebookMessageID: fbMsgID});
 }
 
 // Find user with a MongoDB ObjectID and get associated
 // string used by facebook for user id.
-_Account.prototype.getFacebookMsgID = function(userID) {
+Account.prototype.getFacebookMsgID = function(userID) {
   return User.findOne({_id: userID,
                       facebookMessageID: {$exists: true}})
              .then((user) => {
@@ -22,7 +22,7 @@ _Account.prototype.getFacebookMsgID = function(userID) {
 }
 
 // Create new user and associate Facebook string ID.
-_Account.prototype.createUserWithFacebookMsgID = function(fbMsgID) {
+Account.prototype.createUserWithFacebookMsgID = function(fbMsgID) {
   var user = new User({
     name: '',
     email: '',
@@ -33,4 +33,4 @@ _Account.prototype.createUserWithFacebookMsgID = function(fbMsgID) {
   });
 }
 
-module.exports = _Account;
+module.exports = Account;

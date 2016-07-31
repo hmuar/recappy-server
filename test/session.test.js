@@ -51,7 +51,6 @@ test('create study session', function(t) {
                                                   staticID.subject)
   .then((session) => t.equal(session, null))
   .then(() => {
-    console.log("hello");
     return StudySession.createSession(staticID.userFB2,
                                staticID.subject,
                                staticID.note,
@@ -60,7 +59,6 @@ test('create study session', function(t) {
                                SessionState.INFO
                               );
   }).then(() => {
-    console.log("goodbye");
     return StudySession.getSessionForUserAndSubject(staticID.userFB2,
                                                     staticID.subject)
     .then((session) => t.ok(session));
