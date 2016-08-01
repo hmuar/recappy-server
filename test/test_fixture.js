@@ -70,9 +70,25 @@ let defaultConcept = {
     ObjectID("0850e4270c2aadd7ccdc1ca1"),
     ObjectID("5e28c07bb4d307d667fe83e8")
   ],
-  weight : 1
-// globalIndex: 0,
-  // subjectParent: defaultSubject._id
+  weight : 1,
+  globalIndex: 0,
+  subjectParent: defaultSubject._id
+};
+
+let defaultConcept2 = {
+  _id : ObjectID("7980227254feb46732ca491e"),
+  createdAt : new Date(),
+  order : 2,
+  ctype : "concept",
+  ckey : "molecule",
+  parent : [
+    ObjectID("f64c57184a4ef7f0357f9cd6"),
+    ObjectID("0850e4270c2aadd7ccdc1ca1"),
+    ObjectID("5e28c07bb4d307d667fe83e8")
+  ],
+  weight : 1,
+  globalIndex: 1,
+  subjectParent: defaultSubject._id
 };
 
 let noteParent = [ObjectID("f64c57184a4ef7f0357f9cd6"),
@@ -80,7 +96,12 @@ let noteParent = [ObjectID("f64c57184a4ef7f0357f9cd6"),
     ObjectID("5e28c07bb4d307d667fe83e8"),
     ObjectID("7980227254feb46736ca47fd")];
 
-let defaultNote = {
+let noteParentOtherConcept = [ObjectID("f64c57184a4ef7f0357f9cd6"),
+    ObjectID("0850e4270c2aadd7ccdc1ca1"),
+    ObjectID("5e28c07bb4d307d667fe83e8"),
+    ObjectID("7980227254feb46732ca491e")];
+
+let noteA = {
   _id : ObjectID("9e16c772556579bd6fc6c222"),
   createdAt : new Date(),
   ctype : "note",
@@ -98,7 +119,7 @@ let defaultNote = {
   directParent: noteParent[noteParent.length - 1]
 };
 
-let defaultNote2 = {
+let noteB = {
   _id : ObjectID("987e8177faf2c2f03c974482"),
   createdAt : new Date(),
   ctype : "note",
@@ -117,7 +138,26 @@ let defaultNote2 = {
   directParent: noteParent[noteParent.length - 1]
 };
 
-let defaultNote3 = {
+// Different concept
+let noteC = {
+  createdAt : new Date(),
+  ctype : "note",
+  order : 2,
+  type : "recall",
+  weight : 0.5,
+  level : 0.2,
+  display : "<p>What is a molecule?</p>",
+  extra : "",
+  extra_media : "",
+  parent : noteParentOtherConcept,
+  ckey : "q-molecule",
+  displayRaw : "Multiple atoms stuck together",
+  hidden : "6",
+  globalIndex: 1,
+  directParent: noteParentOtherConcept[noteParent.length - 1]
+};
+
+let noteTemplateA = {
   createdAt : new Date(),
   ctype : "note",
   order : 2,
@@ -135,7 +175,7 @@ let defaultNote3 = {
   directParent: noteParent[noteParent.length - 1]
 };
 
-let defaultNote4 = {
+let noteTemplateB = {
   createdAt : new Date(),
   ctype : "note",
   order : 2,
@@ -155,18 +195,18 @@ let defaultNote4 = {
 
 // Need to store ids of notes that were cloned and inserted.
 // These will be referenced later in studentNotes.
-let defaultNote3Ids = [];
-let defaultNote4Ids = [];
+let noteTemplateAIds = [];
+let noteTemplateBIds = [];
 
 // ******************** StudentSession ******************
 
-let defaultSession = {
+let sessionTemplate = {
   userID: ObjectID("5716893a8c8aff3221812148"),
   subjects: {
     "f64c57184a4ef7f0357f9cd6": {
-      noteID: defaultNote._id,
+      noteID: noteA._id,
       queueIndex: 0,
-      noteQueue: [defaultNote._id, defaultNote2._id],
+      noteQueue: [noteA._id, noteB._id],
       state: SessionState.RECALL,
       globalIndex: 0
     }
@@ -185,29 +225,29 @@ let dueDate = new Date();
 let lastDoneDate = new Date(dueDate);
 lastDoneDate.setHours(dueDate.getHours() - 1);
 
-let defaultStudentNote = {
-  userID: testUserFBMessenger._id,
-  noteID: defaultNote3._id,
-  noteType: defaultNote3.type,
-  lastDone: lastDoneDate,
-  due: dueDate,
-  factor: SRCore.defaultFactor,
-  interval: SRCore.defaultInterval,
-  count: 1,
-  subjectParent: defaultNote3.parent[0]
-};
-
-let defaultStudentNote2 = {
-  userID: testUserFBMessenger._id,
-  noteID: defaultNote4._id,
-  noteType: defaultNote4.type,
-  lastDone: lastDoneDate,
-  due: dueDate,
-  factor: SRCore.defaultFactor,
-  interval: SRCore.defaultInterval,
-  count: 1,
-  subjectParent: defaultNote4.parent[0]
-};
+// let defaultStudentNote = {
+//   userID: testUserFBMessenger._id,
+//   noteID: noteTemplateA._id,
+//   noteType: noteTemplateA.type,
+//   lastDone: lastDoneDate,
+//   due: dueDate,
+//   factor: SRCore.defaultFactor,
+//   interval: SRCore.defaultInterval,
+//   count: 1,
+//   subjectParent: noteTemplateA.parent[0]
+// };
+//
+// let defaultStudentNote2 = {
+//   userID: testUserFBMessenger._id,
+//   noteID: noteTemplateB._id,
+//   noteType: noteTemplateB.type,
+//   lastDone: lastDoneDate,
+//   due: dueDate,
+//   factor: SRCore.defaultFactor,
+//   interval: SRCore.defaultInterval,
+//   count: 1,
+//   subjectParent: noteTemplateB.parent[0]
+// };
 
 function addUsers() {
   return (new Collection.User(testUserFBMessenger)).save()
@@ -226,32 +266,32 @@ function cloneNote(noteData, num) {
 
 // return two lists of ids of cloned notes
 function addNotes() {
-  console.log("addNotes....");
   let defNoteIds = [];
   // return (new Collection.Category(defaultSubject)).save();
   let subj = new Collection.Category(defaultSubject);
   return subj.save()
     .then(function(doc) {
-      console.log("save unit...");
       return (new Collection.Category(defaultUnit)).save();
     }).then(function(doc) {
-      console.log("save topic...");
-      return (new Collection.Category(defaultTopic)).save();
+        return (new Collection.Category(defaultTopic)).save();
     }).then(function(doc) {
-      return (new Collection.Category(defaultConcept)).save();
+        return (new Collection.Category(defaultConcept)).save();
     }).then(() => {
-      return (new Collection.Note(defaultNote)).save();
+        return (new Collection.Note(noteA)).save();
     }).then(() => {
-      return (new Collection.Note(defaultNote2)).save();
+        return (new Collection.Note(noteB)).save();
     }).then(() => {
-      let defNote3ListIds = [];
-      let defNote3List = cloneNote(defaultNote3, 10);
-      return Collection.Note.create(defNote3List).then((docs) => {
-        let defNote3ListIds = defNote3List.map(defNote => defNote._id);
-        defNoteIds.push(defNote3ListIds);
+        let noteCList = cloneNote(noteC, 10);
+        return Collection.Note.create(noteCList);
+    }).then(() => {
+      let noteTempAListIds = [];
+      let noteTempAList = cloneNote(noteTemplateA, 10);
+      return Collection.Note.create(noteTempAList).then((docs) => {
+        let noteTempAListIds = noteTempAList.map(defNote => defNote._id);
+        defNoteIds.push(noteTempAListIds);
 
         let defNote4ListIds = [];
-        let defNote4List = cloneNote(defaultNote4, 10);
+        let defNote4List = cloneNote(noteTemplateB, 10);
         return Collection.Note.create(defNote4List).then((docs) => {
           let defNote4ListIds = defNote4List.map(defNote => defNote._id);
           defNoteIds.push(defNote4ListIds);
@@ -262,7 +302,7 @@ function addNotes() {
 }
 
 function addSessions() {
-  let session = new Collection.StudentSession(defaultSession);
+  let session = new Collection.StudentSession(sessionTemplate);
   return session.save();
 }
 
@@ -287,12 +327,13 @@ function addStudentNotes(defNoteIds) {
   let minToMillisecFactor = 60000;
   let pChain = null;
 
-  let defaultNote3Ids = defNoteIds[0];
+  let noteTemplateAIds = defNoteIds[0];
 
+  // half will be due in the past, half in the future
   for(let i=0; i<10; i++) {
     let newDueDate = new Date(dueDate.getTime() + (i-5) * minToMillisecFactor);
-    let newStudentNote = getDefStudentNoteData(defaultNote3,
-                                               defaultNote3Ids[i],
+    let newStudentNote = getDefStudentNoteData(noteTemplateA,
+                                               noteTemplateAIds[i],
                                                newDueDate);
     let snote = new Collection.StudentNote(newStudentNote);
     if(!pChain) {
@@ -303,12 +344,13 @@ function addStudentNotes(defNoteIds) {
     }
   }
 
-  let defaultNote4Ids = defNoteIds[0];
+  let noteTemplateBIds = defNoteIds[1];
 
+  // half will be due in the past, half in the future
   for(let i=0; i<10; i++) {
     let newDueDate = new Date(dueDate.getTime() + (i-5) * minToMillisecFactor);
-    let newStudentNote = getDefStudentNoteData(defaultNote4,
-                                               defaultNote4Ids[i],
+    let newStudentNote = getDefStudentNoteData(noteTemplateB,
+                                               noteTemplateBIds[i],
                                                newDueDate);
     let snote = new Collection.StudentNote(newStudentNote);
     if(!pChain) {
@@ -345,8 +387,8 @@ let Fixture = {
       userFB: testUserFBMessenger._id,
       userFB2: testUserFBMessenger2._id,
       subject: defaultSubject._id,
-      note: defaultNote._id,
-      note2: defaultNote2._id
+      note: noteA._id,
+      note2: noteB._id
     }
   }
 

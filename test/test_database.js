@@ -48,6 +48,10 @@ TestDatabase.prototype.clean = function() {
       return Collection.Category.remove({}).then(() => {
         console.log("Category collection cleaned");
       });
+    }).then(() => {
+      return Collection.StudentNote.remove({}).then(() => {
+        console.log("StudenNote collection cleaned");
+      });
     });
   });
 }
@@ -83,6 +87,10 @@ TestDatabase.prototype.loadUserFixtures = function() {
 
 TestDatabase.prototype.getStaticIDs = function() {
   return fixture.getStaticIDs();
+}
+
+TestDatabase.prototype.getTestUser = function() {
+  return Collection.User.findOne();
 }
 
 module.exports = TestDatabase;
