@@ -30,8 +30,6 @@ function routes(apiVersionPath) {
         dbAdapter.connect(request.server.plugins['hapi-mongodb'].db);
         let db = dbAdapter.db;
         db.getOneCat(null, (result) => {
-          console.log("received results!");
-          console.log(result);
         });
       }
       reply();

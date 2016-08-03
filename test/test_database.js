@@ -41,16 +41,12 @@ TestDatabase.prototype.clean = function() {
   }
 
   return Collection.User.remove({}).then(() => {
-    console.log("User collection cleaned");
     return Collection.StudentSession.remove({}).then(() => {
-      console.log("StudentSession collection cleaned");
     }).then(() => {
       return Collection.Category.remove({}).then(() => {
-        console.log("Category collection cleaned");
       });
     }).then(() => {
       return Collection.StudentNote.remove({}).then(() => {
-        console.log("StudenNote collection cleaned");
       });
     });
   });

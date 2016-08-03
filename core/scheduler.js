@@ -55,8 +55,6 @@ function getNewMaterial(subject, numNotes, userID, lastGlobalIndex) {
 // TODO: Detect if two questions have same c-key and only ask one
 // TODO: factor in weighting of concepts
 function getNextNotes(subject, numNotes, userID, lastGlobalIndex) {
-
-  console.log("[[ getNextNotes ]]")
   if(numNotes <= 0){
     return Promise.resolve([]);
   }
@@ -71,8 +69,6 @@ function getNextNotes(subject, numNotes, userID, lastGlobalIndex) {
     .then((oldNotes) => {
       result.push(oldNotes);
       let newNotesNum = numNotes - oldNotes.length;
-      console.log(newNotesNum);
-
       if(newNotesNum > 0) {
         return Scheduler.getNewMaterial(subject, newNotesNum, userID, lastGlobalIndex);
       }

@@ -1,0 +1,21 @@
+--- register message ---
+user study session
+  - no session
+    -- create new session with new note queue
+    -- send first message
+  - existing session
+    -- look at current note based on user state in session
+    -- evaluate incoming message in context
+    -- update student note entries
+    -- update user session
+    -- send response message
+
+
+message data format
+{
+  timestamp  : ""
+  senderID   : "",
+  userID     : ObjectID,
+  text       : "",
+  action     : ""
+}

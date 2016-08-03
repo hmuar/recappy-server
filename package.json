@@ -15,6 +15,7 @@
     "good-console": "^6.1.2",
     "good-squeeze": "^4.0.0",
     "hapi": "^13.5.0",
+    "immutable": "^3.8.1",
     "mongoose": "^4.5.7",
     "promised-mongo": "^1.2.0"
   },

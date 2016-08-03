@@ -8,7 +8,7 @@ const TestDatabase = require('./test_database');
 const DBAssist = require('../db/db_assistant');
 const db = new TestDatabase();
 
-before("before account testing", function(t) {
+before("before db assistant testing", function(t) {
   return db.setup().then(() => db.clean()).then(() => db.loadAllFixtures());
 });
 

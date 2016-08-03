@@ -10,7 +10,7 @@ const FBmessage = require("../resource/fbmessage");
 var server = require('./test_server');
 
 // Server setup
-before("before", function(t) {
+before("before fb message routes testing", function(t) {
   return server.start();
 });
 
