@@ -25,13 +25,13 @@ function routes(apiVersionPath) {
     method: 'POST',
     path: routePath,
     handler: function(request, reply) {
-      let dbAdapter = require("../db/db");
-      if(request.server.plugins.hasOwnProperty('hapi-mongodb')) {
-        dbAdapter.connect(request.server.plugins['hapi-mongodb'].db);
-        let db = dbAdapter.db;
-        db.getOneCat(null, (result) => {
-        });
-      }
+      // let dbAdapter = require("../db/db");
+      // if(request.server.plugins.hasOwnProperty('hapi-mongodb')) {
+      //   dbAdapter.connect(request.server.plugins['hapi-mongodb'].db);
+      //   let db = dbAdapter.db;
+      //   db.getOneCat(null, (result) => {
+      //   });
+      // }
       reply();
     }
   };

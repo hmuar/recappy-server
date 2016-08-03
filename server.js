@@ -1,7 +1,9 @@
 'use strict';
 
 const Hapi = require('hapi');
-var resources = [require('./resource/fbmessage')];
+// add additional resources to this list as they are created
+// for now, it is just fbmessenger resource
+var resources = [require('./resource/fbmessenger')];
 
 var Server = function() {
   this.server = new Hapi.Server();

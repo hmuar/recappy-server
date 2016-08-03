@@ -3,9 +3,12 @@
 const test = require('blue-tape');
 const before = test;
 const after = test;
-const AdapterFB = require('../adapter/adapter_fbmessenger');
+const AdapterFB = require('../adapter/fbmessenger/fbmessenger');
 const TestDatabase = require('./test_database');
-const Imm = require('immutable');
+const Immut = require('immutable');
+const sinon = require('sinon');
+const request = require('request');
+
 const db = new TestDatabase();
 
 before("before fb message adapter testing", function(t) {
@@ -13,7 +16,7 @@ before("before fb message adapter testing", function(t) {
 });
 
 test("convert user", function(t) {
-  let messageData = Imm.Map({
+  let messageData = Immut.Map({
     senderID: "1028279607252619"
   });
   return AdapterFB.convertUser(messageData).then(function(mData) {
@@ -23,7 +26,7 @@ test("convert user", function(t) {
 });
 
 test("create user", function(t) {
-  let messageData = Imm.Map({
+  let messageData = Immut.Map({
     senderID: "8028279607252688"
   });
   return AdapterFB.createUser(messageData).then(function(mData) {
@@ -109,6 +112,18 @@ test("parse payload request into message data", function(t) {
 
 });
 
+// TODO: create tests after creating concept of evalContext
+
+// test("send message", function(t) {
+//   let reqStub = sinon.stub(request, 'post')
+//     .yields(null, 200);
+//     // .yields(null, JSON.stringify({login: "bulkan"}));
+//   AdapterFB.sendMessage("1028279607252642", "test text", (err, result) => {
+//     t.equal(result, 200);
+//     t.end();
+//   });
+//   request.post.restore();
+// });
 
 after("after account testing", function(t) {
   return db.close();

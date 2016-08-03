@@ -5,7 +5,7 @@ const after = test;
 
 const TestDatabase = require('./test_database');
 const db = new TestDatabase();
-const FBmessage = require("../resource/fbmessage");
+const FBmessage = require("../resource/fbmessenger");
 
 var server = require('./test_server');
 
