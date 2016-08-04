@@ -15,11 +15,11 @@ before("before fb message adapter testing", function(t) {
   return db.setup().then(() => db.clean()).then(() => db.loadAllFixtures());
 });
 
-test("convert user", function(t) {
+test("convert sender to user", function(t) {
   let messageData = Immut.Map({
     senderID: "1028279607252619"
   });
-  return AdapterFB.convertUser(messageData).then(function(mData) {
+  return AdapterFB.senderToUser(messageData).then(function(mData) {
     t.ok(mData);
     t.equal(mData.get("userID").toString(), "6716893a8c8aff3221812148");
   });
@@ -112,7 +112,7 @@ test("parse payload request into message data", function(t) {
 
 });
 
-// TODO: create tests after creating concept of evalContext
+// TODO: create tests after fleshing out evalContext
 
 // test("send message", function(t) {
 //   let reqStub = sinon.stub(request, 'post')

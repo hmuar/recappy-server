@@ -63,7 +63,6 @@ function createSession(userID,
                         noteQueue,
                         state,
                         conceptGlobalIndex) {
-
   return StudentSession.findOne({userID: userID}).then((session) => {
     var subjectIDString = subjectID.valueOf();
     if(!session) {
@@ -83,6 +82,8 @@ function createSession(userID,
         return subjects[subjectIDString];
       });
     }
+    // session already exists, so need to return subject if exists,
+    // and if not add to subjects array
     else {
       subjects = session.subjects;
       if(subjectIDString in subjects) {

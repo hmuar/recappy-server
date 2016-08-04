@@ -18,7 +18,6 @@ let testUserFBMessenger2 = {
        email: "apu@faketestemail.com",
        facebookMessageID: "1028279607252619"
      };
-
 let testUser = {
       name: "John Doe",
       email: "john@faketestemail.com"
@@ -31,6 +30,15 @@ let defaultSubject = {
   order : 1,
   ctype : "subject",
   ckey : "crash-course-biology",
+  weight : 1
+};
+
+let subjectA = {
+  _id: ObjectID("e64c57184a4ef7f0357f9cd9"),
+  createdAt : new Date(),
+  order : 1,
+  ctype : "subject",
+  ckey : "cool-new-physics",
   weight : 1
 };
 
@@ -270,20 +278,14 @@ function addNotes() {
   // return (new Collection.Category(defaultSubject)).save();
   let subj = new Collection.Category(defaultSubject);
   return subj.save()
-    .then(function(doc) {
-      return (new Collection.Category(defaultUnit)).save();
-    }).then(function(doc) {
-        return (new Collection.Category(defaultTopic)).save();
-    }).then(function(doc) {
-        return (new Collection.Category(defaultConcept)).save();
-    }).then(() => {
-        return (new Collection.Note(noteA)).save();
-    }).then(() => {
-        return (new Collection.Note(noteB)).save();
-    }).then(() => {
-        let noteCList = cloneNote(noteC, 10);
-        return Collection.Note.create(noteCList);
-    }).then(() => {
+    .then(doc => (new Collection.Category(subjectA)).save())
+    .then(doc => (new Collection.Category(defaultUnit)).save())
+    .then(doc => (new Collection.Category(defaultTopic)).save())
+    .then(doc => (new Collection.Category(defaultConcept)).save())
+    .then(doc => (new Collection.Note(noteA)).save())
+    .then(doc => (new Collection.Note(noteB)).save())
+    .then(doc => Collection.Note.create(cloneNote(noteC, 10)))
+    .then(doc => {
       let noteTempAListIds = [];
       let noteTempAList = cloneNote(noteTemplateA, 10);
       return Collection.Note.create(noteTempAList).then((docs) => {
@@ -370,7 +372,7 @@ let Fixture = {
   addAll: function() {
     return addUsers().then(() => {
       return addNotes();
-    }).then((defNoteIds) => {
+    }).then(defNoteIds => {
       return addStudentNotes(defNoteIds);
     }).then(() => {
       return addSessions();

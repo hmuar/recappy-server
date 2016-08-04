@@ -12,19 +12,20 @@ const MessageType = require('./fbmessage_type');
 // the userID is initially a facebook ID. This needs to be
 // associated with the proper userID stored for this app.
 // `msgData` is Immututable.Map()
-function convertUser(msgData) {
+function senderToUser(msgData) {
   let fbUserID = msgData.get("senderID");
   if(!fbUserID) {
-    return Promise.error(null);
+    throw new Error("Could not find senderID, could not convert to user");
   }
-  return Account.getUserByFacebookMsgID(fbUserID)
-    .then((user) => {
-      console.log(user);
-      if(!user) {
-        return msgData.set('userID', null);
-      }
-      return msgData.set('userID', user._id);
-    });
+  else {
+    return Account.getUserByFacebookMsgID(fbUserID)
+      .then((user) => {
+        if(!user) {
+          return msgData.set('userID', null);
+        }
+        return msgData.set('userID', user._id);
+      });
+  }
 }
 
 // create user based with new Facebook Messenger
@@ -81,11 +82,15 @@ function parse(request) {
   var entry = request.entry[0];
   var msg = entry.messaging[0];
 
+  // TODO: Need to dynamically get this from request
+  const HARDCODED_SUBJ_NAME = 'crash-course-biology';
+
   let initMsgData = Immut.Map({
     timestamp: msg.timestamp,
     senderID: msg.sender.id,
     text: null,
-    action: null
+    action: null,
+    subjectName: HARDCODED_SUBJ_NAME
   });
 
   let msgType = getMsgType(msg);
@@ -101,7 +106,7 @@ function sendMessage(userID, evalContext, callback) {
 }
 
 let AdapterFBMessenger = {
-  convertUser: convertUser,
+  senderToUser: senderToUser,
   createUser: createUser,
   parse: parse,
   sendMessage: sendMessage

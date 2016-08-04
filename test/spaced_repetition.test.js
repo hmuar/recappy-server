@@ -2,7 +2,6 @@
 
 const test = require('blue-tape');
 var Know = require('../core/knowledge');
-
 var SRCore = require('../core/spaced_repetition');
 
 test('Schedule Core Factor Calculation', function(t) {
@@ -58,44 +57,3 @@ test('should not have weight less than 0', function(t) {
   t.ok(Know.calcWeight(0, 0.2, 3) > -0.001);
   t.end();
 });
-
-// test('should throw error for unknown action', function() {
-// 	var errFunc = function() {
-// 		DBAssistant.registerUserAction(
-// 						'5716893a8c8aff3221812148',
-// 						'9e16c772556579bd6fc6c222',
-// 						'undefined-action',
-//             {},
-// 						);
-// 	}
-// 	t.equal(errFunc).toThrowError(Meteor.Error, 'Action not recognized: undefined-action [unknown-action]');
-//   t.end();
-// });
-//
-// test('should throw error for unknown user', function() {
-// 	var errFunc = function() {
-// 		DBAssistant.registerUserAction(
-// 						'7716893a8c8aff3221812147',
-// 						'9e16c772556579bd6fc6c222',
-// 						'response',
-//             {},
-// 						);
-// 	}
-//
-// 	t.equal(errFunc).toThrowError(Meteor.Error, 'No user found with ID: 7716893a8c8aff3221812147 [unknown-user]');
-//   t.end();
-// });
-//
-// test('should throw error for unknown note', function() {
-// 	var errFunc = function() {
-// 		DBAssistant.registerUserAction(
-// 						'5716893a8c8aff3221812148',
-// 						'7e16c772556579bd6fc6c227',
-// 						'response',
-//             {},
-// 						);
-// 	}
-//
-// 	t.equal(errFunc).toThrowError(Meteor.Error, 'No note found with ID: 7e16c772556579bd6fc6c227 [unknown-note]');
-//   t.end();
-// });

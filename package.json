@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "blue-tape test/*.test.js | tap-spec",
+    "test": "blue-tape test/*.test.js | tap-summary",
     "watch": "nodemon -q -x 'npm test'"
   },
   "author": "",
@@ -23,6 +23,6 @@
     "blue-tape": "^0.2.0",
     "request": "^2.74.0",
     "sinon": "^1.17.5",
-    "tap-spec": "^4.1.1"
+    "tap-summary": "^3.0.1"
   }
 }
