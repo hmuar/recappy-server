@@ -18,6 +18,12 @@ let testUserFBMessenger2 = {
        email: "apu@faketestemail.com",
        facebookMessageID: "1028279607252619"
      };
+ let testUserFBMessenger3 = {
+        _id: ObjectID("7716893a8c8aff3221812149"),
+        name: "Wiggum",
+        email: "wiggum@faketestemail.com",
+        facebookMessageID: "2028279607252615"
+      };
 let testUser = {
       name: "John Doe",
       email: "john@faketestemail.com"
@@ -259,11 +265,9 @@ lastDoneDate.setHours(dueDate.getHours() - 1);
 
 function addUsers() {
   return (new Collection.User(testUserFBMessenger)).save()
-  .then(function(doc) {
-    return (new Collection.User(testUserFBMessenger2)).save();
-  }).then(function(doc) {
-    return (new Collection.User(testUser)).save();
-  });
+  .then(doc => (new Collection.User(testUserFBMessenger2)).save())
+  .then(doc => (new Collection.User(testUserFBMessenger3)).save())
+  .then(doc => (new Collection.User(testUser)).save());
 }
 
 function cloneNote(noteData, num) {

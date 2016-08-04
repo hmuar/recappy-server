@@ -50,15 +50,16 @@ test("register message with existing session", function(t) {
 test("register message for new session", function(t) {
   let msg = Immut.Map({
     timestamp: 1,
-    senderID: "1028279607252642",
+    senderID: "2028279607252615",
     userID: null,
     text: "hello",
     action: null,
-    subjectName: 'cool-new-physics'
+    subjectName: 'crash-course-biology'
   });
 
   Controller.registerMsg(msg).then((rMsg) => {
     t.ok(rMsg.get('session'));
+    t.ok(rMsg.get('session').noteQueue.length > 0);
     t.end();
   }).catch((error) => {
     console.error(error);

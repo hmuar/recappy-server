@@ -35,7 +35,7 @@ Controller.prototype.registerMsg = function(msg) {
       throw new Error("Could not find subject " + msg.get('subjectName'));
     }
     else {
-      msg = msg.set('subject', subject._id);
+      msg = msg.set('subjectID', subject._id);
       return this.pipeUser(msg)
       .then(msg => PipeSession.pipe(msg))
       .then(msg => {

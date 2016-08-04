@@ -56,8 +56,7 @@ test('create study session', function(t) {
                                staticID.note,
                                0,
                                [staticID.note, staticID.note2],
-                               SessionState.INFO
-                              );
+                               0);
   }).then(() => {
     return StudySession.getSessionForUserAndSubject(staticID.userFB2,
                                                     staticID.subject)
@@ -82,7 +81,7 @@ test('should append new subject to user session', function(t) {
                                staticID.note,
                                0,
                                [staticID.note],
-                               SessionState.INFO);
+                               0);
   }).then(() => {
     return StudySession.getSessionForUserAndSubject(
                                               staticID.userFB,

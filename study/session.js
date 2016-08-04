@@ -1,6 +1,7 @@
 'use strict';
 const Collection = require('../db/collection');
 const StudentSession = Collection.StudentSession;
+const State = require('./session_state');
 
 // Return a session if user exists and they have a session already for
 // `subjectID` subject.
@@ -57,12 +58,14 @@ function updateSessionForUser(userID,
 }
 
 function createSession(userID,
-                        subjectID,
-                        noteID,
-                        queueIndex,
-                        noteQueue,
-                        state,
-                        conceptGlobalIndex) {
+                       subjectID,
+                       noteID,
+                       queueIndex,
+                       noteQueue,
+                       conceptGlobalIndex) {
+
+  conceptGlobalIndex = conceptGlobalIndex || 0;
+
   return StudentSession.findOne({userID: userID}).then((session) => {
     var subjectIDString = subjectID.valueOf();
     if(!session) {
@@ -71,7 +74,7 @@ function createSession(userID,
         noteID: noteID,
         queueIndex: 0,
         noteQueue: noteQueue,
-        state: state,
+        state: State.getStartState(),
         globalIndex: conceptGlobalIndex
       }
       var newSession = {
@@ -94,7 +97,7 @@ function createSession(userID,
           noteID: noteID,
           queueIndex: 0,
           noteQueue: noteQueue,
-          state: state,
+          state: State.getStartState(),
           globalIndex: conceptGlobalIndex
         }
         return StudentSession.findByIdAndUpdate(session._id, {

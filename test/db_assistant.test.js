@@ -12,18 +12,18 @@ before("before db assistant testing", function(t) {
   return db.setup().then(() => db.clean()).then(() => db.loadAllFixtures());
 });
 
-test("get parent list", function(t) {
-  let tObj = {_id: 1, id: "garbage", name: "stan", subject: "bio"}
-  let tObj2 = {_id: 5, ID: "garbage", last_name: "goodspeed", order: 3}
-  let tObj3 = {_id: 93, _ids: "garbage", first_name: "hank", done: true}
-
-  let ids = DBAssist.getParentList([tObj, tObj2, tObj3]);
-  t.deepEqual(ids, [1, 5, 93]);
-  t.deepEqual(DBAssist.getParentList([]), []);
-  t.deepEqual(DBAssist.getParentList([null]), [null]);
-  t.deepEqual(DBAssist.getParentList([undefined]), [null]);
-  t.end();
-});
+// test("get parent list", function(t) {
+//   let tObj = {_id: 1, id: "garbage", name: "stan", subject: "bio"}
+//   let tObj2 = {_id: 5, ID: "garbage", last_name: "goodspeed", order: 3}
+//   let tObj3 = {_id: 93, _ids: "garbage", first_name: "hank", done: true}
+//
+//   let ids = DBAssist.getParentList([tObj, tObj2, tObj3]);
+//   t.deepEqual(ids, [1, 5, 93]);
+//   t.deepEqual(DBAssist.getParentList([]), []);
+//   t.deepEqual(DBAssist.getParentList([null]), [null]);
+//   t.deepEqual(DBAssist.getParentList([undefined]), [null]);
+//   t.end();
+// });
 
 test("get category by name", function(t) {
   return DBAssist.getCategoryByName("subject", "crash-course-biology")
@@ -37,15 +37,15 @@ test("get category by name", function(t) {
   });
 });
 
-test("get parent query", function(t) {
-  let tObj = {_id: 1, id: "garbage", name: "stan", subject: "bio"}
-  let tObj2 = {_id: 5, ID: "garbage", last_name: "goodspeed", order: 3}
-  let tObj3 = {_id: 93, _ids: "garbage", first_name: "hank", done: true}
-
-  let query = DBAssist.getParentQuery([tObj, tObj2, tObj3]);
-  t.deepEqual([{parent: [1, 5, 93]}], query);
-  t.end();
-});
+// test("get parent query", function(t) {
+//   let tObj = {_id: 1, id: "garbage", name: "stan", subject: "bio"}
+//   let tObj2 = {_id: 5, ID: "garbage", last_name: "goodspeed", order: 3}
+//   let tObj3 = {_id: 93, _ids: "garbage", first_name: "hank", done: true}
+//
+//   let query = DBAssist.getParentQuery([tObj, tObj2, tObj3]);
+//   t.deepEqual([{parent: [1, 5, 93]}], query);
+//   t.end();
+// });
 
 test("get parent query with id", function(t) {
   let query = DBAssist.getParentQueryWithId([1, 5, 93]);

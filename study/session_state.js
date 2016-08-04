@@ -13,8 +13,13 @@ const SessionState = {
   UNKNOWN: 'unknown'
 }
 
+function getStartState() {
+  return SessionState.INIT;
+}
+
 let Session = {
-  SessionState: SessionState
+  SessionState: SessionState,
+  getStartState: getStartState
 }
 
 module.exports = Session;

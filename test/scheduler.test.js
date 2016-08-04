@@ -26,21 +26,21 @@ before("before scheduler testing", (t) => {
 });
 
 test('schedule old notes based on due date', (t) => {
-  return Scheduler.getOldMaterial(subject, 20, testUser._id)
+  return Scheduler.getOldMaterial(testUser._id, subject._id, 20)
   .then(nextNotes => {
     t.equal(nextNotes.length, 12);
   });
 });
 
 test('schedule new notes', function(t) {
-  return Scheduler.getNewMaterial(subject, 20, testUser._id, -1)
+  return Scheduler.getNewMaterial(subject._id, 20, -1)
   .then(nextNotes => {
     t.equal(nextNotes.length, 22);
   });
 });
 
 test('schedule combined old and new notes', function(t) {
-  return Scheduler.getNextNotes(subject, 20, testUser._id, -1)
+  return Scheduler.getNextNotes(testUser._id, subject._id, 20, -1)
   .then((nextNotes) => {
     let oldNotes = nextNotes[0];
     let newNotes = nextNotes[1];
