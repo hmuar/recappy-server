@@ -13,13 +13,32 @@ const SessionState = {
   UNKNOWN: 'unknown'
 }
 
+function getEntryStateForNoteType(ntype) {
+  if(ntype === 'info') {
+    return SessionState.INFO;
+  }
+  else if(ntype === 'recall') {
+    return SessionState.RECALL;
+  }
+  else if(ntype === 'choice') {
+    return SessionState.MULT_CHOICE;
+  }
+  else if(ntype === 'input') {
+    return SessionState.INPUT;
+  }
+  else {
+    return SessionState.UNKNOWN;
+  }
+};
+
 function getStartState() {
   return SessionState.INIT;
 }
 
 let Session = {
   SessionState: SessionState,
-  getStartState: getStartState
+  getStartState: getStartState,
+  getEntryStateForNoteType: getEntryStateForNoteType
 }
 
 module.exports = Session;

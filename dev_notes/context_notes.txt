@@ -1,0 +1,33 @@
+eval contexts - user msg is evaluated in these contexts
+--------------
+init context
+  - input is ignored
+  - state advanced
+
+info context
+  - advance state if accept
+  - else don't advance state
+
+recall context
+  - evaluate user response based on accept / reject
+  - advance state
+
+input context
+  - evaluate user response based on provided data
+  - advance state
+
+multi-choice context
+  - evaluate user response based on provided data
+  - advance state
+  
+
+response commands - adapters operate with these, know how to translate these
+into outgoing messages that differ based on platform adapter is supporting
+--------------------------
+send intro
+send plain text (for greeting, encouragement, feedback, etc)
+send info note
+send recall
+send recall confirm
+send input note
+send multi choice note

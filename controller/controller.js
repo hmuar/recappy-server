@@ -18,12 +18,13 @@ let Controller = function(adapter) {
 // check if key property added to msg and
 // corresponding value is not undefined and not null
 // `msg` is Immut.Map
-Controller.prototype.pipeSuccess = function(msg, key) {
-  return msg.has(key) && msg.get(key) != null ;
+Controller.prototype.pipeSuccess = function(mState, key) {
+  return mState.has(key) && mState.get(key) != null ;
 }
 
-Controller.prototype.pipeUser = function(msg) {
-  return this.adapter.senderToUser(msg);
+// convert adapter specific sender id into app user id
+Controller.prototype.pipeUser = function(mState) {
+  return this.adapter.senderToUser(mState);
 }
 
 // main entry method called by external adapters
@@ -35,11 +36,16 @@ Controller.prototype.registerMsg = function(msg) {
       throw new Error("Could not find subject " + msg.get('subjectName'));
     }
     else {
-      msg = msg.set('subjectID', subject._id);
-      return this.pipeUser(msg)
-      .then(msg => PipeSession.pipe(msg))
-      .then(msg => {
-        return msg;
+      let mState = Immut.Map(msg);
+      mState = mState.set('subjectID', subject._id);
+      // convert adapter specific sender id into app user id
+      return this.pipeUser(mState)
+      // at this point should have app user information
+      .then(state => PipeSession.pipe(state))
+      // at this point should have session information
+      .then(state => {
+        // need to evaluate msg in context of current state
+        return state;
       })
     }
   });

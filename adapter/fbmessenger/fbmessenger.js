@@ -1,5 +1,6 @@
 'use strict';
 const Account = require('../../account/account');
+const Input = require('../../core/input');
 const Immut = require('immutable');
 const fbrequest = require('./fbmessenger_request');
 const MessageType = require('./fbmessage_type');
@@ -68,12 +69,46 @@ function contentExtractor(msgType) {
 // return a function that properly adds content to a
 // given Immut.Map object based on given `msgType`
 function contentInjector(msgType) {
-  let addMap = {};
-  addMap[MessageType['TEXT']] = (msg, content) => msg.set('text', content),
-  addMap[MessageType['POSTBACK']] =
-      (msg, content) => msg.set('action', content),
-  addMap[MessageType['UNKNOWN']] = (msg, content) => msg
-  return addMap[msgType]
+
+  if(msgType === MessageType.TEXT) {
+    return (msg, content) => {
+      return msg.set('input', {
+        type: Input.Type.CUSTOM,
+        data: content
+      });
+    }
+  }
+
+  else if(msgType === MessageType.POSTBACK) {
+    return (msg, content) => {
+      let mtype = null;
+      let dataVal = null;
+      if(content === 'accept') {
+        mtype = Input.Type.ACCEPT;
+      }
+      else if(content === 'reject'){
+        mtype = Input.Type.REJECT;
+      }
+      else {
+        mtype = Input.Type.CUSTOM;
+        dataVal = content;
+      }
+      return msg.set('input', {
+        type: mtype,
+        data: dataVal
+      });
+    }
+  }
+
+  else {
+    return (msg, content) => {
+      return msg.set('input', {
+        type: Input.Type.UNKNOWN,
+        data: null
+      });
+    }
+  }
+
 }
 
 // Parse incoming POST request and return an Immut.Map
@@ -88,9 +123,8 @@ function parse(request) {
   let initMsgData = Immut.Map({
     timestamp: msg.timestamp,
     senderID: msg.sender.id,
-    text: null,
-    action: null,
-    subjectName: HARDCODED_SUBJ_NAME
+    subjectName: HARDCODED_SUBJ_NAME,
+    input: null
   });
 
   let msgType = getMsgType(msg);

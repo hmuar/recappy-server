@@ -24,7 +24,6 @@ test("register message with existing session", function(t) {
   //   text       : "",
   //   action     : ""
   // }
-
   let msg = Immut.Map({
     timestamp: 1,
     senderID: "1028279607252642",
@@ -42,11 +41,10 @@ test("register message with existing session", function(t) {
     t.fail("could not register message");
     t.end();
   });
-
 });
 
 // senderID doesn't have an existing session in test database
-// so this should go through process of session creation
+// so this tests process of session creation
 test("register message for new session", function(t) {
   let msg = Immut.Map({
     timestamp: 1,
@@ -66,9 +64,9 @@ test("register message for new session", function(t) {
     t.fail("could not register message");
     t.end();
   });
-
 });
 
-after("after account testing", function(t) {
+
+after("after controller testing", function(t) {
   return db.close();
 });

@@ -1,0 +1,19 @@
+incoming message data format
+{
+  timestamp  : ""
+  senderID   : "",
+  userID     : ObjectID,
+  input      : <Input Object>
+}
+
+InputObject format
+{
+  type: InputAction,
+  data: text or maybe multiple choice number
+}
+
+InputAction
+-------
+ACCEPT
+REJECT
+CUSTOM
