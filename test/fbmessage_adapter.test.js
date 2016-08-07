@@ -10,7 +10,6 @@ const sinon = require('sinon');
 const request = require('request');
 
 const Input = require('../core/input');
-
 const db = new TestDatabase();
 
 before("before fb message adapter testing", function(t) {
@@ -113,7 +112,7 @@ test("parse accept payload request into message data", function(t) {
   t.end();
 });
 
-test("parse accept payload request into message data", function(t) {
+test("parse reject payload request into message data", function(t) {
   let request = {
     "object":"page",
     "entry":[
@@ -148,7 +147,7 @@ test("parse accept payload request into message data", function(t) {
   t.end();
 });
 
-test("parse accept payload request into message data", function(t) {
+test("parse choice payload request into message data", function(t) {
   let request = {
     "object":"page",
     "entry":[
@@ -179,7 +178,7 @@ test("parse accept payload request into message data", function(t) {
   t.equal(mData.get("senderID"), "1028279607252642");
   t.ok(mData.has("input"));
   t.equal(mData.get("input").type, Input.Type.CUSTOM);
-  t.equal(mData.get("input").data, 'choice-5');
+  t.equal(mData.get("input").data, 5);
   t.end();
 });
 

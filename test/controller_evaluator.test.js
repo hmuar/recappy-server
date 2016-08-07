@@ -58,12 +58,7 @@ function getSession() {
          "display" : "<p>A polar covalent bond leads to what?</p>",
          "extra" : "",
          "extra_media" : "",
-         "parent" : [
-             db.createObjectID("f64c57184a4ef7f0357f9cd6"),
-             db.createObjectID("0850e4270c2aadd7ccdc1ca1"),
-             db.createObjectID("0088cf4f4aa300a407eecbb5"),
-             db.createObjectID("f9e515b670e5b8de9210872e")
-         ],
+         "parent" : [],
          "ckey" : "polar-covalent-bond",
          "displayRaw" : "A polar covalent bond leads to what?",
          "choice1" : "equal sharing of electrons",
@@ -80,22 +75,31 @@ function getSession() {
              "pre" : []
          },
          "label" : "" },
-      { _id: db.createObjectID("57a533de11aa3f271d51a2aa"),
-        directParent: db.createObjectID("7980227254feb46736ca47fd"),
-        globalIndex: 2,
-        displayRaw: 'How many protons and neutrons does carbon have?',
-        ckey: 'test-default-3-recall',
-        extra_media: '',
-        extra: '',
-        display: '<p>Default note 3 question?</p>',
-        level: 0.2,
-        weight: 0.5,
-        type: 'recall',
-        order: 2,
-        ctype: 'note',
-        createdAt: "2016-08-06T00:48:29.339Z",
-        __v: 0,
-        parent: [] },
+      { "_id" : db.createObjectID("1abf784a870127cca006e09c"),
+        "createdAt" : "2016-04-13T17:16:38.076Z",
+        "ctype" : "note",
+        "order" : 4,
+        "type" : "input",
+        "weight" : 0.5,
+        "level" : 0.5,
+        "display" : "<p>what the outermost filled electron shell is called?</p>",
+        "extra" : "",
+        "extra_media" : "",
+        "parent" : [],
+        "ckey" : "atomic-shell-valence",
+        "displayRaw" : "what the outermost filled electron shell is called?",
+        "answer" : "valence",
+        "hidden" : "Remember that an atom likes to get together with other atoms just so it can share and exchange electrons with them and fill this valence shell.",
+        "phrase" : {
+            "pre" : [
+                "Do you remember",
+                "Can you tell me"
+            ]
+        },
+        "globalIndex" : 26,
+        "subjectParent" : db.createObjectID("f64c57184a4ef7f0357f9cd6"),
+        "directParent" : db.createObjectID("f9e515b670e5b8de9210872e"),
+        "label" : ""},
       { _id: db.createObjectID("57a533de11aa3f271d51a2ab"),
         directParent: db.createObjectID("7980227254feb46736ca47fd"),
         globalIndex: 2,
@@ -337,6 +341,90 @@ test("eval with recall response state", function(t) {
 
 
   t.end();
+});
+
+test("eval with choice state", function(t) {
+  let initSession = getSession();
+  initSession.state = SessionState.MULT_CHOICE;
+  initSession.queueIndex = 2;
+
+  let mState = Immut.Map({
+      'timestamp': 1,
+      'senderID': '2028279607252615',
+      'userID': '7716893a8c8aff3221812149',
+      'input': {
+        'type': Input.Type.CUSTOM,
+        'data': 3
+      },
+      'subjectName': 'crash-course-biology',
+      'subjectID': db.createObjectID('f64c57184a4ef7f0357f9cd6'),
+      'session': initSession
+  });
+
+  let mEvalState = Evaluator.eval(mState);
+  let evalCtx = mEvalState.get('evalCtx');
+  t.equal(evalCtx.answerQuality, Answer.max);
+  t.equal(evalCtx.doneNote, true);
+
+  // check if string data '3' is properly accepted
+  // as correct answer choice 3
+  let mStateString = Immut.Map({
+      'timestamp': 1,
+      'senderID': '2028279607252615',
+      'userID': '7716893a8c8aff3221812149',
+      'input': {
+        'type': Input.Type.CUSTOM,
+        'data': '3'
+      },
+      'subjectName': 'crash-course-biology',
+      'subjectID': db.createObjectID('f64c57184a4ef7f0357f9cd6'),
+      'session': initSession
+  });
+
+  let mEvalStateString = Evaluator.eval(mStateString);
+  let evalCtxString = mEvalStateString.get('evalCtx');
+  t.equal(evalCtxString.answerQuality, Answer.max);
+  t.equal(evalCtxString.doneNote, true);
+
+  // check if incorrect answer is correctly evaluated as wrong
+  let mStateWrong = Immut.Map({
+      'timestamp': 1,
+      'senderID': '2028279607252615',
+      'userID': '7716893a8c8aff3221812149',
+      'input': {
+        'type': Input.Type.CUSTOM,
+        'data': 2
+      },
+      'subjectName': 'crash-course-biology',
+      'subjectID': db.createObjectID('f64c57184a4ef7f0357f9cd6'),
+      'session': initSession
+  });
+
+  let mEvalStateWrong = Evaluator.eval(mStateWrong);
+  let evalCtxWrong = mEvalStateWrong.get('evalCtx');
+  t.equal(evalCtxWrong.answerQuality, Answer.min);
+  t.equal(evalCtxWrong.doneNote, true);
+
+  // check if incorrect answer string is correctly evaluated as wrong
+  let mStateWrongString = Immut.Map({
+      'timestamp': 1,
+      'senderID': '2028279607252615',
+      'userID': '7716893a8c8aff3221812149',
+      'input': {
+        'type': Input.Type.CUSTOM,
+        'data': '5'
+      },
+      'subjectName': 'crash-course-biology',
+      'subjectID': db.createObjectID('f64c57184a4ef7f0357f9cd6'),
+      'session': initSession
+  });
+
+  let mEvalStateWrongString = Evaluator.eval(mStateWrongString);
+  let evalCtxWrongString = mEvalStateWrongString.get('evalCtx');
+  t.equal(evalCtxWrongString.answerQuality, Answer.min);
+  t.equal(evalCtxWrongString.doneNote, true);
+  t.end();
+
 });
 
 

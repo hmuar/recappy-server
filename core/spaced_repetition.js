@@ -1,5 +1,5 @@
 'use strict';
-const Eval = require('./evaluate');
+const Eval = require('./eval');
 
 // Calculate factor used to calculate spaced interval
 // 'previousFactor' From 1.3 (hardest) to 2.5 (easiest)

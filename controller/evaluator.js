@@ -4,9 +4,8 @@ const Answer = require('../core/answer');
 
 // Each evaluation context has knowledge about how to transition among
 // local state. For example, the RecallContext knows how to transition
-// to RecallResponse state when appropriate. Each context also knows
-// when it is time to transition out of all local states, at which
-// point they defer transition to `deferToGlobalStateChange`.
+// to RecallResponse state when appropriate. When local transition has
+// reached end, `doneNote` on `mSTate.evalCtx` will be set to true.
 
 
 // progress state by advancing note queue
@@ -27,7 +26,6 @@ const Answer = require('../core/answer');
 // Ignore input and advance state
 // `mState` is Immut.Map
 function InitContext(mState) {
-  console.log(mState);
   // let session = mState.get('session');
   // let firstNote = session.noteQueue[0];
   // // advance session state based on first note in queue
@@ -58,8 +56,8 @@ function InfoContext(mState) {
       evalCtx.answerQuality = Answer.ok;
       evalCtx.doneNote = true;
   }
-  // didn't find proper input type so return as is without advancing state
-  return mState.set('evalCtx', evalCtx);;
+
+  return mState.set('evalCtx', evalCtx);
 }
 
 // Look for ACCEPT or REJECT input type and then advance state
@@ -76,7 +74,6 @@ function RecallContext(mState) {
     session.state = SessionState.RECALL_RESPONSE;
     mState = mState.set('session', session);
   }
-  // didn't find proper input type so return as is without advancing state
   return mState.set('evalCtx', evalCtx);
 }
 
@@ -95,9 +92,7 @@ function RecallResponseContext(mState) {
     evalCtx.answerQuality = Answer.min;
     evalCtx.doneNote = true;
   }
-
-  // didn't find proper input type so return as is without advancing state
-  return mState.set('evalCtx', evalCtx);;
+  return mState.set('evalCtx', evalCtx);
 }
 
 //
@@ -105,9 +100,28 @@ function RecallResponseContext(mState) {
 //
 // }
 //
-// function MultChoiceContext(mState) {
-//
-// }
+
+
+function MultChoiceContext(mState) {
+  let session = mState.get('session');
+  let input = mState.get('input');
+  let evalCtx = {
+    answerQuality: null,
+    doneNote: false
+  }
+  // use isNaN to accept both numerical and number as text inputs
+  if(input.type === Input.Type.CUSTOM && !isNaN(input.data)) {
+    let dataAsNum = parseInt(input.data, 10);
+    // Note should be type "choice"
+    let note = session.noteQueue[session.queueIndex];
+    let correctAnswer = dataAsNum === note.answer;
+    evalCtx.answerQuality =  correctAnswer? Answer.max : Answer.min;
+    evalCtx.doneNote = true;
+  }
+
+  // didn't find proper input type so return as is without advancing state
+  return mState.set('evalCtx', evalCtx);
+}
 
 function getEvalContext(state) {
   switch(state) {

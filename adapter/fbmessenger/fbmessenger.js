@@ -66,6 +66,12 @@ function contentExtractor(msgType) {
   return extMap[msgType];
 }
 
+function stripChoiceNum(choice) {
+  let c = choice.split("-");
+  let cnum = parseInt(c[c.length -1], 10);
+  return cnum;
+}
+
 // return a function that properly adds content to a
 // given Immut.Map object based on given `msgType`
 function contentInjector(msgType) {
@@ -83,6 +89,7 @@ function contentInjector(msgType) {
     return (msg, content) => {
       let mtype = null;
       let dataVal = null;
+
       if(content === 'accept') {
         mtype = Input.Type.ACCEPT;
       }
@@ -91,7 +98,15 @@ function contentInjector(msgType) {
       }
       else {
         mtype = Input.Type.CUSTOM;
-        dataVal = content;
+        if(~content.indexOf('choice-')) {
+          // if 'choice-' is in content, it was a payload representing
+          // a predefined choice made by user, so strip out choice num
+          dataVal = stripChoiceNum(content);
+        }
+        else {
+          // just set data to entirety of input text
+          dataVal = content;
+        }
       }
       return msg.set('input', {
         type: mtype,
