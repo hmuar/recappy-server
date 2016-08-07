@@ -95,12 +95,26 @@ function RecallResponseContext(mState) {
   return mState.set('evalCtx', evalCtx);
 }
 
-//
-// function InputContext(mState) {
-//
-// }
-//
 
+function InputContext(mState) {
+  let session = mState.get('session');
+  let input = mState.get('input');
+  let evalCtx = {
+    answerQuality: null,
+    doneNote: false
+  }
+  // use isNaN to accept both numerical and number as text inputs
+  if(input.type === Input.Type.CUSTOM) {
+    // Note should be type "choice"
+    let note = session.noteQueue[session.queueIndex];
+    let correctAnswer = input.data === note.answer;
+    evalCtx.answerQuality =  correctAnswer? Answer.max : Answer.min;
+    evalCtx.doneNote = true;
+  }
+
+  // didn't find proper input type so return as is without advancing state
+  return mState.set('evalCtx', evalCtx);
+}
 
 function MultChoiceContext(mState) {
   let session = mState.get('session');

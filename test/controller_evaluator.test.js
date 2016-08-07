@@ -427,6 +427,51 @@ test("eval with choice state", function(t) {
 
 });
 
+test("eval with input state", function(t) {
+  let initSession = getSession();
+  initSession.state = SessionState.INPUT;
+  initSession.queueIndex = 3;
+
+  let mState = Immut.Map({
+      'timestamp': 1,
+      'senderID': '2028279607252615',
+      'userID': '7716893a8c8aff3221812149',
+      'input': {
+        'type': Input.Type.CUSTOM,
+        'data': 'valence'
+      },
+      'subjectName': 'crash-course-biology',
+      'subjectID': db.createObjectID('f64c57184a4ef7f0357f9cd6'),
+      'session': initSession
+  });
+
+  let mEvalState = Evaluator.eval(mState);
+  let evalCtx = mEvalState.get('evalCtx');
+  t.equal(evalCtx.answerQuality, Answer.max);
+  t.equal(evalCtx.doneNote, true);
+
+  // check if incorrect answer is correctly evaluated as wrong
+  let mStateWrong = Immut.Map({
+      'timestamp': 1,
+      'senderID': '2028279607252615',
+      'userID': '7716893a8c8aff3221812149',
+      'input': {
+        'type': Input.Type.CUSTOM,
+        'data': 'hydrogen'
+      },
+      'subjectName': 'crash-course-biology',
+      'subjectID': db.createObjectID('f64c57184a4ef7f0357f9cd6'),
+      'session': initSession
+  });
+
+  let mEvalStateWrong = Evaluator.eval(mStateWrong);
+  let evalCtxWrong = mEvalStateWrong.get('evalCtx');
+  t.equal(evalCtxWrong.answerQuality, Answer.min);
+  t.equal(evalCtxWrong.doneNote, true);
+
+  t.end();
+
+});
 
 after("after controller evaluator testing", function(t) {
   return db.close();
