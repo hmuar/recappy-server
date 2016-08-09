@@ -1,5 +1,5 @@
-const DBAssist = require('../db/db_assistant');
-const StudySession = require('../study/session');
+const DBAssist = require('../db/note_assistant');
+const SessionAssist = require('../db/session_assistant');
 const PipeSession = require('./pipe_session');
 const Immut = require('immutable');
 

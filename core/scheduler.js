@@ -1,5 +1,5 @@
 const Collection = require('../db/collection');
-const StudentNote = Collection.StudentNote;
+const NoteRecord = Collection.NoteRecord;
 const Category = Collection.Category;
 
 const TARGET_NUM_NOTES_IN_SESSION = 3;
@@ -12,7 +12,7 @@ function getOldMaterial(userID, subjectID, numNotes) {
   }
 
   // dont query info notes
-  return StudentNote.find({"userID": userID,
+  return NoteRecord.find({"userID": userID,
                           "subjectParent": subjectID,
                           "due": {$lte: new Date()},
                           "noteType": {$ne: "info"}})

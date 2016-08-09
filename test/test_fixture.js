@@ -1,5 +1,5 @@
 'use strict';
-const SessionState = require('../study/session_state').SessionState;
+const SessionState = require('../core/session_state').SessionState;
 const Collection = require('../db/collection');
 const SRCore = require('../core/spaced_repetition');
 
@@ -227,7 +227,7 @@ let sessionTemplate = {
   }
 };
 
-// ******* StudentNote **************************
+// ******* NoteRecord **************************
 // - noteID (MongoID)
 // - lastDone (Date)
 // - due (Date)
@@ -239,29 +239,29 @@ let dueDate = new Date();
 let lastDoneDate = new Date(dueDate);
 lastDoneDate.setHours(dueDate.getHours() - 1);
 
-// let defaultStudentNote = {
-//   userID: testUserFBMessenger._id,
-//   noteID: noteTemplateA._id,
-//   noteType: noteTemplateA.type,
-//   lastDone: lastDoneDate,
-//   due: dueDate,
-//   factor: SRCore.defaultFactor,
-//   interval: SRCore.defaultInterval,
-//   count: 1,
-//   subjectParent: noteTemplateA.parent[0]
-// };
-//
-// let defaultStudentNote2 = {
-//   userID: testUserFBMessenger._id,
-//   noteID: noteTemplateB._id,
-//   noteType: noteTemplateB.type,
-//   lastDone: lastDoneDate,
-//   due: dueDate,
-//   factor: SRCore.defaultFactor,
-//   interval: SRCore.defaultInterval,
-//   count: 1,
-//   subjectParent: noteTemplateB.parent[0]
-// };
+let defaultNoteRecord = {
+  userID: testUserFBMessenger._id,
+  noteID: noteA._id,
+  noteType: noteTemplateA.type,
+  lastDone: lastDoneDate,
+  due: dueDate,
+  factor: SRCore.defaultFactor,
+  interval: SRCore.defaultInterval,
+  count: 1,
+  subjectParent: noteTemplateA.parent[0]
+};
+
+let defaultNoteRecord2 = {
+  userID: testUserFBMessenger._id,
+  noteID: noteB._id,
+  noteType: noteTemplateB.type,
+  lastDone: lastDoneDate,
+  due: dueDate,
+  factor: SRCore.defaultFactor,
+  interval: SRCore.defaultInterval,
+  count: 1,
+  subjectParent: noteTemplateB.parent[0]
+};
 
 function addUsers() {
   return (new Collection.User(testUserFBMessenger)).save()
@@ -314,9 +314,9 @@ function addSessions() {
 
 // defNoteIds should be an array with two elems.
 // Each elem is a list of ids
-function addStudentNotes(defNoteIds) {
+function addNoteRecords(defNoteIds) {
 
-  function getDefStudentNoteData(note, noteID, dueDate) {
+  function getDefNoteRecordData(note, noteID, dueDate) {
     return {
       userID: testUserFBMessenger._id,
       noteID: noteID,
@@ -331,17 +331,21 @@ function addStudentNotes(defNoteIds) {
   }
 
   let minToMillisecFactor = 60000;
-  let pChain = null;
+
+  let defRec = new Collection.NoteRecord(defaultNoteRecord);
+  let defRec2 = new Collection.NoteRecord(defaultNoteRecord2);
+
+  let pChain = defRec.save().then(() => defRec2.save());
 
   let noteTemplateAIds = defNoteIds[0];
 
   // half will be due in the past, half in the future
   for(let i=0; i<10; i++) {
     let newDueDate = new Date(dueDate.getTime() + (i-5) * minToMillisecFactor);
-    let newStudentNote = getDefStudentNoteData(noteTemplateA,
+    let newNoteRecord = getDefNoteRecordData(noteTemplateA,
                                                noteTemplateAIds[i],
                                                newDueDate);
-    let snote = new Collection.StudentNote(newStudentNote);
+    let snote = new Collection.NoteRecord(newNoteRecord);
     if(!pChain) {
       pChain = snote.save();
     }
@@ -355,10 +359,10 @@ function addStudentNotes(defNoteIds) {
   // half will be due in the past, half in the future
   for(let i=0; i<10; i++) {
     let newDueDate = new Date(dueDate.getTime() + (i-5) * minToMillisecFactor);
-    let newStudentNote = getDefStudentNoteData(noteTemplateB,
+    let newNoteRecord = getDefNoteRecordData(noteTemplateB,
                                                noteTemplateBIds[i],
                                                newDueDate);
-    let snote = new Collection.StudentNote(newStudentNote);
+    let snote = new Collection.NoteRecord(newNoteRecord);
     if(!pChain) {
       pChain = snote.save();
     }
@@ -377,7 +381,7 @@ let Fixture = {
     return addUsers().then(() => {
       return addNotes();
     }).then(defNoteIds => {
-      return addStudentNotes(defNoteIds);
+      return addNoteRecords(defNoteIds);
     }).then(() => {
       return addSessions();
     });
@@ -386,7 +390,7 @@ let Fixture = {
   addUsers: addUsers,
   addNotes: addNotes,
   addSessions: addSessions,
-  addStudentNotes, addStudentNotes,
+  addNoteRecords, addNoteRecords,
 
   getStaticIDs: function() {
     return {

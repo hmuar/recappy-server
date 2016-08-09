@@ -6,7 +6,7 @@ const after = test;
 
 const TestDatabase = require('./test_database');
 const Scheduler = require('../core/scheduler');
-const DBAssist = require('../db/db_assistant');
+const DBAssist = require('../db/note_assistant');
 const db = new TestDatabase();
 
 const SUBJECT_NAME = 'crash-course-biology';
@@ -28,7 +28,7 @@ before("before scheduler testing", (t) => {
 test('schedule old notes based on due date', (t) => {
   return Scheduler.getOldMaterial(testUser._id, subject._id, 20)
   .then(nextNotes => {
-    t.equal(nextNotes.length, 12);
+    t.equal(nextNotes.length, 14);
   });
 });
 
@@ -44,7 +44,7 @@ test('schedule combined old and new notes', function(t) {
   .then((nextNotes) => {
     let oldNotes = nextNotes[0];
     let newNotes = nextNotes[1];
-    t.equal(oldNotes.length + newNotes.length, 34);
+    t.equal(oldNotes.length + newNotes.length, 36);
   });
 });
 

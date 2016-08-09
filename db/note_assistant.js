@@ -67,7 +67,7 @@ function getNotesInOrder(subjectID, unitID, topicID, conceptID) {
   return Category.find({ctype: 'note', $and: parentQuery}).sort('order');
 }
 
-let DBAssistant = {
+let NoteAssistant = {
   // getParentList: getParentIdList,
   getCategoryByName: getCategoryByName,
   // getParentQuery: getParentQuery,
@@ -79,4 +79,4 @@ let DBAssistant = {
   getNotesInOrder: getNotesInOrder
 }
 
-module.exports = DBAssistant;
+module.exports = NoteAssistant;

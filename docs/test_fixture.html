@@ -290,7 +290,7 @@ These will be referenced later in studentNotes.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-6">&#182;</a>
               </div>
-              <p><strong><em>*</em></strong> StudentNote <strong><strong><strong><strong><strong><strong>**</strong></strong></strong></strong></strong></strong></p>
+              <p><strong><em>*</em></strong> NoteRecord <strong><strong><strong><strong><strong><strong>**</strong></strong></strong></strong></strong></strong></p>
 <ul>
 <li>noteID (MongoID)</li>
 <li>lastDone (Date)</li>
@@ -307,7 +307,7 @@ These will be referenced later in studentNotes.</p>
 <span class="hljs-keyword">var</span> lastDoneDate = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>(dueDate);
 lastDoneDate.setHours(dueDate.getHours() - <span class="hljs-number">1</span>);
 
-<span class="hljs-keyword">var</span> defaultStudentNote = {
+<span class="hljs-keyword">var</span> defaultNoteRecord = {
   userID: testUserFBMessenger._id,
   noteID: defaultNote3._id,
   noteType: defaultNote3.type,
@@ -319,7 +319,7 @@ lastDoneDate.setHours(dueDate.getHours() - <span class="hljs-number">1</span>);
   subjectParent: defaultNote3.parent[<span class="hljs-number">0</span>]
 };
 
-<span class="hljs-keyword">var</span> defaultStudentNote2 = {
+<span class="hljs-keyword">var</span> defaultNoteRecord2 = {
   userID: testUserFBMessenger._id,
   noteID: defaultNote4._id,
   noteType: defaultNote4.type,
@@ -389,9 +389,9 @@ db.user.insert(testUserFBMessenger2);</p>
   db.studentsession.insert(defaultSession);
 }
 
-<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">addStudentNotes</span>(<span class="hljs-params">db</span>) </span>{
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">addNoteRecords</span>(<span class="hljs-params">db</span>) </span>{
 
-  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">getDefaultStudentNote</span>(<span class="hljs-params">note, noteID, dueDate</span>) </span>{
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">getDefaultNoteRecord</span>(<span class="hljs-params">note, noteID, dueDate</span>) </span>{
     <span class="hljs-keyword">return</span> {
       userID: testUserFBMessenger._id,
       noteID: noteID,
@@ -408,18 +408,18 @@ db.user.insert(testUserFBMessenger2);</p>
   <span class="hljs-keyword">var</span> minToMillisecFactor = <span class="hljs-number">60000</span>;
   <span class="hljs-keyword">for</span>(<span class="hljs-keyword">var</span> i=<span class="hljs-number">0</span>; i&lt;<span class="hljs-number">10</span>; i++) {
     <span class="hljs-keyword">var</span> newDueDate = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>(dueDate.getTime() + (i<span class="hljs-number">-5</span>) * minToMillisecFactor);
-    <span class="hljs-keyword">var</span> newStudentNote = getDefaultStudentNote(defaultNote3,
+    <span class="hljs-keyword">var</span> newNoteRecord = getDefaultNoteRecord(defaultNote3,
                                                defaultNote3Ids[i],
                                                newDueDate);
-    db.studentnote.insert(newStudentNote);
+    db.studentnote.insert(newNoteRecord);
   }
 
   <span class="hljs-keyword">for</span>(<span class="hljs-keyword">var</span> i=<span class="hljs-number">0</span>; i&lt;<span class="hljs-number">10</span>; i++) {
     <span class="hljs-keyword">var</span> newDueDate = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>(dueDate.getTime() + (i<span class="hljs-number">-5</span>) * minToMillisecFactor);
-    <span class="hljs-keyword">var</span> newStudentNote = getDefaultStudentNote(defaultNote4,
+    <span class="hljs-keyword">var</span> newNoteRecord = getDefaultNoteRecord(defaultNote4,
                                                defaultNote4Ids[i],
                                                newDueDate);
-    db.studentnote.insert(newStudentNote);
+    db.studentnote.insert(newNoteRecord);
   }
 
 }
@@ -430,13 +430,13 @@ db.user.insert(testUserFBMessenger2);</p>
     addUsers(db),
     addNotes(db),
     addSessions(db),
-    addStudentNotes(db)
+    addNoteRecords(db)
   },
 
   addUsers: addUsers,
   addNotes: addNotes,
   addSessions: addSessions,
-  addStudentNotes, addStudentNotes
+  addNoteRecords, addNoteRecords
 
 };
 

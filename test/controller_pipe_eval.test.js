@@ -6,8 +6,8 @@ const after = test;
 const TestDatabase = require('./test_database');
 const db = new TestDatabase();
 const Immut = require('immutable');
-const Evaluator = require('../controller/evaluator');
-const SessionState = require('../study/session_state').SessionState;
+const PipeEval = require('../controller/pipe_eval');
+const SessionState = require('../core/session_state').SessionState;
 const Input = require('../core/input');
 const Answer = require('../core/answer');
 
@@ -202,7 +202,7 @@ function getSession() {
   }
 }
 
-before("before controller evaluator testing", function(t) {
+before("before controller pipe evaluator testing", function(t) {
   return db.setup().then(() => db.clean()).then(() => db.loadAllFixtures());
 });
 
@@ -221,7 +221,7 @@ test("eval with init state", function(t) {
       'session': initSession
   });
 
-  let mEvalState = Evaluator.eval(mState);
+  let mEvalState = PipeEval.pipe(mState);
   let evalCtx = mEvalState.get('evalCtx');
   t.equal(evalCtx.answerQuality, Answer.ok);
   t.equal(evalCtx.doneNote, false);
@@ -245,7 +245,7 @@ test("eval with info state", function(t) {
       'session': initSession
   });
 
-  let mEvalState = Evaluator.eval(mState);
+  let mEvalState = PipeEval.pipe(mState);
   let evalCtx = mEvalState.get('evalCtx');
   t.equal(evalCtx.answerQuality, Answer.ok);
   t.equal(evalCtx.doneNote, true);
@@ -263,7 +263,7 @@ test("eval with info state", function(t) {
       'session': initSession
   });
 
-  let mEvalStateReject = Evaluator.eval(mStateReject);
+  let mEvalStateReject = PipeEval.pipe(mStateReject);
   let evalCtxReject = mEvalStateReject.get('evalCtx');
   t.equal(evalCtxReject.answerQuality, null);
   t.equal(evalCtxReject.doneNote, false);
@@ -288,7 +288,7 @@ test("eval with recall state", function(t) {
       'session': initSession
   });
 
-  let mEvalState = Evaluator.eval(mState);
+  let mEvalState = PipeEval.pipe(mState);
   let evalCtx= mEvalState.get('evalCtx');
 
   t.equal(mEvalState.get('session').state, SessionState.RECALL_RESPONSE)
@@ -316,7 +316,7 @@ test("eval with recall response state", function(t) {
       'session': initSession
   });
 
-  let mEvalState = Evaluator.eval(mState);
+  let mEvalState = PipeEval.pipe(mState);
   let evalCtx = mEvalState.get('evalCtx');
   t.equal(evalCtx.answerQuality, Answer.max);
   t.equal(evalCtx.doneNote, true);
@@ -334,7 +334,7 @@ test("eval with recall response state", function(t) {
       'session': initSession
   });
 
-  let mEvalStateReject = Evaluator.eval(mStateReject);
+  let mEvalStateReject = PipeEval.pipe(mStateReject);
   let evalCtxReject = mEvalStateReject.get('evalCtx');
   t.equal(evalCtxReject.answerQuality, Answer.min);
   t.equal(evalCtxReject.doneNote, true);
@@ -361,7 +361,7 @@ test("eval with choice state", function(t) {
       'session': initSession
   });
 
-  let mEvalState = Evaluator.eval(mState);
+  let mEvalState = PipeEval.pipe(mState);
   let evalCtx = mEvalState.get('evalCtx');
   t.equal(evalCtx.answerQuality, Answer.max);
   t.equal(evalCtx.doneNote, true);
@@ -381,7 +381,7 @@ test("eval with choice state", function(t) {
       'session': initSession
   });
 
-  let mEvalStateString = Evaluator.eval(mStateString);
+  let mEvalStateString = PipeEval.pipe(mStateString);
   let evalCtxString = mEvalStateString.get('evalCtx');
   t.equal(evalCtxString.answerQuality, Answer.max);
   t.equal(evalCtxString.doneNote, true);
@@ -400,7 +400,7 @@ test("eval with choice state", function(t) {
       'session': initSession
   });
 
-  let mEvalStateWrong = Evaluator.eval(mStateWrong);
+  let mEvalStateWrong = PipeEval.pipe(mStateWrong);
   let evalCtxWrong = mEvalStateWrong.get('evalCtx');
   t.equal(evalCtxWrong.answerQuality, Answer.min);
   t.equal(evalCtxWrong.doneNote, true);
@@ -419,7 +419,7 @@ test("eval with choice state", function(t) {
       'session': initSession
   });
 
-  let mEvalStateWrongString = Evaluator.eval(mStateWrongString);
+  let mEvalStateWrongString = PipeEval.pipe(mStateWrongString);
   let evalCtxWrongString = mEvalStateWrongString.get('evalCtx');
   t.equal(evalCtxWrongString.answerQuality, Answer.min);
   t.equal(evalCtxWrongString.doneNote, true);
@@ -445,7 +445,7 @@ test("eval with input state", function(t) {
       'session': initSession
   });
 
-  let mEvalState = Evaluator.eval(mState);
+  let mEvalState = PipeEval.pipe(mState);
   let evalCtx = mEvalState.get('evalCtx');
   t.equal(evalCtx.answerQuality, Answer.max);
   t.equal(evalCtx.doneNote, true);
@@ -464,7 +464,7 @@ test("eval with input state", function(t) {
       'session': initSession
   });
 
-  let mEvalStateWrong = Evaluator.eval(mStateWrong);
+  let mEvalStateWrong = PipeEval.pipe(mStateWrong);
   let evalCtxWrong = mEvalStateWrong.get('evalCtx');
   t.equal(evalCtxWrong.answerQuality, Answer.min);
   t.equal(evalCtxWrong.doneNote, true);
@@ -473,6 +473,6 @@ test("eval with input state", function(t) {
 
 });
 
-after("after controller evaluator testing", function(t) {
+after("after controller pipe evaluator testing", function(t) {
   return db.close();
 });

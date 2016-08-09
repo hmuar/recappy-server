@@ -46,7 +46,7 @@ TestDatabase.prototype.clean = function() {
       return Collection.Category.remove({}).then(() => {
       });
     }).then(() => {
-      return Collection.StudentNote.remove({}).then(() => {
+      return Collection.NoteRecord.remove({}).then(() => {
       });
     });
   });

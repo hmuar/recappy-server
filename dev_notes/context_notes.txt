@@ -1,25 +1,12 @@
 eval contexts - user msg is evaluated in these contexts
 --------------
-init context
-  - input is ignored
-  - state advanced
+context for all note types and states that evaluates user input
+and adds a eval context object to message data.
 
-info context
-  - advance state if accept
-  - else don't advance state
-
-recall context
-  - evaluate user response based on accept / reject
-  - advance state
-
-input context
-  - evaluate user response based on provided data
-  - advance state
-
-multi-choice context
-  - evaluate user response based on provided data
-  - advance state
-  
+evalCtx: {
+  answerQuality: <number>,
+  doneNote: <boolean>
+}
 
 response commands - adapters operate with these, know how to translate these
 into outgoing messages that differ based on platform adapter is supporting

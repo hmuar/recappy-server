@@ -6,8 +6,8 @@ const before = test;
 const after = test;
 
 const TestDatabase = require('./test_database');
-const StudySession = require('../study/session');
-const SessionState = require('../study/session_state').SessionState;
+const SessionAssist = require('../db/session_assistant');
+const SessionState = require('../core/session_state').SessionState;
 const db = new TestDatabase();
 
 const staticID = db.getStaticIDs();
@@ -26,20 +26,20 @@ before("before session testing", function(t) {
 });
 
 test('find study session for test student', function(t) {
-  return StudySession.getSessionForUserAndSubject(staticID.userFB,
+  return SessionAssist.getSessionForUserAndSubject(staticID.userFB,
                                                   staticID.subject)
   .then((session) => t.ok(session));
 });
 
 test('dont find study session for fake student', function(t) {
-  return StudySession.getSessionForUserAndSubject(
+  return SessionAssist.getSessionForUserAndSubject(
                               db.createObjectID('7716893a8c8aff3221812147'),
                               staticID.subject)
   .then((session) => t.equal(session, null));
 });
 
 test('dont find session for fake subject', function(t) {
-  return StudySession.getSessionForUserAndSubject(
+  return SessionAssist.getSessionForUserAndSubject(
                                                staticID.userFB,
                                                staticID.newSubject)
   .then((session) => t.equal(session, null));
@@ -47,18 +47,18 @@ test('dont find session for fake subject', function(t) {
 
 test('create study session', function(t) {
 
-  return StudySession.getSessionForUserAndSubject(staticID.userFB2,
+  return SessionAssist.getSessionForUserAndSubject(staticID.userFB2,
                                                   staticID.subject)
   .then((session) => t.equal(session, null))
   .then(() => {
-    return StudySession.createSession(staticID.userFB2,
+    return SessionAssist.createSession(staticID.userFB2,
                                staticID.subject,
                                staticID.note,
                                0,
                                [staticID.note, staticID.note2],
                                0);
   }).then(() => {
-    return StudySession.getSessionForUserAndSubject(staticID.userFB2,
+    return SessionAssist.getSessionForUserAndSubject(staticID.userFB2,
                                                     staticID.subject)
     .then((session) => t.ok(session));
   })
@@ -67,28 +67,28 @@ test('create study session', function(t) {
 
 test('should append new subject to user session', function(t) {
 
-  return StudySession.getSessionForUserAndSubject(staticID.userFB,
+  return SessionAssist.getSessionForUserAndSubject(staticID.userFB,
                                                   staticID.subject)
   .then((session) => {
     t.ok(session);
-    return  StudySession.getSessionForUserAndSubject(
+    return  SessionAssist.getSessionForUserAndSubject(
                                                   staticID.userFB,
                                                   staticID.newSubject);
   }).then((session) => {
     t.equal(session, null);
-    return StudySession.createSession(staticID.userFB,
+    return SessionAssist.createSession(staticID.userFB,
                                staticID.newSubject,
                                staticID.note,
                                0,
                                [staticID.note],
                                0);
   }).then(() => {
-    return StudySession.getSessionForUserAndSubject(
+    return SessionAssist.getSessionForUserAndSubject(
                                               staticID.userFB,
                                               staticID.newSubject);
   }).then((sessionNewSubj) => {
     t.ok(sessionNewSubj);
-    return StudySession.getSessionForUserAndSubject(
+    return SessionAssist.getSessionForUserAndSubject(
                                                   staticID.userFB,
                                                   staticID.subject);
   }).then((sessionOldSubj) => {

@@ -1,6 +1,9 @@
 'use strict';
 const Eval = require('./eval');
 
+const intervalToMinutesFactor = 1;
+const minToMillisecFactor = 60000;
+
 // Calculate factor used to calculate spaced interval
 // 'previousFactor' From 1.3 (hardest) to 2.5 (easiest)
 // 'responseQuality' From 0 (worst) to 5 (best)
@@ -47,6 +50,13 @@ function calcInterval(prevInterval, factor, count, responseQuality) {
   }
 }
 
+// TODO: write a test for this function
+function calcDueDate(interval) {
+  var dueDate = new Date();
+  var intervalMin = intervalInMinutes(interval);
+  return new Date(dueDate.getTime() + intervalMin * minToMillisecFactor);
+}
+
 function intervalInMinutes(interval) {
   return interval * intervalToMinutesFactor;
 }
@@ -58,11 +68,11 @@ function isBadResponse(responseQuality) {
 let SRCore = {
   defaultFactor: 2.5,
   defaultInterval: 1.0,
-  intervalToMinutesFactor: 1,
-
+  defaultCount: 1,
   calcFactor: calcFactor,
   calcInterval: calcInterval,
   intervalInMinutes: intervalInMinutes,
+  calcDueDate: calcDueDate,
   isBadResponse: isBadResponse
 }
 

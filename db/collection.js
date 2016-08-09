@@ -54,7 +54,7 @@ let noteSchema = new mongoose.Schema({
 // schema to make it easier and clearer to work with.
 let Note = mongoose.model('Note', noteSchema, 'category');
 
-let studentNoteSchema = new mongoose.Schema({
+let noteRecordSchema = new mongoose.Schema({
   userID : mongoose.Schema.Types.ObjectId,
   noteID : mongoose.Schema.Types.ObjectId,
   noteType : String,
@@ -68,16 +68,16 @@ let studentNoteSchema = new mongoose.Schema({
   health : Number
 });
 
-let StudentNote = mongoose.model('StudentNote',
-                                 studentNoteSchema,
-                                 'studentnote');
+let NoteRecord = mongoose.model('NoteRecord',
+                                 noteRecordSchema,
+                                 'noterecord');
 
 let Schema = {
   User: User,
   StudentSession: StudentSession,
   Category: Category,
   Note: Note,
-  StudentNote: StudentNote,
+  NoteRecord: NoteRecord,
   ObjectID: mongoose.Types.ObjectId
 }
 

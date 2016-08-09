@@ -5,7 +5,7 @@ const before = test;
 const after = test;
 
 const TestDatabase = require('./test_database');
-const DBAssist = require('../db/db_assistant');
+const DBAssist = require('../db/note_assistant');
 const db = new TestDatabase();
 
 before("before db assistant testing", function(t) {

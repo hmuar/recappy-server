@@ -1,5 +1,5 @@
-const DBAssist = require('../db/db_assistant');
-const StudySession = require('../study/session');
+const DBAssist = require('../db/note_assistant');
+const SessionAssist = require('../db/session_assistant');
 const Scheduler = require('../core/scheduler.js')
 
 function addNewSession(mState) {
@@ -12,7 +12,7 @@ function addNewSession(mState) {
   .then(noteQueue => {
     let startNoteIndex = 0;
     let startGlobalIndex = 0;
-    return StudySession.createSession(userID,
+    return SessionAssist.createSession(userID,
                                       subjectID,
                                       startNoteIndex,
                                       noteQueue,
@@ -30,7 +30,7 @@ function pipe(mState) {
   // if(!mState.get('text') && ! mState.get('action')) {
   //   return Promise.reject("No text or action included in message");
   // }
-  return StudySession.getSessionForUserAndSubject(
+  return SessionAssist.getSessionForUserAndSubject(
                           mState.get('userID'),
                           mState.get('subjectID'))
   .then(session => {

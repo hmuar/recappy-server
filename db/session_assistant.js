@@ -1,7 +1,7 @@
 'use strict';
 const Collection = require('../db/collection');
 const StudentSession = Collection.StudentSession;
-const SessionState = require('./session_state');
+const SessionState = require('../core/session_state');
 
 // Return a session if user exists and they have a session already for
 // `subjectID` subject.
@@ -105,10 +105,10 @@ function createSession(userID,
   });
 }
 
-let StudySession = {
+let SessionAssist = {
   getSessionForUserAndSubject: getSessionForUserAndSubject,
   updateSessionForUser: updateSessionForUser,
   createSession: createSession
 }
 
-module.exports = StudySession;
+module.exports = SessionAssist;
