@@ -4,8 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "blue-tape test/*.test.js | tap-summary",
-    "watch": "nodemon -q -x 'npm test'"
+    "test": "nodemon -q -x blue-tape test/*.test.js | tap-summary"
   },
   "author": "",
   "license": "ISC",

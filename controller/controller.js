@@ -38,7 +38,7 @@ Controller.prototype.registerMsg = function(msg) {
     else {
       let mState = Immut.Map(msg);
       mState = mState.set('subjectID', subject._id);
-      // convert adapter specific sender id into app user id
+      // convert adapter specific sender id into app user
       return this.pipeUser(mState)
       // at this point should have app user information
       .then(state => PipeSession.pipe(state))

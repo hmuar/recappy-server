@@ -1,2 +1,6 @@
+----- Start server ----------
+** Note starting server doesn't work yet, only tested individual modules
 start server: nodemon app.js
-start test: npm run watch
+
+----- Testing ---------
+start test: npm run test
