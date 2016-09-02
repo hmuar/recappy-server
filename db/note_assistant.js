@@ -1,4 +1,4 @@
-const Collection = require('../db/collection');
+import Collection from '../db/collection';
 const Category = Collection.Category;
 
 // function getParentIdList(parentCategories) {
@@ -69,14 +69,14 @@ function getNotesInOrder(subjectID, unitID, topicID, conceptID) {
 
 let NoteAssistant = {
   // getParentList: getParentIdList,
-  getCategoryByName: getCategoryByName,
+  getCategoryByName,
   // getParentQuery: getParentQuery,
-  getParentQueryWithId: getParentQueryWithId,
-  getCategoryById: getCategoryById,
-  getUnitsInOrder: getUnitsInOrder,
-  getTopicsInOrder: getTopicsInOrder,
-  getConceptsInOrder: getConceptsInOrder,
-  getNotesInOrder: getNotesInOrder
+  getParentQueryWithId,
+  getCategoryById,
+  getUnitsInOrder,
+  getTopicsInOrder,
+  getConceptsInOrder,
+  getNotesInOrder
 }
 
-module.exports = NoteAssistant;
+export default NoteAssistant;

@@ -9,4 +9,4 @@ let Answer = {
   ok: maxQuality
 }
 
-module.exports = Answer;
+export default Answer;

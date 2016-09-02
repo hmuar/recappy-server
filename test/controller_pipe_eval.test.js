@@ -1,15 +1,13 @@
-'use strict';
-
-const test = require('blue-tape');
+import test from 'blue-tape';
 const before = test;
 const after = test;
-const TestDatabase = require('./test_database');
+import TestDatabase from './test_database';
 const db = new TestDatabase();
-const Immut = require('immutable');
-const PipeEval = require('../controller/pipe_eval');
-const SessionState = require('../core/session_state').SessionState;
-const Input = require('../core/input');
-const Answer = require('../core/answer');
+import Immut from 'immutable';
+import PipeEval from '../controller/pipe_eval';
+import {SessionState} from '../core/session_state';
+import Input from '../core/input';
+import Answer from '../core/answer';
 
 function getSession() {
   return {
@@ -202,11 +200,9 @@ function getSession() {
   }
 }
 
-before("before controller pipe evaluator testing", function(t) {
-  return db.setup().then(() => db.clean()).then(() => db.loadAllFixtures());
-});
+before("before controller pipe evaluator testing", t => db.setup().then(() => db.clean()).then(() => db.loadAllFixtures()));
 
-test("eval with init state", function(t) {
+test("eval with init state", t => {
   let initSession = getSession();
   let mState = Immut.Map({
       'timestamp': 1,
@@ -228,7 +224,7 @@ test("eval with init state", function(t) {
   t.end();
 });
 
-test("eval with info state", function(t) {
+test("eval with info state", t => {
   let initSession = getSession();
   initSession.state = SessionState.INFO;
 
@@ -270,7 +266,7 @@ test("eval with info state", function(t) {
   t.end();
 });
 
-test("eval with recall state", function(t) {
+test("eval with recall state", t => {
   let initSession = getSession();
   initSession.state = SessionState.RECALL;
   initSession.queueIndex = 1;
@@ -298,7 +294,7 @@ test("eval with recall state", function(t) {
   t.end();
 });
 
-test("eval with recall response state", function(t) {
+test("eval with recall response state", t => {
   let initSession = getSession();
   initSession.state = SessionState.RECALL_RESPONSE;
   initSession.queueIndex = 1;
@@ -343,7 +339,7 @@ test("eval with recall response state", function(t) {
   t.end();
 });
 
-test("eval with choice state", function(t) {
+test("eval with choice state", t => {
   let initSession = getSession();
   initSession.state = SessionState.MULT_CHOICE;
   initSession.queueIndex = 2;
@@ -427,7 +423,7 @@ test("eval with choice state", function(t) {
 
 });
 
-test("eval with input state", function(t) {
+test("eval with input state", t => {
   let initSession = getSession();
   initSession.state = SessionState.INPUT;
   initSession.queueIndex = 3;
@@ -473,6 +469,4 @@ test("eval with input state", function(t) {
 
 });
 
-after("after controller pipe evaluator testing", function(t) {
-  return db.close();
-});
+after("after controller pipe evaluator testing", t => db.close());

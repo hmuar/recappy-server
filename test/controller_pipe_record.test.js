@@ -1,16 +1,14 @@
-'use strict';
-
-const test = require('blue-tape');
+import test from 'blue-tape';
 const before = test;
 const after = test;
-const TestDatabase = require('./test_database');
+import TestDatabase from './test_database';
 const db = new TestDatabase();
-const Answer = require('../core/answer');
-const PipeRecord = require('../controller/pipe_record');
-const NoteRecord = require('../db/collection').NoteRecord;
-const Immut = require('immutable');
-const Input = require('../core/input');
-const SessionState = require('../core/session_state').SessionState;
+import Answer from '../core/answer';
+import PipeRecord from '../controller/pipe_record';
+import {NoteRecord} from '../db/collection';
+import Immut from 'immutable';
+import Input from '../core/input';
+import {SessionState} from '../core/session_state';
 
 function getSession() {
   return {
@@ -97,11 +95,9 @@ function getSession() {
   }
 }
 
-before("before controller pipe record testing", function(t) {
-  return db.setup().then(() => db.clean()).then(() => db.loadAllFixtures());
-});
+before("before controller pipe record testing", t => db.setup().then(() => db.clean()).then(() => db.loadAllFixtures()));
 
-test("update existing note record", function(t) {
+test("update existing note record", t => {
 
   let userID = db.getStaticIDs().userFB;
 
@@ -137,7 +133,7 @@ test("update existing note record", function(t) {
 
 });
 
-test("create new note record", function(t) {
+test("create new note record", t => {
 
   let userID = db.getStaticIDs().userFB;
 
@@ -177,6 +173,4 @@ test("create new note record", function(t) {
 
 });
 
-after("after controller pipe record testing", function(t) {
-  return db.close();
-});
+after("after controller pipe record testing", t => db.close());

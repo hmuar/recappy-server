@@ -1,4 +1,3 @@
-'use strict';
 exports = module.exports = {};
 
 function NotConnectedError() {
@@ -19,7 +18,7 @@ Database.prototype.getOneCat = function(errorCallback, successCallback) {
     throw new NotConnectedError();
     return;
   }
-  this.db.collection('category').findOne(function(err, result) {
+  this.db.collection('category').findOne((err, result) => {
       if(err) {
         errorCallback(err);
       } else {
@@ -30,4 +29,4 @@ Database.prototype.getOneCat = function(errorCallback, successCallback) {
 
 // Export instance so that it will get cached when require(),
 // so will act like a singleton across entire app.
-module.exports = new Database();
+export default new Database();

@@ -9,4 +9,4 @@ let Input = {
   Type : InputType
 }
 
-module.exports = Input;
+export default Input;

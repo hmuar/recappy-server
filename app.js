@@ -1,7 +1,6 @@
-'use strict';
-var Server = require("./server");
-const Good = require('good');
-const mongojs = require('mongojs');
+import Server from "./server";
+import Good from 'good';
+import mongojs from 'mongojs';
 
 Server.setup(5000);
 

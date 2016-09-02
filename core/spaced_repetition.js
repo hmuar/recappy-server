@@ -1,5 +1,4 @@
-'use strict';
-const Eval = require('./eval');
+import Eval from './eval';
 
 const intervalToMinutesFactor = 1;
 const minToMillisecFactor = 60000;
@@ -69,11 +68,11 @@ let SRCore = {
   defaultFactor: 2.5,
   defaultInterval: 1.0,
   defaultCount: 1,
-  calcFactor: calcFactor,
-  calcInterval: calcInterval,
-  intervalInMinutes: intervalInMinutes,
-  calcDueDate: calcDueDate,
-  isBadResponse: isBadResponse
+  calcFactor,
+  calcInterval,
+  intervalInMinutes,
+  calcDueDate,
+  isBadResponse
 }
 
-module.exports = SRCore;
+export default SRCore;

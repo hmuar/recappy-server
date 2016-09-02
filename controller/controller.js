@@ -1,7 +1,7 @@
-const DBAssist = require('../db/note_assistant');
-const SessionAssist = require('../db/session_assistant');
-const PipeSession = require('./pipe_session');
-const Immut = require('immutable');
+import DBAssist from '../db/note_assistant';
+import SessionAssist from '../db/session_assistant';
+import PipeSession from './pipe_session';
+import Immut from 'immutable';
 
 let Controller = function(adapter) {
   this.adapter = adapter;
@@ -18,9 +18,7 @@ let Controller = function(adapter) {
 // check if key property added to msg and
 // corresponding value is not undefined and not null
 // `msg` is Immut.Map
-Controller.prototype.pipeSuccess = function(mState, key) {
-  return mState.has(key) && mState.get(key) != null ;
-}
+Controller.prototype.pipeSuccess = (mState, key) => mState.has(key) && mState.get(key) != null
 
 // convert adapter specific sender id into app user id
 Controller.prototype.pipeUser = function(mState) {
@@ -51,4 +49,4 @@ Controller.prototype.registerMsg = function(msg) {
   });
 }
 
-module.exports = Controller;
+export default Controller;

@@ -1,6 +1,4 @@
-'use strict';
-
-const Collection = require('../db/collection');
+import Collection from '../db/collection';
 const User = Collection.User;
 
 // `fbMsgID` is string used by Facebook to identify users
@@ -32,9 +30,9 @@ function createUserWithFacebookMsgID(fbMsgID) {
 }
 
 var Account = {
-  getUserByFacebookMsgID: getUserByFacebookMsgID,
-  getFacebookMsgID: getFacebookMsgID,
-  createUserWithFacebookMsgID: createUserWithFacebookMsgID
+  getUserByFacebookMsgID,
+  getFacebookMsgID,
+  createUserWithFacebookMsgID
 }
 
-module.exports = Account;
+export default Account;

@@ -1,5 +1,4 @@
-'use strict';
-const Collection = require('../db/collection');
+import Collection from '../db/collection';
 const NoteRecord = Collection.NoteRecord;
 
 // Make database updates based on evaluation of student input.
@@ -10,4 +9,4 @@ let RecordAssistant = {
 
 }
 
-module.exports = RecordAssistant;
+export default RecordAssistant;

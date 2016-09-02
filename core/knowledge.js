@@ -1,6 +1,4 @@
-'use strict';
-
-function calcWeight(prevWeight, level, responseQuality) {
+export function calcWeight(prevWeight, level, responseQuality) {
 	let weightFactor = 0;
 	let weightDelta = 0;
 	if(responseQuality < 4) {
@@ -18,9 +16,4 @@ function calcWeight(prevWeight, level, responseQuality) {
 	return finalWeight;
 }
 
-let Know = {
-	defaultWeight: 0,
-	calcWeight: calcWeight
-}
-
-module.exports = Know;
+export const DEFAULT_WEIGHT = 0;

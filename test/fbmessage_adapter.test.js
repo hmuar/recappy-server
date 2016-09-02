@@ -1,42 +1,37 @@
-'use strict';
-
-const test = require('blue-tape');
+import test from 'blue-tape';
 const before = test;
 const after = test;
-const AdapterFB = require('../adapter/fbmessenger/fbmessenger');
-const TestDatabase = require('./test_database');
-const Immut = require('immutable');
-const sinon = require('sinon');
-const request = require('request');
-
-const Input = require('../core/input');
+import AdapterFB from '../adapter/fbmessenger/fbmessenger';
+import TestDatabase from './test_database';
+import Immut from 'immutable';
+import sinon from 'sinon';
+import request from 'request';
+import Input from '../core/input';
 const db = new TestDatabase();
 
-before("before fb message adapter testing", function(t) {
-  return db.setup().then(() => db.clean()).then(() => db.loadAllFixtures());
-});
+before("before fb message adapter testing", t => db.setup().then(() => db.clean()).then(() => db.loadAllFixtures()));
 
-test("convert sender to user", function(t) {
+test("convert sender to user", t => {
   let messageData = Immut.Map({
     senderID: "1028279607252619"
   });
-  return AdapterFB.senderToUser(messageData).then(function(mData) {
+  return AdapterFB.senderToUser(messageData).then(mData => {
     t.ok(mData);
     t.equal(mData.get("userID").toString(), "6716893a8c8aff3221812148");
   });
 });
 
-test("create user", function(t) {
+test("create user", t => {
   let messageData = Immut.Map({
     senderID: "8028279607252688"
   });
-  return AdapterFB.createUser(messageData).then(function(mData) {
+  return AdapterFB.createUser(messageData).then(mData => {
     t.ok(mData);
     t.ok(mData.get("userID"));
   });
 });
 
-test("parse text request into message data", function(t) {
+test("parse text request into message data", t => {
   let request = {
     "object":"page",
     "entry":[
@@ -77,7 +72,7 @@ test("parse text request into message data", function(t) {
 });
 
 
-test("parse accept payload request into message data", function(t) {
+test("parse accept payload request into message data", t => {
   let request = {
     "object":"page",
     "entry":[
@@ -112,7 +107,7 @@ test("parse accept payload request into message data", function(t) {
   t.end();
 });
 
-test("parse reject payload request into message data", function(t) {
+test("parse reject payload request into message data", t => {
   let request = {
     "object":"page",
     "entry":[
@@ -147,7 +142,7 @@ test("parse reject payload request into message data", function(t) {
   t.end();
 });
 
-test("parse choice payload request into message data", function(t) {
+test("parse choice payload request into message data", t => {
   let request = {
     "object":"page",
     "entry":[
@@ -195,6 +190,4 @@ test("parse choice payload request into message data", function(t) {
 //   request.post.restore();
 // });
 
-after("after account testing", function(t) {
-  return db.close();
-});
+after("after account testing", t => db.close());

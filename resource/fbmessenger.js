@@ -1,5 +1,3 @@
-'use strict';
-
 function getRoutePath(apiVersionPath) {
   return apiVersionPath + '/fbmessage';
 }
@@ -40,9 +38,7 @@ function routes(apiVersionPath) {
 
 }
 
-let FBMessage = {
-  routes: routes,
-  getRoutePath: getRoutePath
-};
-
-module.exports = FBMessage;
+export default {
+  getRoutePath,
+  routes
+}

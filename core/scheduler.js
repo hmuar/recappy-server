@@ -1,12 +1,12 @@
-const Collection = require('../db/collection');
+import Collection from '../db/collection';
 const NoteRecord = Collection.NoteRecord;
 const Category = Collection.Category;
 
-const TARGET_NUM_NOTES_IN_SESSION = 3;
+export const TARGET_NUM_NOTES_IN_SESSION = 3;
 
 // Grab old notes user has already seen that are now
 // due according to note's due date.
-function getOldMaterial(userID, subjectID, numNotes) {
+export function getOldMaterial(userID, subjectID, numNotes) {
   if(!subjectID || numNotes <= 0 || !userID) {
     return Promise.resolve([]);
   }
@@ -20,9 +20,7 @@ function getOldMaterial(userID, subjectID, numNotes) {
                           .limit(numNotes)
     .then(dueNotes => {
       // map each note to its noteID
-      return dueNotes.map(function(item, index) {
-        return item.noteID;
-      });
+      return dueNotes.map((item, index) => item.noteID);
     }).then(noteIDs => {
       return Category.find({_id: {$in: noteIDs}});
     });
@@ -33,7 +31,7 @@ function getOldMaterial(userID, subjectID, numNotes) {
 // on given lastGlobalIndex. Note lastGlobalIndex is actually
 // globalIndex of the next concept that should be introduced to user.
 // Get all notes associated with this concept.
-function getNewMaterial(subjectID, numNotes, lastGlobalIndex) {
+export function getNewMaterial(subjectID, numNotes, lastGlobalIndex) {
   if(!subjectID || numNotes <= 0) {
     return Promise.resolve([]);
   }
@@ -58,7 +56,7 @@ function getNewMaterial(subjectID, numNotes, lastGlobalIndex) {
 // return [oldNotes, newNotes]
 // TODO: Detect if two questions have same c-key and only ask one
 // TODO: factor in weighting of concepts
-function getNextNotes(userID, subjectID, numNotes, lastGlobalIndex) {
+export function getNextNotes(userID, subjectID, numNotes, lastGlobalIndex) {
   if(numNotes <= 0){
     return Promise.resolve([]);
   }
@@ -68,14 +66,14 @@ function getNextNotes(userID, subjectID, numNotes, lastGlobalIndex) {
   let result = []
 
 
-  return Scheduler.getOldMaterial(userID,
+  return getOldMaterial(userID,
                                   subjectID,
                                   oldNotesNum)
     .then((oldNotes) => {
       result.push(oldNotes);
       let newNotesNum = numNotes - oldNotes.length;
       if(newNotesNum > 0) {
-        return Scheduler.getNewMaterial(subjectID, newNotesNum, lastGlobalIndex);
+        return getNewMaterial(subjectID, newNotesNum, lastGlobalIndex);
       }
       else {
         return [];
@@ -86,17 +84,6 @@ function getNextNotes(userID, subjectID, numNotes, lastGlobalIndex) {
     });
 }
 
-function getStartingNotes(subjectID, numNotes) {
-  return Scheduler.getNewMaterial(subjectID, numNotes);
+export function getStartingNotes(subjectID, numNotes) {
+  return getNewMaterial(subjectID, numNotes);
 }
-
-
-Scheduler = {
-  getNextNotes: getNextNotes,
-  getOldMaterial: getOldMaterial,
-  getNewMaterial: getNewMaterial,
-  getStartingNotes: getStartingNotes,
-  TARGET_NUM_NOTES_IN_SESSION: TARGET_NUM_NOTES_IN_SESSION
-};
-
-module.exports = Scheduler;

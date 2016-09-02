@@ -1,6 +1,4 @@
-'use strict';
-
-const SessionState = {
+export const SessionState = {
   INIT: 'init',
   RECALL: 'recall',
   RECALL_RESPONSE: 'recall-response',
@@ -13,7 +11,7 @@ const SessionState = {
   UNKNOWN: 'unknown'
 }
 
-function getEntryStateForNoteType(ntype) {
+export function getEntryStateForNoteType(ntype) {
   if(ntype === 'info') {
     return SessionState.INFO;
   }
@@ -29,16 +27,8 @@ function getEntryStateForNoteType(ntype) {
   else {
     return SessionState.UNKNOWN;
   }
-};
+}
 
-function getStartState() {
+export function getStartState() {
   return SessionState.INIT;
 }
-
-let Session = {
-  SessionState: SessionState,
-  getStartState: getStartState,
-  getEntryStateForNoteType: getEntryStateForNoteType
-}
-
-module.exports = Session;

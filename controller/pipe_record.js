@@ -1,7 +1,7 @@
-const SpacedRep = require('../core/spaced_repetition');
-const SessionState = require('../core/session_state').SessionState;
-const Immut = require('immutable');
-const NoteRecord = require('../db/collection').NoteRecord;
+import SpacedRep from '../core/spaced_repetition';
+import {SessionState} from '../core/session_state';
+import Immut from 'immutable';
+import {NoteRecord} from '../db/collection';
 
 // Record results of input evaluation using NoteRecord collection
 // This will involve calculating future due date, updating note history
@@ -71,7 +71,7 @@ function pipeSpaceRepVals(recordCtx,
 function pipeDates(recordCtx) {
   let due = SpacedRep.calcDueDate(recordCtx.get('interval'));
   return recordCtx.merge({
-    due: due,
+    due,
     lastDone: new Date()
   });
 }
@@ -111,7 +111,7 @@ function createNewRecord(userID, note, recordCtx) {
   // });
 
   let recData = {
-    userID: userID,
+    userID,
     noteID: note._id,
     noteType: note.type,
     subjectParent: note.parent[0],
@@ -177,7 +177,7 @@ function pipe(mState) {
 }
 
 let PipeRecord = {
-  pipe: pipe
+  pipe
 }
 
-module.exports = PipeRecord;
+export default PipeRecord;

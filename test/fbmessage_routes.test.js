@@ -1,23 +1,19 @@
-'use strict';
-const test = require('blue-tape');
+import test from 'blue-tape';
 const before = test;
 const after = test;
 
-const TestDatabase = require('./test_database');
+import TestDatabase from './test_database';
 const db = new TestDatabase();
-const FBmessage = require("../resource/fbmessenger");
-
-var server = require('./test_server');
+import FBmessage from "../resource/fbmessenger";
+import server from './test_server';
 
 // Server setup
-before("before fb message routes testing", function(t) {
-  return server.start();
-});
+before("before fb message routes testing", t => server.start());
 
 // FBMessenger will hit this route with a GET request
 // with a hub.challenge that must be responded to when
 // first registering the webhook address.
-test("FBmessage route GET", function(t) {
+test("FBmessage route GET", t => {
   var options = {
       method: "GET",
       url: FBmessage.getRoutePath("/api/v1") + "?hub.challenge=35",
@@ -30,7 +26,7 @@ test("FBmessage route GET", function(t) {
 });
 
 // Main POST route which receives all incoming messages
-test("FBmessage route POST", function(t) {
+test("FBmessage route POST", t => {
 
     var msg = {
       "object":"page",
@@ -70,6 +66,4 @@ test("FBmessage route POST", function(t) {
 
 });
 
-after("after", function(t) {
-  return server.stop();
-});
+after("after", t => server.stop());

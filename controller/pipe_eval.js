@@ -1,6 +1,6 @@
-const SessionState = require('../core/session_state').SessionState;
-const Input = require('../core/input');
-const Answer = require('../core/answer');
+import {SessionState} from '../core/session_state';
+import Input from '../core/input';
+import Answer from '../core/answer';
 
 // Evaluate user input in the context of user's current session state.
 // Add a `evalCtx` object to message data.
@@ -171,7 +171,7 @@ function pipe(mState) {
 }
 
 let PipeEval = {
-  pipe: pipe
+  pipe
 }
 
-module.exports = PipeEval;
+export default PipeEval;

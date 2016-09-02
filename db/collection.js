@@ -1,6 +1,4 @@
-'use strict';
-
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 let userSchema = new mongoose.Schema({
   name : String,
@@ -73,12 +71,12 @@ let NoteRecord = mongoose.model('NoteRecord',
                                  'noterecord');
 
 let Schema = {
-  User: User,
-  StudentSession: StudentSession,
-  Category: Category,
-  Note: Note,
-  NoteRecord: NoteRecord,
+  User,
+  StudentSession,
+  Category,
+  Note,
+  NoteRecord,
   ObjectID: mongoose.Types.ObjectId
 }
 
-module.exports = Schema
+export default Schema;

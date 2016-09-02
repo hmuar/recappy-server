@@ -5,4 +5,4 @@ const MessageType = {
   UNKNOWN: 'unknown'
 }
 
-module.exports = MessageType;
+export default MessageType;

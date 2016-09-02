@@ -1,9 +1,8 @@
-'use strict';
-const Account = require('../../account/account');
-const Input = require('../../core/input');
-const Immut = require('immutable');
-const fbrequest = require('./fbmessenger_request');
-const MessageType = require('./fbmessage_type');
+import Account from '../../account/account';
+import Input from '../../core/input';
+import Immut from 'immutable';
+import fbrequest from './fbmessenger_request';
+import MessageType from './fbmessage_type';
 
 // Adapter for parsing incoming requests and responding
 // if user is using Facebook Messenger platform.
@@ -155,10 +154,10 @@ function sendMessage(userID, evalContext, callback) {
 }
 
 let AdapterFBMessenger = {
-  senderToUser: senderToUser,
-  createUser: createUser,
-  parse: parse,
-  sendMessage: sendMessage
+  senderToUser,
+  createUser,
+  parse,
+  sendMessage
 };
 
-module.exports = AdapterFBMessenger;
+export default AdapterFBMessenger;

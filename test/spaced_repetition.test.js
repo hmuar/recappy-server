@@ -1,10 +1,8 @@
-'use strict';
+import test from 'blue-tape';
+import { calcWeight } from '../core/knowledge';
+import SRCore from '../core/spaced_repetition';
 
-const test = require('blue-tape');
-var Know = require('../core/knowledge');
-var SRCore = require('../core/spaced_repetition');
-
-test('Schedule Core Factor Calculation', function(t) {
+test('Schedule Core Factor Calculation', t => {
 	t.equal(SRCore.calcFactor(2, 0), 1.3);
 	t.equal(SRCore.calcFactor(2, 1), 1.46);
 	t.equal(SRCore.calcFactor(2, 2), 1.68);
@@ -16,7 +14,7 @@ test('Schedule Core Factor Calculation', function(t) {
   t.end();
 });
 
-test('should calculate correct interval', function(t) {
+test('should calculate correct interval', t => {
 	t.equal(SRCore.calcInterval(2, 2, 0, 5), 0);
 	t.equal(SRCore.calcInterval(2, 2.1, 1, 5), 1);
 	t.equal(SRCore.calcInterval(2, 2.2, 2, 5), 2);
@@ -28,7 +26,7 @@ test('should calculate correct interval', function(t) {
   t.end();
 });
 
-test('should calculate correct interval for initial count cases', function(t) {
+test('should calculate correct interval for initial count cases', t => {
 	t.equal(SRCore.calcInterval(2, 2, 0, 5), SRCore.calcInterval(5, 3, 0));
 	t.equal(SRCore.calcInterval(2, 2, 0, 5), SRCore.calcInterval(6, 2, 0));
 	t.equal(SRCore.calcInterval(2, 2, 1, 5), SRCore.calcInterval(5, 3, 1));
@@ -38,7 +36,7 @@ test('should calculate correct interval for initial count cases', function(t) {
   t.end();
 });
 
-test('should calculate interval for wrong response', function(t) {
+test('should calculate interval for wrong response', t => {
   // _SRCore.calcInterval = function(prevInterval, factor, count, responseQuality)
   t.equal(SRCore.calcInterval(2, 2.1, 0, 0), SRCore.calcInterval(2, 2, 0, 0));
   // the rest interval calculations should be equal to calculating the interval
@@ -53,7 +51,7 @@ test('should calculate interval for wrong response', function(t) {
   t.end();
 });
 
-test('should not have weight less than 0', function(t) {
-  t.ok(Know.calcWeight(0, 0.2, 3) > -0.001);
+test('should not have weight less than 0', t => {
+  t.ok(calcWeight(0, 0.2, 3) > -0.001);
   t.end();
 });

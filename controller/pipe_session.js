@@ -1,14 +1,15 @@
-const DBAssist = require('../db/note_assistant');
-const SessionAssist = require('../db/session_assistant');
-const Scheduler = require('../core/scheduler.js')
+import DBAssist from '../db/note_assistant';
+import SessionAssist from '../db/session_assistant';
+import { getStartingNotes,
+         TARGET_NUM_NOTES_IN_SESSION } from '../core/scheduler.js';
 
 function addNewSession(mState) {
   // get new notes
   let subjectID = mState.get('subjectID');
   let userID = mState.get('userID');
 
-  return Scheduler.getStartingNotes(subjectID,
-                                    Scheduler.TARGET_NUM_NOTES_IN_SESSION)
+  return getStartingNotes(subjectID,
+                                    TARGET_NUM_NOTES_IN_SESSION)
   .then(noteQueue => {
     let startNoteIndex = 0;
     let startGlobalIndex = 0;
@@ -44,7 +45,7 @@ function pipe(mState) {
 }
 
 let PipeSession = {
-  pipe: pipe
+  pipe
 }
 
-module.exports = PipeSession;
+export default PipeSession;

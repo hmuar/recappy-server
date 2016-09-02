@@ -1,22 +1,17 @@
-'use strict';
-
-const test = require('blue-tape');
+import test from 'blue-tape';
 const before = test;
 const after = test;
-const AdapterFB = require('../adapter/fbmessenger/fbmessenger');
-const TestDatabase = require('./test_database');
-
-const Immut = require('immutable');
+import AdapterFB from '../adapter/fbmessenger/fbmessenger';
+import TestDatabase from './test_database';
+import Immut from 'immutable';
 const db = new TestDatabase();
 
-const cMod = require('../controller/controller');
+import cMod from '../controller/controller';
 let Controller = new cMod(AdapterFB);
 
-before("before controller testing", function(t) {
-  return db.setup().then(() => db.clean()).then(() => db.loadAllFixtures());
-});
+before("before controller testing", t => db.setup().then(() => db.clean()).then(() => db.loadAllFixtures()));
 
-test("register message with existing session", function(t) {
+test("register message with existing session", t => {
   // `msg` = {
   //   timestamp  : ""
   //   senderID   : "",
@@ -45,7 +40,7 @@ test("register message with existing session", function(t) {
 
 // senderID doesn't have an existing session in test database
 // so this tests process of session creation
-test("register message for new session", function(t) {
+test("register message for new session", t => {
   let msg = Immut.Map({
     timestamp: 1,
     senderID: "2028279607252615",
@@ -67,6 +62,4 @@ test("register message for new session", function(t) {
 });
 
 
-after("after controller testing", function(t) {
-  return db.close();
-});
+after("after controller testing", t => db.close());

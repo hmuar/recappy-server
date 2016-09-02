@@ -7,4 +7,4 @@ let Config = {
   "AuthEndpoint": "https://41d8e76d.ngrok.io/api/v1/login"
 }
 
-module.exports = Config
+export default Config;
