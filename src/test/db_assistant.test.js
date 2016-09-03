@@ -1,12 +1,13 @@
 import test from 'blue-tape';
-const before = test;
-const after = test;
-
 import TestDatabase from './test_database';
 import DBAssist from '../db/note_assistant';
+
+const before = test;
+const after = test;
 const db = new TestDatabase();
 
-before("before db assistant testing", t => db.setup().then(() => db.clean()).then(() => db.loadAllFixtures()));
+before('before db assistant testing',
+  () => db.setup().then(() => db.clean()).then(() => db.loadAllFixtures()));
 
 // test("get parent list", function(t) {
 //   let tObj = {_id: 1, id: "garbage", name: "stan", subject: "bio"}
@@ -21,14 +22,14 @@ before("before db assistant testing", t => db.setup().then(() => db.clean()).the
 //   t.end();
 // });
 
-test("get category by name", t => DBAssist.getCategoryByName("subject", "crash-course-biology")
+test('get category by name', t => DBAssist.getCategoryByName('subject', 'crash-course-biology')
 .then((cat) => {
   t.ok(cat);
-  t.equal(cat._id.toString(), "f64c57184a4ef7f0357f9cd6");
-  return DBAssist.getCategoryByName("unit", "episode-1-carbon");
+  t.equal(cat._id.toString(), 'f64c57184a4ef7f0357f9cd6');
+  return DBAssist.getCategoryByName('unit', 'episode-1-carbon');
 }).then((cat) => {
   t.ok(cat);
-  t.equal(cat._id.toString(), "0850e4270c2aadd7ccdc1ca1");
+  t.equal(cat._id.toString(), '0850e4270c2aadd7ccdc1ca1');
 }));
 
 // test("get parent query", function(t) {
@@ -41,47 +42,47 @@ test("get category by name", t => DBAssist.getCategoryByName("subject", "crash-c
 //   t.end();
 // });
 
-test("get parent query with id", t => {
-  let query = DBAssist.getParentQueryWithId([1, 5, 93]);
-  t.deepEqual(query, [{parent: [1, 5, 93]}]);
+test('get parent query with id', t => {
+  const query = DBAssist.getParentQueryWithId([1, 5, 93]);
+  t.deepEqual(query, [{ parent: [1, 5, 93] }]);
   t.end();
 });
 
-test("get category by id", t => DBAssist.getCategoryById(
-            db.createObjectID("5e28c07bb4d307d667fe83e8"))
+test('get category by id', t => DBAssist.getCategoryById(
+            db.createObjectID('5e28c07bb4d307d667fe83e8'))
   .then((cat) => {
     t.ok(cat);
-    t.equal(cat._id.toString(), "5e28c07bb4d307d667fe83e8");
+    t.equal(cat._id.toString(), '5e28c07bb4d307d667fe83e8');
   }));
 
-test("get units in order", t => DBAssist.getUnitsInOrder(
-                  db.createObjectID("f64c57184a4ef7f0357f9cd6"))
+test('get units in order', t => DBAssist.getUnitsInOrder(
+                  db.createObjectID('f64c57184a4ef7f0357f9cd6'))
   .then((units) => {
     t.ok(units);
   }));
 
-test("get topics in order", t => DBAssist.getTopicsInOrder(
-                  db.createObjectID("f64c57184a4ef7f0357f9cd6"),
-                  db.createObjectID("0850e4270c2aadd7ccdc1ca1"))
+test('get topics in order', t => DBAssist.getTopicsInOrder(
+                  db.createObjectID('f64c57184a4ef7f0357f9cd6'),
+                  db.createObjectID('0850e4270c2aadd7ccdc1ca1'))
   .then((topics) => {
     t.ok(topics);
   }));
 
-test("get concepts in order", t => DBAssist.getConceptsInOrder(
-                  db.createObjectID("f64c57184a4ef7f0357f9cd6"),
-                  db.createObjectID("0850e4270c2aadd7ccdc1ca1"),
-                  db.createObjectID("5e28c07bb4d307d667fe83e8"))
+test('get concepts in order', t => DBAssist.getConceptsInOrder(
+                  db.createObjectID('f64c57184a4ef7f0357f9cd6'),
+                  db.createObjectID('0850e4270c2aadd7ccdc1ca1'),
+                  db.createObjectID('5e28c07bb4d307d667fe83e8'))
   .then((concepts) => {
     t.ok(concepts);
   }));
 
-test("get notes in order", t => DBAssist.getNotesInOrder(
-                  db.createObjectID("f64c57184a4ef7f0357f9cd6"),
-                  db.createObjectID("0850e4270c2aadd7ccdc1ca1"),
-                  db.createObjectID("5e28c07bb4d307d667fe83e8"),
-                  db.createObjectID("7980227254feb46736ca47fd"))
+test('get notes in order', t => DBAssist.getNotesInOrder(
+                  db.createObjectID('f64c57184a4ef7f0357f9cd6'),
+                  db.createObjectID('0850e4270c2aadd7ccdc1ca1'),
+                  db.createObjectID('5e28c07bb4d307d667fe83e8'),
+                  db.createObjectID('7980227254feb46736ca47fd'))
   .then((notes) => {
     t.ok(notes);
   }));
 
-after("after account testing", t => db.close());
+after('after account testing', () => db.close());

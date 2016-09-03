@@ -1,4 +1,4 @@
-import {SessionState} from '../core/session_state';
+import { SessionState } from '../core/session_state';
 import Input from '../core/input';
 import Answer from '../core/answer';
 
@@ -33,10 +33,10 @@ function InitContext(mState) {
   // session.state = Session.getEntryStateForNoteType(firstNote.type);
   // // reset queueIndex to beginning of queue
   // session.queueIndex = 0;
-  let evalCtx = {
+  const evalCtx = {
     answerQuality: Answer.ok,
-    doneNote: false
-  }
+    doneNote: false,
+  };
 
   return mState.set('evalCtx', evalCtx);
 }
@@ -45,17 +45,16 @@ function InitContext(mState) {
 // Otherwise return original state.
 // `mState` is Immut.Map
 function InfoContext(mState) {
-  let session = mState.get('session');
-  let input = mState.get('input');
+  const input = mState.get('input');
 
-  let evalCtx = {
+  const evalCtx = {
     answerQuality: null,
-    doneNote: false
-  }
+    doneNote: false,
+  };
 
-  if(input.type === Input.Type.ACCEPT) {
-      evalCtx.answerQuality = Answer.ok;
-      evalCtx.doneNote = true;
+  if (input.type === Input.Type.ACCEPT) {
+    evalCtx.answerQuality = Answer.ok;
+    evalCtx.doneNote = true;
   }
 
   return mState.set('evalCtx', evalCtx);
@@ -64,32 +63,31 @@ function InfoContext(mState) {
 // Look for ACCEPT or REJECT input type and then advance state
 // Otherwise return original state.
 function RecallContext(mState) {
-  let session = mState.get('session');
-  let input = mState.get('input');
-  let evalCtx = {
+  const session = mState.get('session');
+  const input = mState.get('input');
+  const evalCtx = {
     answerQuality: null,
-    doneNote: false
-  }
-  if(input.type === Input.Type.ACCEPT) {
+    doneNote: false,
+  };
+  let newState = mState;
+  if (input.type === Input.Type.ACCEPT) {
     evalCtx.answerQuality = Answer.ok;
     session.state = SessionState.RECALL_RESPONSE;
-    mState = mState.set('session', session);
+    newState = mState.set('session', session);
   }
-  return mState.set('evalCtx', evalCtx);
+  return newState.set('evalCtx', evalCtx);
 }
 
 function RecallResponseContext(mState) {
-  let session = mState.get('session');
-  let input = mState.get('input');
-  let evalCtx = {
+  const input = mState.get('input');
+  const evalCtx = {
     answerQuality: null,
-    doneNote: false
-  }
-  if(input.type === Input.Type.ACCEPT) {
+    doneNote: false,
+  };
+  if (input.type === Input.Type.ACCEPT) {
     evalCtx.answerQuality = Answer.max;
     evalCtx.doneNote = true;
-  }
-  else if(input.type === Input.Type.REJECT){
+  } else if (input.type === Input.Type.REJECT) {
     evalCtx.answerQuality = Answer.min;
     evalCtx.doneNote = true;
   }
@@ -98,18 +96,18 @@ function RecallResponseContext(mState) {
 
 
 function InputContext(mState) {
-  let session = mState.get('session');
-  let input = mState.get('input');
-  let evalCtx = {
+  const session = mState.get('session');
+  const input = mState.get('input');
+  const evalCtx = {
     answerQuality: null,
-    doneNote: false
-  }
+    doneNote: false,
+  };
   // use isNaN to accept both numerical and number as text inputs
-  if(input.type === Input.Type.CUSTOM) {
+  if (input.type === Input.Type.CUSTOM) {
     // Note should be type "choice"
-    let note = session.noteQueue[session.queueIndex];
-    let correctAnswer = input.data === note.answer;
-    evalCtx.answerQuality =  correctAnswer? Answer.max : Answer.min;
+    const note = session.noteQueue[session.queueIndex];
+    const correctAnswer = input.data === note.answer;
+    evalCtx.answerQuality = correctAnswer ? Answer.max : Answer.min;
     evalCtx.doneNote = true;
   }
 
@@ -118,19 +116,19 @@ function InputContext(mState) {
 }
 
 function MultChoiceContext(mState) {
-  let session = mState.get('session');
-  let input = mState.get('input');
-  let evalCtx = {
+  const session = mState.get('session');
+  const input = mState.get('input');
+  const evalCtx = {
     answerQuality: null,
-    doneNote: false
-  }
+    doneNote: false,
+  };
   // use isNaN to accept both numerical and number as text inputs
-  if(input.type === Input.Type.CUSTOM && !isNaN(input.data)) {
-    let dataAsNum = parseInt(input.data, 10);
+  if (input.type === Input.Type.CUSTOM && !isNaN(input.data)) {
+    const dataAsNum = parseInt(input.data, 10);
     // Note should be type "choice"
-    let note = session.noteQueue[session.queueIndex];
-    let correctAnswer = dataAsNum === note.answer;
-    evalCtx.answerQuality =  correctAnswer? Answer.max : Answer.min;
+    const note = session.noteQueue[session.queueIndex];
+    const correctAnswer = dataAsNum === note.answer;
+    evalCtx.answerQuality = correctAnswer ? Answer.max : Answer.min;
     evalCtx.doneNote = true;
   }
 
@@ -138,40 +136,54 @@ function MultChoiceContext(mState) {
   return mState.set('evalCtx', evalCtx);
 }
 
+function WaitContext(mState) {
+  return mState;
+}
+
+function DoneContext(mState) {
+  return mState;
+}
+
+function UnknownContext(mState) {
+  return mState;
+}
+
 function getEvalContext(state) {
-  switch(state) {
-  case SessionState.INIT:
-    return InitContext;
-  case SessionState.INFO:
-    return InfoContext;
-  case SessionState.RECALL:
-    return RecallContext;
-  case SessionState.RECALL_RESPONSE:
-    return RecallResponseContext;
-  case SessionState.INPUT:
-    return InputContext;
-  case SessionState.MULT_CHOICE:
-    return MultChoiceContext;
-  case SessionState.WAIT_NEXT_NOTE:
-    return WaitContext;
-  case SessionState.DONE_SESSION:
-    return DoneContext;
-  default:
-    return UnknownContext;
+  switch (state) {
+    case SessionState.INIT:
+      return InitContext;
+    case SessionState.INFO:
+      return InfoContext;
+    case SessionState.RECALL:
+      return RecallContext;
+    case SessionState.RECALL_RESPONSE:
+      return RecallResponseContext;
+    case SessionState.INPUT:
+      return InputContext;
+    case SessionState.MULT_CHOICE:
+      return MultChoiceContext;
+    case SessionState.WAIT_NEXT_NOTE:
+      // TODO: implement WaitContext
+      return WaitContext;
+    case SessionState.DONE_SESSION:
+      // TODO: implement DoneContext
+      return DoneContext;
+    default:
+      return UnknownContext;
   }
 }
 
 function pipe(mState) {
-  if(!mState.has('session')) {
+  if (!mState.has('session')) {
     return mState;
   }
 
-  let sState = mState.get('session').state;
+  const sState = mState.get('session').state;
   return getEvalContext(sState)(mState);
 }
 
-let PipeEval = {
-  pipe
-}
+const PipeEval = {
+  pipe,
+};
 
 export default PipeEval;

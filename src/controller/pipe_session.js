@@ -1,26 +1,25 @@
-import DBAssist from '../db/note_assistant';
 import SessionAssist from '../db/session_assistant';
 import { getStartingNotes,
          TARGET_NUM_NOTES_IN_SESSION } from '../core/scheduler.js';
 
 function addNewSession(mState) {
   // get new notes
-  let subjectID = mState.get('subjectID');
-  let userID = mState.get('userID');
+  const subjectID = mState.get('subjectID');
+  const userID = mState.get('userID');
 
   return getStartingNotes(subjectID,
                                     TARGET_NUM_NOTES_IN_SESSION)
   .then(noteQueue => {
-    let startNoteIndex = 0;
-    let startGlobalIndex = 0;
+    const startNoteIndex = 0;
+    const startGlobalIndex = 0;
     return SessionAssist.createSession(userID,
                                       subjectID,
                                       startNoteIndex,
                                       noteQueue,
-                                      startGlobalIndex)
-  }).then(session => {
-    return mState.set('session', session);
-  })
+                                      startGlobalIndex);
+  }).then(session => (
+    mState.set('session', session)
+  ));
 }
 
 // find existing user session for given subject and set `session` key
@@ -35,17 +34,15 @@ function pipe(mState) {
                           mState.get('userID'),
                           mState.get('subjectID'))
   .then(session => {
-    if(!session) {
+    if (!session) {
       return addNewSession(mState);
     }
-    else {
-      return mState.set('session', session);
-    }
+    return mState.set('session', session);
   });
 }
 
-let PipeSession = {
-  pipe
-}
+const PipeSession = {
+  pipe,
+};
 
 export default PipeSession;

@@ -1,12 +1,12 @@
-let InputType = {
+const InputType = {
   ACCEPT: 'accept',
   REJECT: 'reject',
   CUSTOM: 'custom',
-  UNKOWN: 'unknown'
-}
+  UNKOWN: 'unknown',
+};
 
-let Input = {
-  Type : InputType
-}
+const Input = {
+  Type: InputType,
+};
 
 export default Input;

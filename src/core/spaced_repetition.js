@@ -9,12 +9,11 @@ const minToMillisecFactor = 60000;
 function calcFactor(previousFactor, responseQuality) {
   // EF':=EF+(0.1-(5-q)*(0.08+(5-q)*0.02))
   // User shouldn't update factor if answer is low quality
-  var q = responseQuality;
-  var q = Math.min(responseQuality, 5);
+  let q = Math.min(responseQuality, 5);
   q = Math.max(q, 0);
-  var newFactor = previousFactor + (0.1 - (5-q) * (0.08+(5-q)*0.02) );
+  let newFactor = previousFactor + (0.1 - (5 - q) * (0.08 + (5 - q) * 0.02)); // eslint-disable-line
   newFactor = Math.max(newFactor, 1.3);
-	return newFactor;
+  return newFactor;
 }
 
 //  Interval used for spaced repetition
@@ -22,49 +21,45 @@ function calcFactor(previousFactor, responseQuality) {
 //  `count` - Number of times content has been viewed
 //  return new interval in days
 function calcIntervalCore(prevInterval, factor, count) {
-    if(count == 0) {
-    	return 0;
-    } else if(count == 1) {
-    	return 1;
-    } else if(count == 2) {
-    	return 2;
-    } else {
-    	return Math.floor(prevInterval * factor);
-    }
-}
-
-function calcInterval(prevInterval, factor, count, responseQuality) {
-  if(isBadResponse(responseQuality)) {
-    if(count < 1) {
-      return calcIntervalCore(prevInterval, factor, count);
-    }
-    else {
-      // treat interval calculation as if this is first time, with count = 1
-      // since response quality is bad
-      return calcIntervalCore(prevInterval, factor, 1);
-    }
+  if (count === 0) {
+    return 0;
+  } else if (count === 1) {
+    return 1;
+  } else if (count === 2) {
+    return 2;
   }
-  else {
-    return calcIntervalCore(prevInterval, factor, count);
-  }
-}
-
-// TODO: write a test for this function
-function calcDueDate(interval) {
-  var dueDate = new Date();
-  var intervalMin = intervalInMinutes(interval);
-  return new Date(dueDate.getTime() + intervalMin * minToMillisecFactor);
-}
-
-function intervalInMinutes(interval) {
-  return interval * intervalToMinutesFactor;
+  return Math.floor(prevInterval * factor);
 }
 
 function isBadResponse(responseQuality) {
   return responseQuality < Eval.maxResponseQuality / 2.0;
 }
 
-let SRCore = {
+function calcInterval(prevInterval, factor, count, responseQuality) {
+  if (isBadResponse(responseQuality)) {
+    if (count < 1) {
+      return calcIntervalCore(prevInterval, factor, count);
+    }
+    // treat interval calculation as if this is first time, with count = 1
+    // since response quality is bad
+    return calcIntervalCore(prevInterval, factor, 1);
+  }
+  return calcIntervalCore(prevInterval, factor, count);
+}
+
+function intervalInMinutes(interval) {
+  return interval * intervalToMinutesFactor;
+}
+
+// TODO: write a test for this function
+function calcDueDate(interval) {
+  const dueDate = new Date();
+  const intervalMin = intervalInMinutes(interval);
+  return new Date(dueDate.getTime() + (intervalMin * minToMillisecFactor));
+}
+
+
+const SRCore = {
   defaultFactor: 2.5,
   defaultInterval: 1.0,
   defaultCount: 1,
@@ -72,7 +67,7 @@ let SRCore = {
   calcInterval,
   intervalInMinutes,
   calcDueDate,
-  isBadResponse
-}
+  isBadResponse,
+};
 
 export default SRCore;

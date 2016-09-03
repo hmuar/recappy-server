@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test" : "watch 'clear && npm run test-run' src",
+    "lint": "esw -w src",
+    "test": "watch 'clear && npm run test-run' src",
     "test-run": "blue-tape -r babel-register src/test/*.test.js | tap-summary"
   },
   "author": "",
@@ -18,14 +19,20 @@
     "hapi": "^13.5.0",
     "immutable": "^3.8.1",
     "mongoose": "^4.5.7",
-    "promised-mongo": "^1.2.0"
+    "promised-mongo": "^1.2.0",
+    "request": "^2.74.0"
   },
   "devDependencies": {
     "babel-cli": "^6.14.0",
     "babel-preset-node5": "^11.1.0",
     "babel-preset-stage-0": "^6.5.0",
     "blue-tape": "^0.2.0",
-    "request": "^2.74.0",
+    "eslint": "^3.4.0",
+    "eslint-config-airbnb": "^10.0.1",
+    "eslint-plugin-import": "^1.14.0",
+    "eslint-plugin-jsx-a11y": "^2.2.1",
+    "eslint-plugin-react": "^6.2.0",
+    "eslint-watch": "^2.1.14",
     "sinon": "^1.17.5",
     "tap-summary": "^3.0.1",
     "watch": "^0.19.2"

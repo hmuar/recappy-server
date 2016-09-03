@@ -1,85 +1,90 @@
 import mongoose from 'mongoose';
+import Promise from 'bluebird';
 import fixture from './test_fixture';
 import { NoteRecord,
          Category,
          StudentSession,
          User,
          ObjectID } from '../db/collection';
-import Promise from "bluebird";
+
 Promise.promisifyAll(mongoose);
 
-var TestDatabase = function() {
-  this.loaded = null;
-}
+export default class TestDatabase {
+  constructor() {
+    this.loaded = null;
+  }
 
-TestDatabase.prototype.createObjectID = idString => ObjectID(idString)
+  createObjectID(idString) {
+    return ObjectID(idString);
+  }
 
-TestDatabase.prototype.initialize = function() {
-  return new Promise((resolve, reject) => {
-    if(!this.loaded) {
-      var connection = mongoose.connect('mongodb://127.0.0.1:3001/test').connection;
-      connection.on('error', () => reject("Could not connect to test database") );
-      connection.on('open', () => {
+  initialize() {
+    return new Promise((resolve, reject) => {
+      if (!this.loaded) {
+        const connection = mongoose.connect('mongodb://127.0.0.1:3001/test').connection;
+        connection.on('error', () => reject('Could not connect to test database'));
+        connection.on('open', () => {
           this.loaded = true;
           resolve();
-      });
-    }
-    else {
-      resolve();
-    }
-  });
-}
-
-TestDatabase.prototype.setup = function() {
-  return this.initialize();
-}
-
-TestDatabase.prototype.clean = function() {
-  if(!this.loaded) {
-    return Promise.reject(new Error("DB not loaded"));
-  }
-
-  return User.remove({}).then(() => {
-    return StudentSession.remove({}).then(() => {
-    }).then(() => {
-      return Category.remove({}).then(() => {
-      });
-    }).then(() => {
-      return NoteRecord.remove({}).then(() => {
-      });
+        });
+      } else {
+        resolve();
+      }
     });
-  });
-}
-
-TestDatabase.prototype.close = function() {
-  if(!this.loaded) {
-    return Promise.reject(new Error("DB not loaded"));
-  }
-  return mongoose.connection.close();
-}
-
-TestDatabase.prototype.teardown = function() {
-  if(!this.loaded) {
-    return Promise.reject(new Error("DB not loaded"));
   }
 
-  return this.clean();
-
-}
-
-TestDatabase.prototype.loadAllFixtures = () => fixture.addAll()
-
-TestDatabase.prototype.loadUserFixtures = function() {
-  if(!this.loaded) {
-    return Promise.reject(new Error("DB not loaded"));
+  setup() {
+    return this.initialize();
   }
 
-  return fixture.addUsers();
+  clean() {
+    if (!this.loaded) {
+      return Promise.reject(new Error('DB not loaded'));
+    }
 
+    return User.remove({}).then(() => (
+      StudentSession.remove({}).then(() => {
+      })
+      .then(() => (
+        Category.remove({})
+      ))
+      .then(() => (
+        NoteRecord.remove({})
+      ))
+    ));
+  }
+
+  close() {
+    if (!this.loaded) {
+      return Promise.reject(new Error('DB not loaded'));
+    }
+    return mongoose.connection.close();
+  }
+
+  teardown() {
+    if (!this.loaded) {
+      return Promise.reject(new Error('DB not loaded'));
+    }
+
+    return this.clean();
+  }
+
+  loadAllFixtures() {
+    return fixture.addAll();
+  }
+
+  loadUserFixtures() {
+    if (!this.loaded) {
+      return Promise.reject(new Error('DB not loaded'));
+    }
+
+    return fixture.addUsers();
+  }
+
+  getStaticIDs() {
+    return fixture.getStaticIDs();
+  }
+  getTestUser() {
+    return User.findOne();
+  }
 }
-
-TestDatabase.prototype.getStaticIDs = () => fixture.getStaticIDs()
-
-TestDatabase.prototype.getTestUser = () => User.findOne()
-
-export default TestDatabase;

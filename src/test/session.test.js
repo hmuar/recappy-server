@@ -1,11 +1,9 @@
-import { Schema } from '../db/collection';
 import test from 'blue-tape';
-const before = test;
-const after = test;
-
 import TestDatabase from './test_database';
 import SessionAssist from '../db/session_assistant';
-import { SessionState } from '../core/session_state';
+
+const before = test;
+const after = test;
 const db = new TestDatabase();
 
 const staticID = db.getStaticIDs();
@@ -19,9 +17,11 @@ staticID.newSubject = db.createObjectID('764c57184a4ef7f0357f9cd6');
 //   newSubject: new ID
 // }
 
-before("before session testing", t => db.setup().then(() => db.clean()).then(() => db.loadAllFixtures()));
+before('before session testing',
+  () => db.setup().then(() => db.clean()).then(() => db.loadAllFixtures()));
 
-test('find study session for test student', t => SessionAssist.getSessionForUserAndSubject(staticID.userFB,
+test('find study session for test student',
+  t => SessionAssist.getSessionForUserAndSubject(staticID.userFB,
                                                 staticID.subject)
 .then((session) => t.ok(session)));
 
@@ -38,24 +38,26 @@ test('dont find session for fake subject', t => SessionAssist.getSessionForUserA
 test('create study session', t => SessionAssist.getSessionForUserAndSubject(staticID.userFB2,
                                                 staticID.subject)
 .then((session) => t.equal(session, null))
-.then(() => {
-  return SessionAssist.createSession(staticID.userFB2,
+.then(() => (
+  SessionAssist.createSession(staticID.userFB2,
                              staticID.subject,
                              staticID.note,
                              0,
                              [staticID.note, staticID.note2],
-                             0);
-}).then(() => {
-  return SessionAssist.getSessionForUserAndSubject(staticID.userFB2,
+                             0)
+))
+.then(() => (
+  SessionAssist.getSessionForUserAndSubject(staticID.userFB2,
                                                   staticID.subject)
-  .then((session) => t.ok(session));
-}));
+  .then((session) => t.ok(session))
+)));
 
-test('should append new subject to user session', t => SessionAssist.getSessionForUserAndSubject(staticID.userFB,
+test('should append new subject to user session',
+  t => SessionAssist.getSessionForUserAndSubject(staticID.userFB,
                                                 staticID.subject)
 .then((session) => {
   t.ok(session);
-  return  SessionAssist.getSessionForUserAndSubject(
+  return SessionAssist.getSessionForUserAndSubject(
                                                 staticID.userFB,
                                                 staticID.newSubject);
 }).then((session) => {
@@ -66,17 +68,19 @@ test('should append new subject to user session', t => SessionAssist.getSessionF
                              0,
                              [staticID.note],
                              0);
-}).then(() => {
-  return SessionAssist.getSessionForUserAndSubject(
+}).then(() => (
+  SessionAssist.getSessionForUserAndSubject(
                                             staticID.userFB,
-                                            staticID.newSubject);
-}).then((sessionNewSubj) => {
+                                            staticID.newSubject)
+))
+.then((sessionNewSubj) => {
   t.ok(sessionNewSubj);
   return SessionAssist.getSessionForUserAndSubject(
                                                 staticID.userFB,
                                                 staticID.subject);
-}).then((sessionOldSubj) => {
+})
+.then((sessionOldSubj) => {
   t.ok(sessionOldSubj);
 }));
 
-after("after session testing", t => db.close());
+after('after session testing', () => db.close());

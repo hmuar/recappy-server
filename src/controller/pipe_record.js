@@ -1,39 +1,39 @@
+import Immut from 'immutable';
 import SpacedRep from '../core/spaced_repetition';
 import { SessionState } from '../core/session_state';
-import Immut from 'immutable';
 import { NoteRecord } from '../db/collection';
 
 // Record results of input evaluation using NoteRecord collection
 // This will involve calculating future due date, updating note history
 
 function calcNoteHealth(responseHistory) {
-  if(responseHistory.length === 0) {
+  if (responseHistory.length === 0) {
     return 0;
   }
 
-  if(responseHistory.length > 3) {
-    var allBad = true;
-    for(var i=0; i < 3; i++) {
-      if(responseHistory[responseHistory.length - 1 - i] !== 0) {
+  if (responseHistory.length > 3) {
+    let allBad = true;
+    for (let i = 0; i < 3; i++) {
+      if (responseHistory[responseHistory.length - 1 - i] !== 0) {
         allBad = false;
         break;
       }
     }
     // if past x responses were all bad, drop note health to 0
-    if(allBad) {
+    if (allBad) {
       return 0;
     }
   }
 
-  var lastResponses = responseHistory.slice(-4);
+  const lastResponses = responseHistory.slice(-4);
   // var sum = 5;
-  var sum = 0;
-  for(var i=0; i < lastResponses.length; i++) {
+  let sum = 0;
+  for (let i = 0; i < lastResponses.length; i++) {
     sum += lastResponses[i];
   }
 
   // var avg = sum / (lastResponses.length + 1);
-  var avg = sum / (lastResponses.length);
+  const avg = sum / (lastResponses.length);
   return avg;
 }
 
@@ -43,50 +43,45 @@ function calcNoteHealth(responseHistory) {
 function pipeSpaceRepVals(recordCtx,
                           record,
                           evalCtx) {
+  const rec = record || {
+    factor: SpacedRep.defaultFactor,
+    interval: SpacedRep.defaultInterval,
+    count: SpacedRep.defaultCount,
+  };
 
-  if(!record) {
-    record = {
-      factor: SpacedRep.defaultFactor,
-      interval: SpacedRep.defaultInterval,
-      count: SpacedRep.defaultCount
-    }
-  }
+  const responseQuality = evalCtx.answerQuality;
+  const newFactor = SpacedRep.calcFactor(rec.factor, responseQuality);
+  const newCount = rec.count + 1;
 
-  let responseQuality = evalCtx.answerQuality;
-  let newFactor = SpacedRep.calcFactor(record.factor, responseQuality);
-  let newCount = record.count + 1;
-
-  let newInterval = SpacedRep.calcInterval(record.interval,
+  const newInterval = SpacedRep.calcInterval(rec.interval,
                                            newFactor,
                                            newCount,
                                            responseQuality);
   return recordCtx.merge({
     factor: newFactor,
     interval: newInterval,
-    count: newCount
+    count: newCount,
   });
 }
 
 // recordCtx is Immut.Map
 function pipeDates(recordCtx) {
-  let due = SpacedRep.calcDueDate(recordCtx.get('interval'));
+  const due = SpacedRep.calcDueDate(recordCtx.get('interval'));
   return recordCtx.merge({
     due,
-    lastDone: new Date()
+    lastDone: new Date(),
   });
 }
 
 // recordCtx is Immut.Map
 function pipeHistory(recordCtx, record, evalCtx) {
-  if(!record) {
-    let history = [evalCtx.answerQuality];
+  if (!record) {
+    const history = [evalCtx.answerQuality];
     return recordCtx.set('history', history);
   }
-  else {
-    let history = record.get('history');
-    history.push(evalCtx.answerQuality);
-    return recordCtx.set('history', history);
-  }
+  const history = record.get('history');
+  history.push(evalCtx.answerQuality);
+  return recordCtx.set('history', history);
 }
 
 // recordCtx needs to have history
@@ -110,14 +105,14 @@ function createNewRecord(userID, note, recordCtx) {
   //   health : Number
   // });
 
-  let recData = {
+  const recData = {
     userID,
     noteID: note._id,
     noteType: note.type,
     subjectParent: note.parent[0],
-  }
+  };
   // newRecord is combined Immut.Map
-  let newRecord = recordCtx.merge(recData);
+  const newRecord = recordCtx.merge(recData);
   return NoteRecord.create(newRecord.toObject());
 }
 
@@ -126,23 +121,22 @@ function pipe(mState) {
   // grab current note info from `session.noteQueue[session.queueIndex]`
   // update NoteRecord using note info and evalCtx data
 
-  if(!mState.has('evalCtx')) {
+  if (!mState.has('evalCtx')) {
     return mState;
   }
 
-  let session = mState.get('session');
+  const session = mState.get('session');
 
-  if(session.state === SessionState.DONE_SESSION) {
+  if (session.state === SessionState.DONE_SESSION) {
     return mState;
   }
 
-  let note = session.noteQueue[session.queueIndex];
-  let evalCtx = mState.get('evalCtx');
+  const note = session.noteQueue[session.queueIndex];
+  const evalCtx = mState.get('evalCtx');
 
-  return NoteRecord.findOne({userID: mState.get('userID'),
-                             noteID: note._id})
+  return NoteRecord.findOne({ userID: mState.get('userID'),
+                             noteID: note._id })
   .then(record => {
-
     let recordCtx = Immut.Map({});
 
     recordCtx = pipeSpaceRepVals(recordCtx,
@@ -158,26 +152,23 @@ function pipe(mState) {
     recordCtx = pipeHistory(recordCtx, record, evalCtx);
     recordCtx = pipeHealth(recordCtx, record, evalCtx);
 
-    if(record){
-      return record.update(recordCtx.toObject()).then(() => {
-        return mState.set('recordCtx', recordCtx.toObject());
-      });
+    if (record) {
+      return record.update(recordCtx.toObject()).then(() => (
+        mState.set('recordCtx', recordCtx.toObject())
+      ));
     }
-    else {
-      // need to create new record
-      console.log("creating new record");
-
-      return createNewRecord(mState.get('userID'),
-                             note,
-                             recordCtx).then(() => {
-        return mState.set('recordCtx', recordCtx.toObject());
-      });
-    }
+    // need to create new record
+    console.log('creating new record');
+    return createNewRecord(mState.get('userID'),
+                           note,
+                           recordCtx).then(() => (
+                             mState.set('recordCtx', recordCtx.toObject())
+                           ));
   });
 }
 
-let PipeRecord = {
-  pipe
-}
+const PipeRecord = {
+  pipe,
+};
 
 export default PipeRecord;

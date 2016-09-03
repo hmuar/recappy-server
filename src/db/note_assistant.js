@@ -11,7 +11,7 @@ import { Category } from '../db/collection';
 // }
 
 function getCategoryByName(catLabel, catName) {
-  return Category.findOne({ctype:catLabel, ckey: catName});
+  return Category.findOne({ ctype: catLabel, ckey: catName });
 }
 
 // function getParentQuery(parentCategories) {
@@ -20,7 +20,7 @@ function getCategoryByName(catLabel, catName) {
 // }
 
 function getParentQueryWithId(parentCategoriesIds) {
-  return [{parent: parentCategoriesIds}];
+  return [{ parent: parentCategoriesIds }];
 }
 
 function getCategoryById(catId) {
@@ -28,45 +28,45 @@ function getCategoryById(catId) {
 }
 
 function getUnitsInOrder(subjectID) {
-  let parentQuery = getParentQueryWithId([subjectID]);
-  if(parentQuery.length == 0) {
+  const parentQuery = getParentQueryWithId([subjectID]);
+  if (parentQuery.length === 0) {
     return [];
   }
-  return Category.find({ctype: 'unit', $and: parentQuery}).sort('order');
+  return Category.find({ ctype: 'unit', $and: parentQuery }).sort('order');
 }
 
 function getTopicsInOrder(subjectID, unitID) {
-  let parentQuery = getParentQueryWithId([subjectID,
+  const parentQuery = getParentQueryWithId([subjectID,
                                     unitID]);
-  if(parentQuery.length == 0) {
+  if (parentQuery.length === 0) {
     return [];
   }
-  return Category.find({ctype: 'topic', $and: parentQuery}).sort('order');
+  return Category.find({ ctype: 'topic', $and: parentQuery }).sort('order');
 }
 
 function getConceptsInOrder(subjectID, unitID, topicID) {
-  let parentQuery = getParentQueryWithId([subjectID,
+  const parentQuery = getParentQueryWithId([subjectID,
                                     unitID,
                                     topicID]);
-  if(parentQuery.length == 0) {
+  if (parentQuery.length === 0) {
     return [];
   }
-  return Category.find({ctype: 'concept', $and: parentQuery}).sort('order');
+  return Category.find({ ctype: 'concept', $and: parentQuery }).sort('order');
 }
 
 function getNotesInOrder(subjectID, unitID, topicID, conceptID) {
-  let parentQuery = getParentQueryWithId([subjectID,
+  const parentQuery = getParentQueryWithId([subjectID,
                                     unitID,
                                     topicID,
                                     conceptID]);
-  if(parentQuery.length == 0) {
+  if (parentQuery.length === 0) {
     return [];
   }
 
-  return Category.find({ctype: 'note', $and: parentQuery}).sort('order');
+  return Category.find({ ctype: 'note', $and: parentQuery }).sort('order');
 }
 
-let NoteAssistant = {
+const NoteAssistant = {
   // getParentList: getParentIdList,
   getCategoryByName,
   // getParentQuery: getParentQuery,
@@ -75,7 +75,7 @@ let NoteAssistant = {
   getUnitsInOrder,
   getTopicsInOrder,
   getConceptsInOrder,
-  getNotesInOrder
-}
+  getNotesInOrder,
+};
 
 export default NoteAssistant;

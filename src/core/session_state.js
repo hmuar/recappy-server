@@ -8,25 +8,21 @@ export const SessionState = {
   INFO: 'info',
   WAIT_NEXT_NOTE: 'wait-next-note',
   DONE_SESSION: 'done-session',
-  UNKNOWN: 'unknown'
-}
+  UNKNOWN: 'unknown',
+};
 
 export function getEntryStateForNoteType(ntype) {
-  if(ntype === 'info') {
+  if (ntype === 'info') {
     return SessionState.INFO;
-  }
-  else if(ntype === 'recall') {
+  } else if (ntype === 'recall') {
     return SessionState.RECALL;
-  }
-  else if(ntype === 'choice') {
+  } else if (ntype === 'choice') {
     return SessionState.MULT_CHOICE;
-  }
-  else if(ntype === 'input') {
+  } else if (ntype === 'input') {
     return SessionState.INPUT;
   }
-  else {
-    return SessionState.UNKNOWN;
-  }
+
+  return SessionState.UNKNOWN;
 }
 
 export function getStartState() {

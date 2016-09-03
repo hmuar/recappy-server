@@ -1,17 +1,19 @@
+import Immut from 'immutable';
 import test from 'blue-tape';
-const before = test;
-const after = test;
 import AdapterFB from '../adapter/fbmessenger/fbmessenger';
 import TestDatabase from './test_database';
-import Immut from 'immutable';
+import cMod from '../controller/controller';
+
+const before = test;
+const after = test;
 const db = new TestDatabase();
 
-import cMod from '../controller/controller';
-let Controller = new cMod(AdapterFB);
+const Controller = new cMod(AdapterFB);
 
-before("before controller testing", t => db.setup().then(() => db.clean()).then(() => db.loadAllFixtures()));
+before('before controller testing',
+  () => db.setup().then(() => db.clean()).then(() => db.loadAllFixtures()));
 
-test("register message with existing session", t => {
+test('register message with existing session', t => {
   // `msg` = {
   //   timestamp  : ""
   //   senderID   : "",
@@ -19,13 +21,13 @@ test("register message with existing session", t => {
   //   text       : "",
   //   action     : ""
   // }
-  let msg = Immut.Map({
+  const msg = Immut.Map({
     timestamp: 1,
-    senderID: "1028279607252642",
+    senderID: '1028279607252642',
     userID: null,
-    text: "hello",
+    text: 'hello',
     action: null,
-    subjectName: 'crash-course-biology'
+    subjectName: 'crash-course-biology',
   });
 
   Controller.registerMsg(msg).then((rMsg) => {
@@ -33,21 +35,21 @@ test("register message with existing session", t => {
     t.end();
   }).catch((error) => {
     console.error(error);
-    t.fail("could not register message");
+    t.fail('could not register message');
     t.end();
   });
 });
 
 // senderID doesn't have an existing session in test database
 // so this tests process of session creation
-test("register message for new session", t => {
-  let msg = Immut.Map({
+test('register message for new session', t => {
+  const msg = Immut.Map({
     timestamp: 1,
-    senderID: "2028279607252615",
+    senderID: '2028279607252615',
     userID: null,
-    text: "hello",
+    text: 'hello',
     action: null,
-    subjectName: 'crash-course-biology'
+    subjectName: 'crash-course-biology',
   });
 
   Controller.registerMsg(msg).then((rMsg) => {
@@ -56,10 +58,10 @@ test("register message for new session", t => {
     t.end();
   }).catch((error) => {
     console.error(error);
-    t.fail("could not register message");
+    t.fail('could not register message');
     t.end();
   });
 });
 
 
-after("after controller testing", t => db.close());
+after('after controller testing', () => db.close());

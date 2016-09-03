@@ -1,6 +1,6 @@
-import Server from "../server";
+import Server from '../server';
 
-var server = new Server();
+const server = new Server();
 server.setup(5001);
 
 export default server;

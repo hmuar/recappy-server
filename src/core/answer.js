@@ -1,12 +1,12 @@
-let minQuality = 0;
-let maxQuality = 5;
+const minQuality = 0;
+const maxQuality = 5;
 
-let Answer = {
+const Answer = {
   min: minQuality,
   max: maxQuality,
   // a way of answering as confirmation,
   // effectively considered max quality
-  ok: maxQuality
-}
+  ok: maxQuality,
+};
 
 export default Answer;
