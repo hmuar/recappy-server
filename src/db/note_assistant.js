@@ -1,5 +1,4 @@
-import Collection from '../db/collection';
-const Category = Collection.Category;
+import { Category } from '../db/collection';
 
 // function getParentIdList(parentCategories) {
 //   return parentCategories.map(function(obj) {

@@ -1,7 +1,7 @@
 import test from 'blue-tape';
 const before = test;
 const after = test;
-
+const hey = 'hey';
 import TestDatabase from './test_database';
 import Account from '../account/account';
 const db = new TestDatabase();

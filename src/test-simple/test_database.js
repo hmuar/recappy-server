@@ -1,6 +1,10 @@
 import mongoose from 'mongoose';
 import fixture from './test_fixture';
-import Collection from '../db/collection';
+import { User,
+         StudentSession,
+         Category,
+         NoteRecord,
+         ObjectID } from '../db/collection';
 import Promise from "bluebird";
 Promise.promisifyAll(mongoose);
 
@@ -8,7 +12,7 @@ var TestDatabase = function() {
   this.loaded = null;
 }
 
-TestDatabase.prototype.createObjectID = idString => Collection.ObjectID(idString)
+TestDatabase.prototype.createObjectID = idString => ObjectID(idString)
 
 TestDatabase.prototype.initialize = function() {
   return new Promise((resolve, reject) => {
@@ -35,13 +39,13 @@ TestDatabase.prototype.clean = function() {
     return Promise.reject(new Error("DB not loaded"));
   }
 
-  return Collection.User.remove({}).then(() => {
-    return Collection.StudentSession.remove({}).then(() => {
+  return User.remove({}).then(() => {
+    return StudentSession.remove({}).then(() => {
     }).then(() => {
-      return Collection.Category.remove({}).then(() => {
+      return Category.remove({}).then(() => {
       });
     }).then(() => {
-      return Collection.NoteRecord.remove({}).then(() => {
+      return NoteRecord.remove({}).then(() => {
       });
     });
   });
@@ -76,6 +80,6 @@ TestDatabase.prototype.loadUserFixtures = function() {
 
 TestDatabase.prototype.getStaticIDs = () => fixture.getStaticIDs()
 
-TestDatabase.prototype.getTestUser = () => Collection.User.findOne()
+TestDatabase.prototype.getTestUser = () => User.findOne()
 
 export default TestDatabase;

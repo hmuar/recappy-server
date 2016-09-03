@@ -5,10 +5,10 @@ import TestDatabase from './test_database';
 const db = new TestDatabase();
 import Answer from '../core/answer';
 import PipeRecord from '../controller/pipe_record';
-import {NoteRecord} from '../db/collection';
+import { NoteRecord } from '../db/collection';
 import Immut from 'immutable';
 import Input from '../core/input';
-import {SessionState} from '../core/session_state';
+import { SessionState } from '../core/session_state';
 
 function getSession() {
   return {

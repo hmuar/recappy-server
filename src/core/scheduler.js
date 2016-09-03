@@ -1,6 +1,4 @@
-import Collection from '../db/collection';
-const NoteRecord = Collection.NoteRecord;
-const Category = Collection.Category;
+import { NoteRecord, Category } from '../db/collection';
 
 export const TARGET_NUM_NOTES_IN_SESSION = 3;
 

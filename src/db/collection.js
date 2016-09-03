@@ -6,14 +6,14 @@ let userSchema = new mongoose.Schema({
   facebookMessageID: String
 });
 
-let User = mongoose.model('User', userSchema, 'users');
+export const User = mongoose.model('User', userSchema, 'users');
 
 let sessionSchema = new mongoose.Schema({
   userID: mongoose.Schema.Types.ObjectId,
   subjects: {}
 });
 
-let StudentSession = mongoose.model('StudentSession',
+export const StudentSession = mongoose.model('StudentSession',
                                      sessionSchema,
                                      'studentsession');
 
@@ -28,7 +28,7 @@ let catSchema = new mongoose.Schema({
   subjectParent : mongoose.Schema.Types.ObjectId
 });
 
-let Category = mongoose.model('Category', catSchema, 'category');
+export const Category = mongoose.model('Category', catSchema, 'category');
 
 let noteSchema = new mongoose.Schema({
   createdAt : Date,
@@ -50,7 +50,7 @@ let noteSchema = new mongoose.Schema({
 
 // Note is just subset of Category, but use different
 // schema to make it easier and clearer to work with.
-let Note = mongoose.model('Note', noteSchema, 'category');
+export const Note = mongoose.model('Note', noteSchema, 'category');
 
 let noteRecordSchema = new mongoose.Schema({
   userID : mongoose.Schema.Types.ObjectId,
@@ -66,17 +66,8 @@ let noteRecordSchema = new mongoose.Schema({
   health : Number
 });
 
-let NoteRecord = mongoose.model('NoteRecord',
+export const NoteRecord = mongoose.model('NoteRecord',
                                  noteRecordSchema,
                                  'noterecord');
 
-let Schema = {
-  User,
-  StudentSession,
-  Category,
-  Note,
-  NoteRecord,
-  ObjectID: mongoose.Types.ObjectId
-}
-
-export default Schema;
+export const ObjectID = mongoose.Types.ObjectId;

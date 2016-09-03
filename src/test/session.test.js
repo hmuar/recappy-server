@@ -1,11 +1,11 @@
-import Schema from '../db/collection';
+import { Schema } from '../db/collection';
 import test from 'blue-tape';
 const before = test;
 const after = test;
 
 import TestDatabase from './test_database';
 import SessionAssist from '../db/session_assistant';
-import {SessionState} from '../core/session_state';
+import { SessionState } from '../core/session_state';
 const db = new TestDatabase();
 
 const staticID = db.getStaticIDs();

@@ -1,8 +1,11 @@
 import { SessionState } from '../core/session_state';
-import Collection from '../db/collection';
+import { ObjectID,
+         User,
+         Note,
+         Category,
+         StudentSession,
+         NoteRecord } from '../db/collection';
 import SRCore from '../core/spaced_repetition';
-
-let ObjectID = Collection.ObjectID;
 
 // ******* User *******************************
 let testUserFBMessenger = {
@@ -263,41 +266,41 @@ let defaultNoteRecord2 = {
 };
 
 function addUsers() {
-  return (new Collection.User(testUserFBMessenger)).save()
-  .then(doc => (new Collection.User(testUserFBMessenger2)).save())
-  .then(doc => (new Collection.User(testUserFBMessenger3)).save())
-  .then(doc => (new Collection.User(testUser)).save());
+  return (new User(testUserFBMessenger)).save()
+  .then(doc => (new User(testUserFBMessenger2)).save())
+  .then(doc => (new User(testUserFBMessenger3)).save())
+  .then(doc => (new User(testUser)).save());
 }
 
 function cloneNote(noteData, num) {
   return Array(num).fill().map( () => {
-    return (new Collection.Note(noteData));
+    return (new Note(noteData));
   });
 }
 
 // return two lists of ids of cloned notes
 function addNotes() {
   let defNoteIds = [];
-  // return (new Collection.Category(defaultSubject)).save();
-  let subj = new Collection.Category(defaultSubject);
+  // return (new Category(defaultSubject)).save();
+  let subj = new Category(defaultSubject);
   return subj.save()
-    .then(doc => (new Collection.Category(subjectA)).save())
-    .then(doc => (new Collection.Category(defaultUnit)).save())
-    .then(doc => (new Collection.Category(defaultTopic)).save())
-    .then(doc => (new Collection.Category(defaultConcept)).save())
-    .then(doc => (new Collection.Note(noteA)).save())
-    .then(doc => (new Collection.Note(noteB)).save())
-    .then(doc => Collection.Note.create(cloneNote(noteC, 10)))
+    .then(doc => (new Category(subjectA)).save())
+    .then(doc => (new Category(defaultUnit)).save())
+    .then(doc => (new Category(defaultTopic)).save())
+    .then(doc => (new Category(defaultConcept)).save())
+    .then(doc => (new Note(noteA)).save())
+    .then(doc => (new Note(noteB)).save())
+    .then(doc => Note.create(cloneNote(noteC, 10)))
     .then(doc => {
       let noteTempAListIds = [];
       let noteTempAList = cloneNote(noteTemplateA, 10);
-      return Collection.Note.create(noteTempAList).then((docs) => {
+      return Note.create(noteTempAList).then((docs) => {
         let noteTempAListIds = noteTempAList.map(defNote => defNote._id);
         defNoteIds.push(noteTempAListIds);
 
         let defNote4ListIds = [];
         let defNote4List = cloneNote(noteTemplateB, 10);
-        return Collection.Note.create(defNote4List).then((docs) => {
+        return Note.create(defNote4List).then((docs) => {
           let defNote4ListIds = defNote4List.map(defNote => defNote._id);
           defNoteIds.push(defNote4ListIds);
           return defNoteIds;
@@ -307,7 +310,7 @@ function addNotes() {
 }
 
 function addSessions() {
-  let session = new Collection.StudentSession(sessionTemplate);
+  let session = new StudentSession(sessionTemplate);
   return session.save();
 }
 
@@ -331,8 +334,8 @@ function addNoteRecords(defNoteIds) {
 
   let minToMillisecFactor = 60000;
 
-  let defRec = new Collection.NoteRecord(defaultNoteRecord);
-  let defRec2 = new Collection.NoteRecord(defaultNoteRecord2);
+  let defRec = new NoteRecord(defaultNoteRecord);
+  let defRec2 = new NoteRecord(defaultNoteRecord2);
 
   let pChain = defRec.save().then(() => defRec2.save());
 
@@ -344,7 +347,7 @@ function addNoteRecords(defNoteIds) {
     let newNoteRecord = getDefNoteRecordData(noteTemplateA,
                                                noteTemplateAIds[i],
                                                newDueDate);
-    let snote = new Collection.NoteRecord(newNoteRecord);
+    let snote = new NoteRecord(newNoteRecord);
     if(!pChain) {
       pChain = snote.save();
     }
@@ -361,7 +364,7 @@ function addNoteRecords(defNoteIds) {
     let newNoteRecord = getDefNoteRecordData(noteTemplateB,
                                                noteTemplateBIds[i],
                                                newDueDate);
-    let snote = new Collection.NoteRecord(newNoteRecord);
+    let snote = new NoteRecord(newNoteRecord);
     if(!pChain) {
       pChain = snote.save();
     }

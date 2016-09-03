@@ -1,5 +1,4 @@
-import Collection from '../db/collection';
-const User = Collection.User;
+import { User } from '../db/collection';
 
 // `fbMsgID` is string used by Facebook to identify users
 function getUserByFacebookMsgID(fbMsgID) {

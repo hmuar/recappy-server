@@ -3,7 +3,9 @@ const before = test;
 const after = test;
 
 import TestDatabase from './test_database';
-import Scheduler from '../core/scheduler';
+import { getOldMaterial,
+         getNewMaterial,
+         getNextNotes } from '../core/scheduler';
 import DBAssist from '../db/note_assistant';
 const db = new TestDatabase();
 
@@ -24,18 +26,18 @@ before("before scheduler testing", (t) => {
 });
 
 test('schedule old notes based on due date', (t) => {
-  return Scheduler.getOldMaterial(testUser._id, subject._id, 20)
+  return getOldMaterial(testUser._id, subject._id, 20)
   .then(nextNotes => {
     t.equal(nextNotes.length, 14);
   });
 });
 
-test('schedule new notes', t => Scheduler.getNewMaterial(subject._id, 20, -1)
+test('schedule new notes', t => getNewMaterial(subject._id, 20, -1)
 .then(nextNotes => {
   t.equal(nextNotes.length, 22);
 }));
 
-test('schedule combined old and new notes', t => Scheduler.getNextNotes(testUser._id, subject._id, 20, -1)
+test('schedule combined old and new notes', t => getNextNotes(testUser._id, subject._id, 20, -1)
 .then((nextNotes) => {
   let oldNotes = nextNotes[0];
   let newNotes = nextNotes[1];

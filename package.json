@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "nodemon -q -x blue-tape -r babel-register test-simple/*.test.js | tap-summary"
+    "test" : "watch 'clear && npm run test-run' src",
+    "test-run": "blue-tape -r babel-register src/test/*.test.js | tap-summary"
   },
   "author": "",
   "license": "ISC",
@@ -26,6 +27,7 @@
     "blue-tape": "^0.2.0",
     "request": "^2.74.0",
     "sinon": "^1.17.5",
-    "tap-summary": "^3.0.1"
+    "tap-summary": "^3.0.1",
+    "watch": "^0.19.2"
   }
 }
