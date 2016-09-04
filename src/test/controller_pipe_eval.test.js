@@ -1,6 +1,5 @@
 /* eslint-disable max-len */
 
-import Immut from 'immutable';
 import test from 'blue-tape';
 import TestDatabase from './test_database';
 import PipeEval from '../controller/pipe_eval';
@@ -208,7 +207,7 @@ before('before controller pipe evaluator testing',
 
 test('eval with init state', t => {
   const initSession = getSession();
-  const mState = Immut.Map({
+  const mState = {
     timestamp: 1,
     senderID: '2028279607252615',
     userID: '7716893a8c8aff3221812149',
@@ -219,10 +218,10 @@ test('eval with init state', t => {
     subjectName: 'crash-course-biology',
     subjectID: db.createObjectID('f64c57184a4ef7f0357f9cd6'),
     session: initSession,
-  });
+  };
 
   const mEvalState = PipeEval.pipe(mState);
-  const evalCtx = mEvalState.get('evalCtx');
+  const evalCtx = mEvalState.evalCtx;
   t.equal(evalCtx.answerQuality, Answer.ok);
   t.equal(evalCtx.doneNote, false);
   t.end();
@@ -232,7 +231,7 @@ test('eval with info state', t => {
   const initSession = getSession();
   initSession.state = SessionState.INFO;
 
-  const mState = Immut.Map({
+  const mState = {
     timestamp: 1,
     senderID: '2028279607252615',
     userID: '7716893a8c8aff3221812149',
@@ -243,14 +242,14 @@ test('eval with info state', t => {
     subjectName: 'crash-course-biology',
     subjectID: db.createObjectID('f64c57184a4ef7f0357f9cd6'),
     session: initSession,
-  });
+  };
 
   const mEvalState = PipeEval.pipe(mState);
-  const evalCtx = mEvalState.get('evalCtx');
+  const evalCtx = mEvalState.evalCtx;
   t.equal(evalCtx.answerQuality, Answer.ok);
   t.equal(evalCtx.doneNote, true);
 
-  const mStateReject = Immut.Map({
+  const mStateReject = {
     timestamp: 1,
     senderID: '2028279607252615',
     userID: '7716893a8c8aff3221812149',
@@ -261,10 +260,10 @@ test('eval with info state', t => {
     subjectName: 'crash-course-biology',
     subjectID: db.createObjectID('f64c57184a4ef7f0357f9cd6'),
     session: initSession,
-  });
+  };
 
   const mEvalStateReject = PipeEval.pipe(mStateReject);
-  const evalCtxReject = mEvalStateReject.get('evalCtx');
+  const evalCtxReject = mEvalStateReject.evalCtx;
   t.equal(evalCtxReject.answerQuality, null);
   t.equal(evalCtxReject.doneNote, false);
   t.end();
@@ -275,7 +274,7 @@ test('eval with recall state', t => {
   initSession.state = SessionState.RECALL;
   initSession.queueIndex = 1;
 
-  const mState = Immut.Map({
+  const mState = {
     timestamp: 1,
     senderID: '2028279607252615',
     userID: '7716893a8c8aff3221812149',
@@ -286,13 +285,13 @@ test('eval with recall state', t => {
     subjectName: 'crash-course-biology',
     subjectID: db.createObjectID('f64c57184a4ef7f0357f9cd6'),
     session: initSession,
-  });
+  };
 
   const mEvalState = PipeEval.pipe(mState);
-  const evalCtx = mEvalState.get('evalCtx');
+  const evalCtx = mEvalState.evalCtx;
 
-  t.equal(mEvalState.get('session').state, SessionState.RECALL_RESPONSE);
-  t.equal(mEvalState.get('session').queueIndex, 1);
+  t.equal(mEvalState.session.state, SessionState.RECALL_RESPONSE);
+  t.equal(mEvalState.session.queueIndex, 1);
   t.equal(evalCtx.answerQuality, Answer.ok);
   t.equal(evalCtx.doneNote, false);
   t.end();
@@ -303,7 +302,7 @@ test('eval with recall response state', t => {
   initSession.state = SessionState.RECALL_RESPONSE;
   initSession.queueIndex = 1;
 
-  const mState = Immut.Map({
+  const mState = {
     timestamp: 1,
     senderID: '2028279607252615',
     userID: '7716893a8c8aff3221812149',
@@ -314,14 +313,14 @@ test('eval with recall response state', t => {
     subjectName: 'crash-course-biology',
     subjectID: db.createObjectID('f64c57184a4ef7f0357f9cd6'),
     session: initSession,
-  });
+  };
 
   const mEvalState = PipeEval.pipe(mState);
-  const evalCtx = mEvalState.get('evalCtx');
+  const evalCtx = mEvalState.evalCtx;
   t.equal(evalCtx.answerQuality, Answer.max);
   t.equal(evalCtx.doneNote, true);
 
-  const mStateReject = Immut.Map({
+  const mStateReject = {
     timestamp: 1,
     senderID: '2028279607252615',
     userID: '7716893a8c8aff3221812149',
@@ -332,10 +331,10 @@ test('eval with recall response state', t => {
     subjectName: 'crash-course-biology',
     subjectID: db.createObjectID('f64c57184a4ef7f0357f9cd6'),
     session: initSession,
-  });
+  };
 
   const mEvalStateReject = PipeEval.pipe(mStateReject);
-  const evalCtxReject = mEvalStateReject.get('evalCtx');
+  const evalCtxReject = mEvalStateReject.evalCtx;
   t.equal(evalCtxReject.answerQuality, Answer.min);
   t.equal(evalCtxReject.doneNote, true);
 
@@ -348,7 +347,7 @@ test('eval with choice state', t => {
   initSession.state = SessionState.MULT_CHOICE;
   initSession.queueIndex = 2;
 
-  const mState = Immut.Map({
+  const mState = {
     timestamp: 1,
     senderID: '2028279607252615',
     userID: '7716893a8c8aff3221812149',
@@ -359,16 +358,16 @@ test('eval with choice state', t => {
     subjectName: 'crash-course-biology',
     subjectID: db.createObjectID('f64c57184a4ef7f0357f9cd6'),
     session: initSession,
-  });
+  };
 
   const mEvalState = PipeEval.pipe(mState);
-  const evalCtx = mEvalState.get('evalCtx');
+  const evalCtx = mEvalState.evalCtx;
   t.equal(evalCtx.answerQuality, Answer.max);
   t.equal(evalCtx.doneNote, true);
 
   // check if string data '3' is properly accepted
   // as correct answer choice 3
-  const mStateString = Immut.Map({
+  const mStateString = {
     timestamp: 1,
     senderID: '2028279607252615',
     userID: '7716893a8c8aff3221812149',
@@ -379,15 +378,15 @@ test('eval with choice state', t => {
     subjectName: 'crash-course-biology',
     subjectID: db.createObjectID('f64c57184a4ef7f0357f9cd6'),
     session: initSession,
-  });
+  };
 
   const mEvalStateString = PipeEval.pipe(mStateString);
-  const evalCtxString = mEvalStateString.get('evalCtx');
+  const evalCtxString = mEvalStateString.evalCtx;
   t.equal(evalCtxString.answerQuality, Answer.max);
   t.equal(evalCtxString.doneNote, true);
 
   // check if incorrect answer is correctly evaluated as wrong
-  const mStateWrong = Immut.Map({
+  const mStateWrong = {
     timestamp: 1,
     senderID: '2028279607252615',
     userID: '7716893a8c8aff3221812149',
@@ -398,15 +397,15 @@ test('eval with choice state', t => {
     subjectName: 'crash-course-biology',
     subjectID: db.createObjectID('f64c57184a4ef7f0357f9cd6'),
     session: initSession,
-  });
+  };
 
   const mEvalStateWrong = PipeEval.pipe(mStateWrong);
-  const evalCtxWrong = mEvalStateWrong.get('evalCtx');
+  const evalCtxWrong = mEvalStateWrong.evalCtx;
   t.equal(evalCtxWrong.answerQuality, Answer.min);
   t.equal(evalCtxWrong.doneNote, true);
 
   // check if incorrect answer string is correctly evaluated as wrong
-  const mStateWrongString = Immut.Map({
+  const mStateWrongString = {
     timestamp: 1,
     senderID: '2028279607252615',
     userID: '7716893a8c8aff3221812149',
@@ -417,10 +416,10 @@ test('eval with choice state', t => {
     subjectName: 'crash-course-biology',
     subjectID: db.createObjectID('f64c57184a4ef7f0357f9cd6'),
     session: initSession,
-  });
+  };
 
   const mEvalStateWrongString = PipeEval.pipe(mStateWrongString);
-  const evalCtxWrongString = mEvalStateWrongString.get('evalCtx');
+  const evalCtxWrongString = mEvalStateWrongString.evalCtx;
   t.equal(evalCtxWrongString.answerQuality, Answer.min);
   t.equal(evalCtxWrongString.doneNote, true);
   t.end();
@@ -431,7 +430,7 @@ test('eval with input state', t => {
   initSession.state = SessionState.INPUT;
   initSession.queueIndex = 3;
 
-  const mState = Immut.Map({
+  const mState = {
     timestamp: 1,
     senderID: '2028279607252615',
     userID: '7716893a8c8aff3221812149',
@@ -442,15 +441,15 @@ test('eval with input state', t => {
     subjectName: 'crash-course-biology',
     subjectID: db.createObjectID('f64c57184a4ef7f0357f9cd6'),
     session: initSession,
-  });
+  };
 
   const mEvalState = PipeEval.pipe(mState);
-  const evalCtx = mEvalState.get('evalCtx');
+  const evalCtx = mEvalState.evalCtx;
   t.equal(evalCtx.answerQuality, Answer.max);
   t.equal(evalCtx.doneNote, true);
 
   // check if incorrect answer is correctly evaluated as wrong
-  const mStateWrong = Immut.Map({
+  const mStateWrong = {
     timestamp: 1,
     senderID: '2028279607252615',
     userID: '7716893a8c8aff3221812149',
@@ -461,10 +460,10 @@ test('eval with input state', t => {
     subjectName: 'crash-course-biology',
     subjectID: db.createObjectID('f64c57184a4ef7f0357f9cd6'),
     session: initSession,
-  });
+  };
 
   const mEvalStateWrong = PipeEval.pipe(mStateWrong);
-  const evalCtxWrong = mEvalStateWrong.get('evalCtx');
+  const evalCtxWrong = mEvalStateWrong.evalCtx;
   t.equal(evalCtxWrong.answerQuality, Answer.min);
   t.equal(evalCtxWrong.doneNote, true);
 

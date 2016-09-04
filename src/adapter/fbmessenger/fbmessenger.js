@@ -1,4 +1,3 @@
-import Immut from 'immutable';
 import Account from '../../account/account';
 import Input from '../../core/input';
 import { sendText } from './fbmessenger_request';
@@ -13,16 +12,22 @@ import MessageType from './fbmessage_type';
 // associated with the proper userID stored for this app.
 // `msgData` is Immututable.Map()
 function senderToUser(msgData) {
-  const fbUserID = msgData.get('senderID');
+  const fbUserID = msgData.senderID;
   if (!fbUserID) {
     throw new Error('Could not find senderID, could not convert to user');
   } else {
     return Account.getUserByFacebookMsgID(fbUserID)
       .then((user) => {
         if (!user) {
-          return msgData.set('userID', null);
+          return {
+            ...msgData,
+            userID: null,
+          };
         }
-        return msgData.set('userID', user._id);
+        return {
+          ...msgData,
+          userID: user._id,
+        };
       });
   }
 }
@@ -30,12 +35,15 @@ function senderToUser(msgData) {
 // create user based with new Facebook Messenger
 // specific ID. `msgData` is Immututable.Map()
 function createUser(msgData) {
-  const fbUserID = msgData.get('senderID');
+  const fbUserID = msgData.senderID;
   if (!fbUserID) {
     return Promise.error(null);
   }
   return Account.createUserWithFacebookMsgID(fbUserID)
-  .then((user) => msgData.set('userID', user._id));
+  .then((user) => ({
+    ...msgData,
+    userID: user._id,
+  }));
 }
 
 function getMsgType(msg) {
@@ -73,10 +81,13 @@ function stripChoiceNum(choice) {
 function contentInjector(msgType) {
   if (msgType === MessageType.TEXT) {
     return (msg, content) => (
-      msg.set('input', {
-        type: Input.Type.CUSTOM,
-        data: content,
-      })
+      {
+        ...msg,
+        input: {
+          type: Input.Type.CUSTOM,
+          data: content,
+        },
+      }
     );
   } else if (msgType === MessageType.POSTBACK) {
     return (msg, content) => {
@@ -98,18 +109,24 @@ function contentInjector(msgType) {
           dataVal = content;
         }
       }
-      return msg.set('input', {
-        type: mtype,
-        data: dataVal,
-      });
+      return {
+        ...msg,
+        input: {
+          type: mtype,
+          data: dataVal,
+        },
+      };
     };
   }
 
   return (msg) => (
-    msg.set('input', {
-      type: Input.Type.UNKNOWN,
-      data: null,
-    })
+    {
+      ...msg,
+      input: {
+        type: Input.Type.UNKNOWN,
+        data: null,
+      },
+    }
   );
 }
 
@@ -122,12 +139,12 @@ function parse(request) {
   // TODO: Need to dynamically get this from request
   const HARDCODED_SUBJ_NAME = 'crash-course-biology';
 
-  const initMsgData = Immut.Map({
+  const initMsgData = {
     timestamp: msg.timestamp,
     senderID: msg.sender.id,
     subjectName: HARDCODED_SUBJ_NAME,
     input: null,
-  });
+  };
 
   const msgType = getMsgType(msg);
   const content = contentExtractor(msgType)(msg);

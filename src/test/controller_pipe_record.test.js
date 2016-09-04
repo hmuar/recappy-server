@@ -1,6 +1,4 @@
 /* eslint-disable max-len */
-
-import Immut from 'immutable';
 import test from 'blue-tape';
 import TestDatabase from './test_database';
 import Answer from '../core/answer';
@@ -103,7 +101,7 @@ before('before controller pipe record testing',
 test('update existing note record', t => {
   const userID = db.getStaticIDs().userFB;
 
-  const mState = Immut.Map({
+  const mState = {
     timestamp: 1,
     senderID: '2028279607252615',
     userID,
@@ -118,12 +116,12 @@ test('update existing note record', t => {
       answerQuality: Answer.ok,
       noteDone: true,
     },
-  });
+  };
 
   return PipeRecord.pipe(mState)
   .then(state => {
-    t.ok(state.has('recordCtx'));
-    const recordCtx = state.get('recordCtx');
+    t.ok({}.hasOwnProperty.call(state, 'recordCtx'));
+    const recordCtx = state.recordCtx;
     t.ok({}.hasOwnProperty.call(recordCtx, 'factor'));
     t.ok({}.hasOwnProperty.call(recordCtx, 'interval'));
     t.ok({}.hasOwnProperty.call(recordCtx, 'count'));
@@ -140,7 +138,7 @@ test('create new note record', t => {
   const session = getSession();
   session.queueIndex = 2;
 
-  const mState = Immut.Map({
+  const mState = {
     timestamp: 1,
     senderID: '2028279607252615',
     userID,
@@ -155,13 +153,13 @@ test('create new note record', t => {
       answerQuality: Answer.ok,
       noteDone: true,
     },
-  });
+  };
 
   return PipeRecord.pipe(mState)
   .then(state => {
-    t.ok(state.has('recordCtx'));
-    console.log(state.get('recordCtx'));
-    const recordCtx = state.get('recordCtx');
+    t.ok({}.hasOwnProperty.call(state, 'recordCtx'));
+    console.log(state.recordCtx);
+    const recordCtx = state.recordCtx;
     t.ok(hasOwnProperty.call(recordCtx, 'factor'));
     t.ok(hasOwnProperty.call(recordCtx, 'interval'));
     t.ok(hasOwnProperty.call(recordCtx, 'count'));

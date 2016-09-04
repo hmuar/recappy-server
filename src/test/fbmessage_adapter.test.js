@@ -1,4 +1,3 @@
-import Immut from 'immutable';
 import test from 'blue-tape';
 import AdapterFB from '../adapter/fbmessenger/fbmessenger';
 import TestDatabase from './test_database';
@@ -12,22 +11,22 @@ before('before fb message adapter testing',
   () => db.setup().then(() => db.clean()).then(() => db.loadAllFixtures()));
 
 test('convert sender to user', t => {
-  const messageData = Immut.Map({
+  const messageData = {
     senderID: '1028279607252619',
-  });
+  };
   return AdapterFB.senderToUser(messageData).then(mData => {
     t.ok(mData);
-    t.equal(mData.get('userID').toString(), '6716893a8c8aff3221812148');
+    t.equal(mData.userID.toString(), '6716893a8c8aff3221812148');
   });
 });
 
 test('create user', t => {
-  const messageData = Immut.Map({
+  const messageData = {
     senderID: '8028279607252688',
-  });
+  };
   return AdapterFB.createUser(messageData).then(mData => {
     t.ok(mData);
-    t.ok(mData.get('userID'));
+    t.ok(mData.userID);
   });
 });
 
@@ -58,15 +57,13 @@ test('parse text request into message data', t => {
     ],
   };
   const mData = AdapterFB.parse(request);
-  t.ok(mData.has('timestamp'));
-  t.equal(mData.get('timestamp'), 1460245672080);
-  t.ok(mData.has('senderID'));
-  t.equal(mData.get('senderID'), '1028279607252642');
-  // t.ok(mData.has("userID"));
-  // t.equal(mData.get("userID").toString(), "5716893a8c8aff3221812148");
-  t.ok(mData.has('input'));
-  t.equal(mData.get('input').type, Input.Type.CUSTOM);
-  t.equal(mData.get('input').data, 'user response text');
+  t.ok({}.hasOwnProperty.call(mData, 'timestamp'));
+  t.equal(mData.timestamp, 1460245672080);
+  t.ok({}.hasOwnProperty.call(mData, 'senderID'));
+  t.equal(mData.senderID, '1028279607252642');
+  t.ok({}.hasOwnProperty.call(mData, 'input'));
+  t.equal(mData.input.type, Input.Type.CUSTOM);
+  t.equal(mData.input.data, 'user response text');
   t.end();
 });
 
@@ -96,13 +93,13 @@ test('parse accept payload request into message data', t => {
     ],
   };
   const mData = AdapterFB.parse(request);
-  t.ok(mData.has('timestamp'));
-  t.equal(mData.get('timestamp'), 1460245672080);
-  t.ok(mData.has('senderID'));
-  t.equal(mData.get('senderID'), '1028279607252642');
-  t.ok(mData.has('input'));
-  t.equal(mData.get('input').type, Input.Type.ACCEPT);
-  t.equal(mData.get('input').data, null);
+  t.ok({}.hasOwnProperty.call(mData, 'timestamp'));
+  t.equal(mData.timestamp, 1460245672080);
+  t.ok({}.hasOwnProperty.call(mData, 'senderID'));
+  t.equal(mData.senderID, '1028279607252642');
+  t.ok({}.hasOwnProperty.call(mData, 'input'));
+  t.equal(mData.input.type, Input.Type.ACCEPT);
+  t.equal(mData.input.data, null);
   t.end();
 });
 
@@ -131,13 +128,13 @@ test('parse reject payload request into message data', t => {
     ],
   };
   const mData = AdapterFB.parse(request);
-  t.ok(mData.has('timestamp'));
-  t.equal(mData.get('timestamp'), 1460245672080);
-  t.ok(mData.has('senderID'));
-  t.equal(mData.get('senderID'), '1028279607252642');
-  t.ok(mData.has('input'));
-  t.equal(mData.get('input').type, Input.Type.REJECT);
-  t.equal(mData.get('input').data, null);
+  t.ok({}.hasOwnProperty.call(mData, 'timestamp'));
+  t.equal(mData.timestamp, 1460245672080);
+  t.ok({}.hasOwnProperty.call(mData, 'senderID'));
+  t.equal(mData.senderID, '1028279607252642');
+  t.ok({}.hasOwnProperty.call(mData, 'input'));
+  t.equal(mData.input.type, Input.Type.REJECT);
+  t.equal(mData.input.data, null);
   t.end();
 });
 
@@ -166,13 +163,13 @@ test('parse choice payload request into message data', t => {
     ],
   };
   const mData = AdapterFB.parse(request);
-  t.ok(mData.has('timestamp'));
-  t.equal(mData.get('timestamp'), 1460245672080);
-  t.ok(mData.has('senderID'));
-  t.equal(mData.get('senderID'), '1028279607252642');
-  t.ok(mData.has('input'));
-  t.equal(mData.get('input').type, Input.Type.CUSTOM);
-  t.equal(mData.get('input').data, 5);
+  t.ok({}.hasOwnProperty.call(mData, 'timestamp'));
+  t.equal(mData.timestamp, 1460245672080);
+  t.ok({}.hasOwnProperty.call(mData, 'senderID'));
+  t.equal(mData.senderID, '1028279607252642');
+  t.ok({}.hasOwnProperty.call(mData, 'input'));
+  t.equal(mData.input.type, Input.Type.CUSTOM);
+  t.equal(mData.input.data, 5);
   t.end();
 });
 

@@ -1,4 +1,3 @@
-import Immut from 'immutable';
 import test from 'blue-tape';
 import AdapterFB from '../adapter/fbmessenger/fbmessenger';
 import TestDatabase from './test_database';
@@ -21,17 +20,17 @@ test('register message with existing session', t => {
   //   text       : "",
   //   action     : ""
   // }
-  const msg = Immut.Map({
+  const msg = {
     timestamp: 1,
     senderID: '1028279607252642',
     userID: null,
     text: 'hello',
     action: null,
     subjectName: 'crash-course-biology',
-  });
+  };
 
   Controller.registerMsg(msg).then((rMsg) => {
-    t.ok(rMsg.get('session'));
+    t.ok(rMsg.session);
     t.end();
   }).catch((error) => {
     console.error(error);
@@ -43,18 +42,18 @@ test('register message with existing session', t => {
 // senderID doesn't have an existing session in test database
 // so this tests process of session creation
 test('register message for new session', t => {
-  const msg = Immut.Map({
+  const msg = {
     timestamp: 1,
     senderID: '2028279607252615',
     userID: null,
     text: 'hello',
     action: null,
     subjectName: 'crash-course-biology',
-  });
+  };
 
   Controller.registerMsg(msg).then((rMsg) => {
-    t.ok(rMsg.get('session'));
-    t.ok(rMsg.get('session').noteQueue.length > 0);
+    t.ok(rMsg.session);
+    t.ok(rMsg.session.noteQueue.length > 0);
     t.end();
   }).catch((error) => {
     console.error(error);

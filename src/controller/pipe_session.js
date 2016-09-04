@@ -4,8 +4,8 @@ import { getStartingNotes,
 
 function addNewSession(mState) {
   // get new notes
-  const subjectID = mState.get('subjectID');
-  const userID = mState.get('userID');
+  const subjectID = mState.subjectID;
+  const userID = mState.userID;
 
   return getStartingNotes(subjectID,
                                     TARGET_NUM_NOTES_IN_SESSION)
@@ -18,26 +18,27 @@ function addNewSession(mState) {
                                       noteQueue,
                                       startGlobalIndex);
   }).then(session => (
-    mState.set('session', session)
+    {
+      ...mState,
+      session,
+    }
   ));
 }
 
 // find existing user session for given subject and set `session` key
 // to session object. If no session exists, create new session first.
-// `mState` is Immut.Map
-// return Immut.Map
 function pipe(mState) {
-  // if(!mState.get('text') && ! mState.get('action')) {
-  //   return Promise.reject("No text or action included in message");
-  // }
   return SessionAssist.getSessionForUserAndSubject(
-                          mState.get('userID'),
-                          mState.get('subjectID'))
+                          mState.userID,
+                          mState.subjectID)
   .then(session => {
     if (!session) {
       return addNewSession(mState);
     }
-    return mState.set('session', session);
+    return {
+      ...mState,
+      session,
+    };
   });
 }
 

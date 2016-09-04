@@ -4,3 +4,7 @@ start server: nodemon app.js
 
 ----- Testing ---------
 start test: npm run test
+
+----- Linting ------
+(atom plugin)
+npm run lint

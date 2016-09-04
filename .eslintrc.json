@@ -8,6 +8,11 @@
       "no-console": "off",
       "import/no-extraneous-dependencies": ["error", {"devDependencies": true}]
     },
+    "parserOptions":{
+      "ecmaFeatures": {
+        "experimentalObjectRestSpread": true
+      }
+    },
     "plugins": [
         "react",
         "jsx-a11y",

@@ -1,4 +1,3 @@
-import Immut from 'immutable';
 import DBAssist from '../db/note_assistant';
 import PipeSession from './pipe_session';
 
@@ -20,7 +19,8 @@ class Controller {
   // corresponding value is not undefined and not null
   // `msg` is Immut.Map
   pipeSuccess(mState, key) {
-    return mState.has(key) && mState.get(key) != null;
+    return {}.hasOwnProperty.call(mState, key) &&
+           mState[key] != null;
   }
 
   // convert adapter specific sender id into app user id
@@ -31,13 +31,15 @@ class Controller {
   // main entry method called by external adapters
   // `msg` is Immut.Map
   registerMsg(msg) {
-    return DBAssist.getCategoryByName('subject', msg.get('subjectName'))
+    return DBAssist.getCategoryByName('subject', msg.subjectName)
     .then(subject => {
       if (!subject) {
-        throw new Error(`Could not find subject ${msg.get('subjectName')}`);
+        throw new Error(`Could not find subject ${msg.subjectName}`);
       } else {
-        let mState = Immut.Map(msg);
-        mState = mState.set('subjectID', subject._id);
+        const mState = {
+          ...msg,
+          subjectID: subject._id,
+        };
         // convert adapter specific sender id into app user
         return this.pipeUser(mState)
         // at this point should have app user information

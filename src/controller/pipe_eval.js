@@ -11,7 +11,7 @@ import Answer from '../core/answer';
 
 // progress state by advancing note queue
 // function deferToGlobalStateChange(mState) {
-//   let session = mState.get('session');
+//   let session = mState.session;
 //   let newQueueIndex = session.queueIndex + 1;
 //   if(newQueueIndex >= session.noteQueue.length) {
 //     session.state = SessionState.DONE_SESSION;
@@ -27,7 +27,7 @@ import Answer from '../core/answer';
 // Ignore input and advance state
 // `mState` is Immut.Map
 function InitContext(mState) {
-  // let session = mState.get('session');
+  // let session = mState.session;
   // let firstNote = session.noteQueue[0];
   // // advance session state based on first note in queue
   // session.state = Session.getEntryStateForNoteType(firstNote.type);
@@ -37,15 +37,17 @@ function InitContext(mState) {
     answerQuality: Answer.ok,
     doneNote: false,
   };
-
-  return mState.set('evalCtx', evalCtx);
+  return {
+    ...mState,
+    evalCtx,
+  };
 }
 
 // Look for ACCEPT input type and then advance state
 // Otherwise return original state.
 // `mState` is Immut.Map
 function InfoContext(mState) {
-  const input = mState.get('input');
+  const input = mState.input;
 
   const evalCtx = {
     answerQuality: null,
@@ -56,30 +58,33 @@ function InfoContext(mState) {
     evalCtx.answerQuality = Answer.ok;
     evalCtx.doneNote = true;
   }
-
-  return mState.set('evalCtx', evalCtx);
+  return {
+    ...mState,
+    evalCtx,
+  };
 }
 
 // Look for ACCEPT or REJECT input type and then advance state
 // Otherwise return original state.
 function RecallContext(mState) {
-  const session = mState.get('session');
-  const input = mState.get('input');
+  const session = mState.session;
+  const input = mState.input;
   const evalCtx = {
     answerQuality: null,
     doneNote: false,
   };
-  let newState = mState;
+  const newState = { ...mState };
   if (input.type === Input.Type.ACCEPT) {
     evalCtx.answerQuality = Answer.ok;
     session.state = SessionState.RECALL_RESPONSE;
-    newState = mState.set('session', session);
+    newState.session = session;
   }
-  return newState.set('evalCtx', evalCtx);
+  newState.evalCtx = evalCtx;
+  return newState;
 }
 
 function RecallResponseContext(mState) {
-  const input = mState.get('input');
+  const input = mState.input;
   const evalCtx = {
     answerQuality: null,
     doneNote: false,
@@ -91,13 +96,16 @@ function RecallResponseContext(mState) {
     evalCtx.answerQuality = Answer.min;
     evalCtx.doneNote = true;
   }
-  return mState.set('evalCtx', evalCtx);
+  return {
+    ...mState,
+    evalCtx,
+  };
 }
 
 
 function InputContext(mState) {
-  const session = mState.get('session');
-  const input = mState.get('input');
+  const session = mState.session;
+  const input = mState.input;
   const evalCtx = {
     answerQuality: null,
     doneNote: false,
@@ -112,12 +120,15 @@ function InputContext(mState) {
   }
 
   // didn't find proper input type so return as is without advancing state
-  return mState.set('evalCtx', evalCtx);
+  return {
+    ...mState,
+    evalCtx,
+  };
 }
 
 function MultChoiceContext(mState) {
-  const session = mState.get('session');
-  const input = mState.get('input');
+  const session = mState.session;
+  const input = mState.input;
   const evalCtx = {
     answerQuality: null,
     doneNote: false,
@@ -133,7 +144,10 @@ function MultChoiceContext(mState) {
   }
 
   // didn't find proper input type so return as is without advancing state
-  return mState.set('evalCtx', evalCtx);
+  return {
+    ...mState,
+    evalCtx,
+  };
 }
 
 function WaitContext(mState) {
@@ -174,11 +188,11 @@ function getEvalContext(state) {
 }
 
 function pipe(mState) {
-  if (!mState.has('session')) {
+  if (!{}.hasOwnProperty.call(mState, 'session')) {
     return mState;
   }
 
-  const sState = mState.get('session').state;
+  const sState = mState.session.state;
   return getEvalContext(sState)(mState);
 }
 

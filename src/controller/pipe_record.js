@@ -1,4 +1,3 @@
-import Immut from 'immutable';
 import SpacedRep from '../core/spaced_repetition';
 import { SessionState } from '../core/session_state';
 import { NoteRecord } from '../db/collection';
@@ -39,7 +38,6 @@ function calcNoteHealth(responseHistory) {
 
 // calculate new factor
 // calculate new interval
-// recordCtx should be ImmutMap
 function pipeSpaceRepVals(recordCtx,
                           record,
                           evalCtx) {
@@ -57,37 +55,45 @@ function pipeSpaceRepVals(recordCtx,
                                            newFactor,
                                            newCount,
                                            responseQuality);
-  return recordCtx.merge({
+  return {
+    ...recordCtx,
     factor: newFactor,
     interval: newInterval,
     count: newCount,
-  });
+  };
 }
 
-// recordCtx is Immut.Map
 function pipeDates(recordCtx) {
-  const due = SpacedRep.calcDueDate(recordCtx.get('interval'));
-  return recordCtx.merge({
+  const due = SpacedRep.calcDueDate(recordCtx.interval);
+  return {
+    ...recordCtx,
     due,
     lastDone: new Date(),
-  });
+  };
 }
 
-// recordCtx is Immut.Map
 function pipeHistory(recordCtx, record, evalCtx) {
   if (!record) {
     const history = [evalCtx.answerQuality];
-    return recordCtx.set('history', history);
+    return {
+      ...recordCtx,
+      history,
+    };
   }
-  const history = record.get('history');
+  const history = record.history;
   history.push(evalCtx.answerQuality);
-  return recordCtx.set('history', history);
+  return {
+    ...recordCtx,
+    history,
+  };
 }
 
 // recordCtx needs to have history
-// recordCtx is Immut.Map
 function pipeHealth(recordCtx) {
-  return recordCtx.set('health', calcNoteHealth(recordCtx.get('history')));
+  return {
+    ...recordCtx,
+    health: calcNoteHealth(recordCtx.history),
+  };
 }
 
 function createNewRecord(userID, note, recordCtx) {
@@ -111,9 +117,11 @@ function createNewRecord(userID, note, recordCtx) {
     noteType: note.type,
     subjectParent: note.parent[0],
   };
-  // newRecord is combined Immut.Map
-  const newRecord = recordCtx.merge(recData);
-  return NoteRecord.create(newRecord.toObject());
+  const newRecord = {
+    ...recordCtx,
+    ...recData,
+  };
+  return NoteRecord.create(newRecord);
 }
 
 function pipe(mState) {
@@ -121,30 +129,29 @@ function pipe(mState) {
   // grab current note info from `session.noteQueue[session.queueIndex]`
   // update NoteRecord using note info and evalCtx data
 
-  if (!mState.has('evalCtx')) {
+  if (!{}.hasOwnProperty.call(mState, 'evalCtx')) {
     return mState;
   }
 
-  const session = mState.get('session');
+  const session = mState.session;
 
   if (session.state === SessionState.DONE_SESSION) {
     return mState;
   }
 
   const note = session.noteQueue[session.queueIndex];
-  const evalCtx = mState.get('evalCtx');
+  const evalCtx = mState.evalCtx;
 
-  return NoteRecord.findOne({ userID: mState.get('userID'),
+  return NoteRecord.findOne({ userID: mState.userID,
                              noteID: note._id })
   .then(record => {
-    let recordCtx = Immut.Map({});
-
+    let recordCtx = {};
     recordCtx = pipeSpaceRepVals(recordCtx,
                                  record,
                                  evalCtx);
 
 
-    // record = createNewRecord(mState.get('userID'),
+    // record = createNewRecord(mState.userID,
     //                          note,
     //                          recUpdate);
 
@@ -153,16 +160,22 @@ function pipe(mState) {
     recordCtx = pipeHealth(recordCtx, record, evalCtx);
 
     if (record) {
-      return record.update(recordCtx.toObject()).then(() => (
-        mState.set('recordCtx', recordCtx.toObject())
+      return record.update(recordCtx).then(() => (
+        {
+          ...mState,
+          recordCtx,
+        }
       ));
     }
     // need to create new record
     console.log('creating new record');
-    return createNewRecord(mState.get('userID'),
+    return createNewRecord(mState.userID,
                            note,
                            recordCtx).then(() => (
-                             mState.set('recordCtx', recordCtx.toObject())
+                             {
+                               ...mState,
+                               recordCtx,
+                             }
                            ));
   });
 }
