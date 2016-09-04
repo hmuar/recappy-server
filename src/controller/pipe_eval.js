@@ -7,7 +7,7 @@ import Answer from '../core/answer';
 // Each evaluation context has knowledge about how to transition among
 // local state. For example, the RecallContext knows how to transition
 // to RecallResponse state when appropriate. When local transition has
-// reached end, `doneNote` on `mSTate.evalCtx` will be set to true.
+// reached end, `doneContext` on `mSTate.evalCtx` will be set to true.
 
 // progress state by advancing note queue
 // function deferToGlobalStateChange(mState) {
@@ -35,7 +35,7 @@ function InitContext(mState) {
   // session.queueIndex = 0;
   const evalCtx = {
     answerQuality: Answer.ok,
-    doneNote: false,
+    doneContext: false,
   };
   return {
     ...mState,
@@ -51,12 +51,12 @@ function InfoContext(mState) {
 
   const evalCtx = {
     answerQuality: null,
-    doneNote: false,
+    doneContext: false,
   };
 
   if (input.type === Input.Type.ACCEPT) {
     evalCtx.answerQuality = Answer.ok;
-    evalCtx.doneNote = true;
+    evalCtx.doneContext = true;
   }
   return {
     ...mState,
@@ -71,7 +71,7 @@ function RecallContext(mState) {
   const input = mState.input;
   const evalCtx = {
     answerQuality: null,
-    doneNote: false,
+    doneContext: false,
   };
   const newState = { ...mState };
   if (input.type === Input.Type.ACCEPT) {
@@ -87,14 +87,14 @@ function RecallResponseContext(mState) {
   const input = mState.input;
   const evalCtx = {
     answerQuality: null,
-    doneNote: false,
+    doneContext: false,
   };
   if (input.type === Input.Type.ACCEPT) {
     evalCtx.answerQuality = Answer.max;
-    evalCtx.doneNote = true;
+    evalCtx.doneContext = true;
   } else if (input.type === Input.Type.REJECT) {
     evalCtx.answerQuality = Answer.min;
-    evalCtx.doneNote = true;
+    evalCtx.doneContext = true;
   }
   return {
     ...mState,
@@ -108,15 +108,15 @@ function InputContext(mState) {
   const input = mState.input;
   const evalCtx = {
     answerQuality: null,
-    doneNote: false,
+    doneContext: false,
   };
   // use isNaN to accept both numerical and number as text inputs
   if (input.type === Input.Type.CUSTOM) {
     // Note should be type "choice"
     const note = session.noteQueue[session.queueIndex];
-    const correctAnswer = input.data === note.answer;
+    const correctAnswer = input.payload === note.answer;
     evalCtx.answerQuality = correctAnswer ? Answer.max : Answer.min;
-    evalCtx.doneNote = true;
+    evalCtx.doneContext = true;
   }
 
   // didn't find proper input type so return as is without advancing state
@@ -131,16 +131,16 @@ function MultChoiceContext(mState) {
   const input = mState.input;
   const evalCtx = {
     answerQuality: null,
-    doneNote: false,
+    doneContext: false,
   };
   // use isNaN to accept both numerical and number as text inputs
-  if (input.type === Input.Type.CUSTOM && !isNaN(input.data)) {
-    const dataAsNum = parseInt(input.data, 10);
+  if (input.type === Input.Type.CUSTOM && !isNaN(input.payload)) {
+    const dataAsNum = parseInt(input.payload, 10);
     // Note should be type "choice"
     const note = session.noteQueue[session.queueIndex];
     const correctAnswer = dataAsNum === note.answer;
     evalCtx.answerQuality = correctAnswer ? Answer.max : Answer.min;
-    evalCtx.doneNote = true;
+    evalCtx.doneContext = true;
   }
 
   // didn't find proper input type so return as is without advancing state

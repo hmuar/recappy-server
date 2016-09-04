@@ -213,7 +213,7 @@ test('eval with init state', t => {
     userID: '7716893a8c8aff3221812149',
     input: {
       type: Input.Type.CUSTOM,
-      data: 'hey!!',
+      payload: 'hey!!',
     },
     subjectName: 'crash-course-biology',
     subjectID: db.createObjectID('f64c57184a4ef7f0357f9cd6'),
@@ -223,7 +223,7 @@ test('eval with init state', t => {
   const mEvalState = PipeEval.pipe(mState);
   const evalCtx = mEvalState.evalCtx;
   t.equal(evalCtx.answerQuality, Answer.ok);
-  t.equal(evalCtx.doneNote, false);
+  t.equal(evalCtx.doneContext, false);
   t.end();
 });
 
@@ -237,7 +237,7 @@ test('eval with info state', t => {
     userID: '7716893a8c8aff3221812149',
     input: {
       type: Input.Type.ACCEPT,
-      data: null,
+      payload: null,
     },
     subjectName: 'crash-course-biology',
     subjectID: db.createObjectID('f64c57184a4ef7f0357f9cd6'),
@@ -247,7 +247,7 @@ test('eval with info state', t => {
   const mEvalState = PipeEval.pipe(mState);
   const evalCtx = mEvalState.evalCtx;
   t.equal(evalCtx.answerQuality, Answer.ok);
-  t.equal(evalCtx.doneNote, true);
+  t.equal(evalCtx.doneContext, true);
 
   const mStateReject = {
     timestamp: 1,
@@ -255,7 +255,7 @@ test('eval with info state', t => {
     userID: '7716893a8c8aff3221812149',
     input: {
       type: Input.Type.REJECT,
-      data: null,
+      payload: null,
     },
     subjectName: 'crash-course-biology',
     subjectID: db.createObjectID('f64c57184a4ef7f0357f9cd6'),
@@ -265,7 +265,7 @@ test('eval with info state', t => {
   const mEvalStateReject = PipeEval.pipe(mStateReject);
   const evalCtxReject = mEvalStateReject.evalCtx;
   t.equal(evalCtxReject.answerQuality, null);
-  t.equal(evalCtxReject.doneNote, false);
+  t.equal(evalCtxReject.doneContext, false);
   t.end();
 });
 
@@ -280,7 +280,7 @@ test('eval with recall state', t => {
     userID: '7716893a8c8aff3221812149',
     input: {
       type: Input.Type.ACCEPT,
-      data: null,
+      payload: null,
     },
     subjectName: 'crash-course-biology',
     subjectID: db.createObjectID('f64c57184a4ef7f0357f9cd6'),
@@ -293,7 +293,7 @@ test('eval with recall state', t => {
   t.equal(mEvalState.session.state, SessionState.RECALL_RESPONSE);
   t.equal(mEvalState.session.queueIndex, 1);
   t.equal(evalCtx.answerQuality, Answer.ok);
-  t.equal(evalCtx.doneNote, false);
+  t.equal(evalCtx.doneContext, false);
   t.end();
 });
 
@@ -308,7 +308,7 @@ test('eval with recall response state', t => {
     userID: '7716893a8c8aff3221812149',
     input: {
       type: Input.Type.ACCEPT,
-      data: null,
+      payload: null,
     },
     subjectName: 'crash-course-biology',
     subjectID: db.createObjectID('f64c57184a4ef7f0357f9cd6'),
@@ -318,7 +318,7 @@ test('eval with recall response state', t => {
   const mEvalState = PipeEval.pipe(mState);
   const evalCtx = mEvalState.evalCtx;
   t.equal(evalCtx.answerQuality, Answer.max);
-  t.equal(evalCtx.doneNote, true);
+  t.equal(evalCtx.doneContext, true);
 
   const mStateReject = {
     timestamp: 1,
@@ -326,7 +326,7 @@ test('eval with recall response state', t => {
     userID: '7716893a8c8aff3221812149',
     input: {
       type: Input.Type.REJECT,
-      data: null,
+      payload: null,
     },
     subjectName: 'crash-course-biology',
     subjectID: db.createObjectID('f64c57184a4ef7f0357f9cd6'),
@@ -336,7 +336,7 @@ test('eval with recall response state', t => {
   const mEvalStateReject = PipeEval.pipe(mStateReject);
   const evalCtxReject = mEvalStateReject.evalCtx;
   t.equal(evalCtxReject.answerQuality, Answer.min);
-  t.equal(evalCtxReject.doneNote, true);
+  t.equal(evalCtxReject.doneContext, true);
 
 
   t.end();
@@ -353,7 +353,7 @@ test('eval with choice state', t => {
     userID: '7716893a8c8aff3221812149',
     input: {
       type: Input.Type.CUSTOM,
-      data: 3,
+      payload: 3,
     },
     subjectName: 'crash-course-biology',
     subjectID: db.createObjectID('f64c57184a4ef7f0357f9cd6'),
@@ -363,7 +363,7 @@ test('eval with choice state', t => {
   const mEvalState = PipeEval.pipe(mState);
   const evalCtx = mEvalState.evalCtx;
   t.equal(evalCtx.answerQuality, Answer.max);
-  t.equal(evalCtx.doneNote, true);
+  t.equal(evalCtx.doneContext, true);
 
   // check if string data '3' is properly accepted
   // as correct answer choice 3
@@ -373,7 +373,7 @@ test('eval with choice state', t => {
     userID: '7716893a8c8aff3221812149',
     input: {
       type: Input.Type.CUSTOM,
-      data: '3',
+      payload: '3',
     },
     subjectName: 'crash-course-biology',
     subjectID: db.createObjectID('f64c57184a4ef7f0357f9cd6'),
@@ -383,7 +383,7 @@ test('eval with choice state', t => {
   const mEvalStateString = PipeEval.pipe(mStateString);
   const evalCtxString = mEvalStateString.evalCtx;
   t.equal(evalCtxString.answerQuality, Answer.max);
-  t.equal(evalCtxString.doneNote, true);
+  t.equal(evalCtxString.doneContext, true);
 
   // check if incorrect answer is correctly evaluated as wrong
   const mStateWrong = {
@@ -392,7 +392,7 @@ test('eval with choice state', t => {
     userID: '7716893a8c8aff3221812149',
     input: {
       type: Input.Type.CUSTOM,
-      data: 2,
+      payload: 2,
     },
     subjectName: 'crash-course-biology',
     subjectID: db.createObjectID('f64c57184a4ef7f0357f9cd6'),
@@ -402,7 +402,7 @@ test('eval with choice state', t => {
   const mEvalStateWrong = PipeEval.pipe(mStateWrong);
   const evalCtxWrong = mEvalStateWrong.evalCtx;
   t.equal(evalCtxWrong.answerQuality, Answer.min);
-  t.equal(evalCtxWrong.doneNote, true);
+  t.equal(evalCtxWrong.doneContext, true);
 
   // check if incorrect answer string is correctly evaluated as wrong
   const mStateWrongString = {
@@ -411,7 +411,7 @@ test('eval with choice state', t => {
     userID: '7716893a8c8aff3221812149',
     input: {
       type: Input.Type.CUSTOM,
-      data: '5',
+      payload: '5',
     },
     subjectName: 'crash-course-biology',
     subjectID: db.createObjectID('f64c57184a4ef7f0357f9cd6'),
@@ -421,7 +421,7 @@ test('eval with choice state', t => {
   const mEvalStateWrongString = PipeEval.pipe(mStateWrongString);
   const evalCtxWrongString = mEvalStateWrongString.evalCtx;
   t.equal(evalCtxWrongString.answerQuality, Answer.min);
-  t.equal(evalCtxWrongString.doneNote, true);
+  t.equal(evalCtxWrongString.doneContext, true);
   t.end();
 });
 
@@ -436,7 +436,7 @@ test('eval with input state', t => {
     userID: '7716893a8c8aff3221812149',
     input: {
       type: Input.Type.CUSTOM,
-      data: 'valence',
+      payload: 'valence',
     },
     subjectName: 'crash-course-biology',
     subjectID: db.createObjectID('f64c57184a4ef7f0357f9cd6'),
@@ -446,7 +446,7 @@ test('eval with input state', t => {
   const mEvalState = PipeEval.pipe(mState);
   const evalCtx = mEvalState.evalCtx;
   t.equal(evalCtx.answerQuality, Answer.max);
-  t.equal(evalCtx.doneNote, true);
+  t.equal(evalCtx.doneContext, true);
 
   // check if incorrect answer is correctly evaluated as wrong
   const mStateWrong = {
@@ -455,7 +455,7 @@ test('eval with input state', t => {
     userID: '7716893a8c8aff3221812149',
     input: {
       type: Input.Type.CUSTOM,
-      data: 'hydrogen',
+      payload: 'hydrogen',
     },
     subjectName: 'crash-course-biology',
     subjectID: db.createObjectID('f64c57184a4ef7f0357f9cd6'),
@@ -465,7 +465,7 @@ test('eval with input state', t => {
   const mEvalStateWrong = PipeEval.pipe(mStateWrong);
   const evalCtxWrong = mEvalStateWrong.evalCtx;
   t.equal(evalCtxWrong.answerQuality, Answer.min);
-  t.equal(evalCtxWrong.doneNote, true);
+  t.equal(evalCtxWrong.doneContext, true);
 
   t.end();
 });
