@@ -6,7 +6,8 @@
   "scripts": {
     "lint": "esw -w src",
     "test": "watch 'clear && npm run test-run' src",
-    "test-run": "blue-tape -r babel-register src/test/*.test.js | tap-summary"
+    "test-run": "blue-tape -r babel-register src/test/*.test.js | tap-summary",
+    "docs": "watch 'rm -rf docs && docco src/**/**.js && rm -rf docs/*.test.html' src"
   },
   "author": "",
   "license": "ISC",
