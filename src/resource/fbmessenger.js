@@ -1,8 +1,12 @@
+import AdapterFB from '../adapter/fbmessenger/fbmessenger';
+import Controller from '../controller/controller';
+import getPostBody from '../request';
+
 function getRoutePath(apiVersionPath) {
   return `${apiVersionPath}/fbmessage`;
 }
 
-function routes(apiVersionPath) {
+function routes(apiVersionPath, server) {
   const routePath = getRoutePath(apiVersionPath);
 
   // When initially setting up the webhook for messenger platform,
@@ -21,15 +25,30 @@ function routes(apiVersionPath) {
   const routePOST = {
     method: 'POST',
     path: routePath,
+    // config: {
+    //   payload: {
+    //     parse: true,
+    //   },
+    // },
     handler(request, reply) {
-      // let dbAdapter = require("../db/db");
-      // if(request.server.plugins.hasOwnProperty('hapi-mongodb')) {
-      //   dbAdapter.connect(request.server.plugins['hapi-mongodb'].db);
-      //   let db = dbAdapter.db;
-      //   db.getOneCat(null, (result) => {
-      //   });
-      // }
-      reply();
+      reply('Ok');
+      const postBody = getPostBody(request);
+      console.log(postBody);
+      server.log('info', postBody);
+      const controller = new Controller(AdapterFB);
+      const msg = AdapterFB.parse(postBody);
+      console.log(msg);
+      if (msg.input.type != null) {
+        // controller.debugDBAssist(msg);
+        console.log('trying to register message....');
+        controller.registerMsg(msg).then((state) => {
+          console.log('done registering message in controller');
+          controller.sendMessage(state);
+        })
+        .catch((err) => console.log(err));
+      } else {
+        console.log('Unrecognized message...........');
+      }
     },
   };
 

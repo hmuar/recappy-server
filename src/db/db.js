@@ -1,33 +1,54 @@
-exports = module.exports = {};
+import mongoose from 'mongoose';
+import Promise from 'bluebird';
+import { ObjectID } from '../db/collection';
 
-function NotConnectedError() {
-  this.name = 'NotConnectedError';
-  this.message = 'Not connected to database instance.';
-}
+// const mongoose = Promise.promisifyAll(require('mongoose'));
+Promise.promisifyAll(mongoose);
 
-class Database {
+// function NotConnectedError() {
+//   this.name = 'NotConnectedError';
+//   this.message = 'Not connected to database instance.';
+// }
+
+export default class Database {
   constructor() {
-    this.db = null;
+    this.loaded = false;
   }
 
-  connect(connection) {
-    this.db = connection;
+  createObjectID(idString) {
+    return ObjectID(idString);
   }
 
-  getOneCat(errorCallback, successCallback) {
-    if (!this.db) {
-      throw new NotConnectedError();
-    }
-    this.db.collection('category').findOne((err, result) => {
-      if (err) {
-        errorCallback(err);
+  initialize() {
+    return new Promise((resolve, reject) => {
+      if (!this.loaded) {
+        const connection =
+          mongoose.connect('mongodb://127.0.0.1:3001/meteor').connection;
+        connection.on('error', () => reject('Could not connect to database'));
+        connection.on('open', () => {
+          this.loaded = true;
+          resolve();
+        });
       } else {
-        successCallback(result);
+        resolve();
       }
     });
   }
-}
 
-// Export instance so that it will get cached when require(),
-// so will act like a singleton across entire app.
-export default new Database();
+  setup() {
+    return this.initialize();
+  }
+
+  // getOneCat(errorCallback, successCallback) {
+  //   if (!this.db) {
+  //     throw new NotConnectedError();
+  //   }
+  //   this.db.collection('category').findOne((err, result) => {
+  //     if (err) {
+  //       errorCallback(err);
+  //     } else {
+  //       successCallback(result);
+  //     }
+  //   });
+  // }
+}

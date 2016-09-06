@@ -1,6 +1,8 @@
 import Account from '../../account/account';
 import Input from '../../core/input';
-import { sendText } from './fbmessenger_request';
+import { sendText, sendButtons, sendImage } from './fbmessenger_request';
+import { SessionState } from '../../core/session_state';
+import generateQuestion from '../../speech';
 import MessageType from './fbmessage_type';
 
 // Adapter for parsing incoming requests and responding
@@ -77,7 +79,7 @@ function stripChoiceNum(choice) {
 }
 
 // return a function that properly adds content to a
-// given Immut.Map object based on given `msgType`
+// given obj object based on given `msgType`
 function contentInjector(msgType) {
   if (msgType === MessageType.TEXT) {
     return (msg, content) => (
@@ -85,7 +87,7 @@ function contentInjector(msgType) {
         ...msg,
         input: {
           type: Input.Type.CUSTOM,
-          data: content,
+          payload: content,
         },
       }
     );
@@ -113,7 +115,7 @@ function contentInjector(msgType) {
         ...msg,
         input: {
           type: mtype,
-          data: dataVal,
+          payload: dataVal,
         },
       };
     };
@@ -124,16 +126,17 @@ function contentInjector(msgType) {
       ...msg,
       input: {
         type: Input.Type.UNKNOWN,
-        data: null,
+        payload: null,
       },
     }
   );
 }
 
-// Parse incoming POST request and return an Immut.Map
+// Parse incoming POST body and return a msg object
 // object with standard message data
-function parse(request) {
-  const entry = request.entry[0];
+function parse(requestBody) {
+  console.log(requestBody);
+  const entry = requestBody.entry[0];
   const msg = entry.messaging[0];
 
   // TODO: Need to dynamically get this from request
@@ -152,10 +155,103 @@ function parse(request) {
   return finalMsgData;
 }
 
-function sendMessage(userID, evalContext, callback) {
-  // convert userID to fbID
-  const fbID = userID;
-  sendText(fbID, 'dummy text', callback);
+
+export function sendPossibleImage(senderID, note) {
+  if ('imgUrl' in note) {
+    if (note.imgUrl != null) {
+      sendImage(senderID, note.imgUrl);
+    }
+  }
+}
+
+function sendMessageInContext(senderID, session) {
+  console.log('sendMessageInContext *********');
+  console.log(senderID);
+  console.log(session);
+  const fbUserID = senderID;
+  const note = session.noteQueue[session.queueIndex];
+  console.log(note);
+  switch (session.state) {
+    case SessionState.INIT:
+      sendText(fbUserID, "Let's get started!");
+      break;
+
+    case SessionState.RECALL: {
+      const buttonData = [];
+      buttonData.push({
+        title: 'Tell me the answer',
+        action: Input.Type.ACCEPT,
+      });
+      sendPossibleImage(fbUserID, note);
+      const questionText = generateQuestion(note);
+      sendButtons(fbUserID, questionText, buttonData);
+      break;
+    }
+
+    case SessionState.RECALL_RESPONSE: {
+      sendText(fbUserID, note.hidden);
+      const buttonData = [];
+      buttonData.push({
+        title: 'Yes',
+        action: Input.Type.ACCEPT,
+      });
+      buttonData.push({
+        title: 'No',
+        action: Input.Type.REJECT,
+      });
+      sendPossibleImage(fbUserID, note);
+      sendButtons(fbUserID,
+        'Is that what you were thinking?', buttonData);
+      break;
+    }
+
+    case SessionState.INPUT: {
+      sendPossibleImage(fbUserID, note);
+      const questionText = generateQuestion(note);
+      sendText(fbUserID, questionText);
+      break;
+    }
+
+    case SessionState.MULT_CHOICE: {
+      let choicesText = '';
+      choicesText += `(1) ${note.choice1}\n`;
+      choicesText += `(2) ${note.choice2}\n`;
+      choicesText += `(3) ${note.choice3}\n`;
+      choicesText += `(4) ${note.choice4}\n`;
+      choicesText += `(5) ${note.choice5}`;
+
+      sendPossibleImage(fbUserID, note);
+      const questionText = generateQuestion(note);
+      sendText(fbUserID, questionText);
+      // sendButtons(fbUserID, note.displayRaw, buttonData);
+      sendText(fbUserID, choicesText);
+      break;
+    }
+
+    case SessionState.INFO: {
+      const buttonData = [];
+      buttonData.push({
+        title: 'Ok keep going',
+        action: Input.Type.ACCEPT,
+      });
+      sendPossibleImage(fbUserID, note);
+      sendButtons(fbUserID, note.displayRaw, buttonData);
+      break;
+    }
+    case SessionState.DONE_SESSION:
+      sendText(fbUserID,
+        'No more to learn for today, all done! Check back in tomorrow :)');
+      break;
+
+    default:
+      break;
+  }
+}
+
+function sendMessage(state) {
+  console.log('sending message....');
+  console.log(state);
+  sendMessageInContext(state.senderID, state.session);
 }
 
 const AdapterFBMessenger = {

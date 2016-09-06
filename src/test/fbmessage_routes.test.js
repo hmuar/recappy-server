@@ -2,10 +2,10 @@ import test from 'blue-tape';
 import FBmessage from '../resource/fbmessenger';
 import server from './test_server';
 
-const before = test;
-const after = test;
+// const before = test;
+// const after = test;
 // Server setup
-before('before fb message routes testing', () => server.start());
+// before('before fb message routes testing', () => server.start([]));
 
 // FBMessenger will hit this route with a GET request
 // with a hub.challenge that must be responded to when
@@ -61,4 +61,4 @@ test('FBmessage route POST', t => {
   });
 });
 
-after('after', () => server.stop());
+// after('after fb message routes testing', () => server.stop());

@@ -63,7 +63,7 @@ test('parse text request into message data', t => {
   t.equal(mData.senderID, '1028279607252642');
   t.ok({}.hasOwnProperty.call(mData, 'input'));
   t.equal(mData.input.type, Input.Type.CUSTOM);
-  t.equal(mData.input.data, 'user response text');
+  t.equal(mData.input.payload, 'user response text');
   t.end();
 });
 
@@ -99,7 +99,7 @@ test('parse accept payload request into message data', t => {
   t.equal(mData.senderID, '1028279607252642');
   t.ok({}.hasOwnProperty.call(mData, 'input'));
   t.equal(mData.input.type, Input.Type.ACCEPT);
-  t.equal(mData.input.data, null);
+  t.equal(mData.input.payload, null);
   t.end();
 });
 
@@ -134,7 +134,7 @@ test('parse reject payload request into message data', t => {
   t.equal(mData.senderID, '1028279607252642');
   t.ok({}.hasOwnProperty.call(mData, 'input'));
   t.equal(mData.input.type, Input.Type.REJECT);
-  t.equal(mData.input.data, null);
+  t.equal(mData.input.payload, null);
   t.end();
 });
 
@@ -169,7 +169,7 @@ test('parse choice payload request into message data', t => {
   t.equal(mData.senderID, '1028279607252642');
   t.ok({}.hasOwnProperty.call(mData, 'input'));
   t.equal(mData.input.type, Input.Type.CUSTOM);
-  t.equal(mData.input.data, 5);
+  t.equal(mData.input.payload, 5);
   t.end();
 });
 

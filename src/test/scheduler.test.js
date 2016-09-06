@@ -3,7 +3,7 @@ import TestDatabase from './test_database';
 import { getOldMaterial,
          getNewMaterial,
          getNextNotes } from '../core/scheduler';
-import DBAssist from '../db/note_assistant';
+import DBAssist from '../db/category_assistant';
 
 const before = test;
 const after = test;

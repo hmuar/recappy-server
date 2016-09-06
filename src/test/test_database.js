@@ -11,7 +11,7 @@ Promise.promisifyAll(mongoose);
 
 export default class TestDatabase {
   constructor() {
-    this.loaded = null;
+    this.loaded = false;
   }
 
   createObjectID(idString) {

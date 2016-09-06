@@ -5,7 +5,7 @@ import Answer from '../core/answer';
 import pipeSaveSession from '../controller/pipe_save_session';
 import Input from '../core/input';
 import { SessionState } from '../core/session_state';
-import DBAssist from '../db/note_assistant';
+import DBAssist from '../db/category_assistant';
 import { getSessionForUserAndSubject } from '../db/session_assistant';
 
 const before = test;

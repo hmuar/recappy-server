@@ -5,7 +5,7 @@ import Answer from '../core/answer';
 import pipeStateTransition from '../controller/pipe_advance_state';
 import Input from '../core/input';
 import { SessionState } from '../core/session_state';
-import DBAssist from '../db/note_assistant';
+import DBAssist from '../db/category_assistant';
 
 const before = test;
 const after = test;

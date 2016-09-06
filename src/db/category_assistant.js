@@ -11,6 +11,7 @@ import { Category } from '../db/collection';
 // }
 
 function getCategoryByName(catLabel, catName) {
+  console.log('get category by name');
   return Category.findOne({ ctype: catLabel, ckey: catName });
 }
 

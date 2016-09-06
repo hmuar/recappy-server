@@ -1,1 +1,1 @@
-require('./register.js');
+require('./register');

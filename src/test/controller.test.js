@@ -1,7 +1,7 @@
 import test from 'blue-tape';
 import AdapterFB from '../adapter/fbmessenger/fbmessenger';
 import TestDatabase from './test_database';
-import cMod from '../controller/controller';
+import Controller from '../controller/controller';
 import Input from '../core/input';
 // import { SessionState } from '../core/session_state';
 
@@ -9,7 +9,7 @@ const before = test;
 const after = test;
 const db = new TestDatabase();
 
-const Controller = new cMod(AdapterFB);
+const controller = new Controller(AdapterFB);
 
 before('before controller testing',
   () => db.setup().then(() => db.clean()).then(() => db.loadAllFixtures()));
@@ -34,7 +34,7 @@ test('register message with existing session', t => {
     },
   };
 
-  Controller.registerMsg(msg).then((rMsg) => {
+  controller.registerMsg(msg).then((rMsg) => {
     t.ok(rMsg.session);
     t.notDeepLooseEqual(rMsg.session.queueIndex, null);
     t.ok(rMsg.session.noteQueue);
@@ -63,7 +63,7 @@ test('register message with existing session', t => {
 //     subjectName: 'crash-course-biology',
 //   };
 //
-//   Controller.registerMsg(msg).then((rMsg) => {
+//   controller.registerMsg(msg).then((rMsg) => {
 //     t.ok(rMsg.session);
 //     t.ok(rMsg.session.noteQueue.length > 0);
 //     t.equal(rMsg.session.state, SessionState.INFO);
