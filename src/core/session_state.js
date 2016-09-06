@@ -6,8 +6,9 @@ export const SessionState = {
   INPUT: 'input',
   MULT_CHOICE: 'mult-choice',
   INFO: 'info',
-  WAIT_NEXT_NOTE: 'wait-next-note',
-  DONE_SESSION: 'done-session',
+  WAIT_NEXT_IN_QUEUE: 'wait-next-note',
+  START_QUEUE: 'start-queue',
+  DONE_QUEUE: 'done-queue',
   UNKNOWN: 'unknown',
 };
 

@@ -218,7 +218,7 @@ const sessionTemplate = {
     f64c57184a4ef7f0357f9cd6: {
       noteID: noteA._id,
       queueIndex: 0,
-      noteQueue: [noteA._id, noteB._id],
+      noteQueue: [noteA, noteB],
       state: SessionState.RECALL,
       globalIndex: 0,
     },

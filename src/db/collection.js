@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 // User
 // ----
 // Main user account. Has access info from other adapters.
+// E.g. facebook messenger ID
 const userSchema = new mongoose.Schema({
   name: String,
   email: String,

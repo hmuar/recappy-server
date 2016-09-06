@@ -7,6 +7,7 @@ const Answer = {
   // a way of answering as confirmation,
   // effectively considered max quality
   ok: maxQuality,
+  no: minQuality,
 };
 
 export default Answer;

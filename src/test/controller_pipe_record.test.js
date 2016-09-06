@@ -2,7 +2,7 @@
 import test from 'blue-tape';
 import TestDatabase from './test_database';
 import Answer from '../core/answer';
-import PipeRecord from '../controller/pipe_record';
+import pipeRecord from '../controller/pipe_record';
 import Input from '../core/input';
 import { SessionState } from '../core/session_state';
 
@@ -118,7 +118,7 @@ test('update existing note record', t => {
     },
   };
 
-  return PipeRecord.pipe(mState)
+  return pipeRecord(mState)
   .then(state => {
     t.ok({}.hasOwnProperty.call(state, 'recordCtx'));
     const recordCtx = state.recordCtx;
@@ -155,10 +155,9 @@ test('create new note record', t => {
     },
   };
 
-  return PipeRecord.pipe(mState)
+  return pipeRecord(mState)
   .then(state => {
     t.ok({}.hasOwnProperty.call(state, 'recordCtx'));
-    console.log(state.recordCtx);
     const recordCtx = state.recordCtx;
     t.ok(hasOwnProperty.call(recordCtx, 'factor'));
     t.ok(hasOwnProperty.call(recordCtx, 'interval'));

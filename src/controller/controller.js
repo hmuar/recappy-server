@@ -1,5 +1,8 @@
 import DBAssist from '../db/note_assistant';
-import PipeSession from './pipe_session';
+import pipeSession from './pipe_session';
+import pipeRecord from './pipe_record';
+import pipeEval from './pipe_eval';
+import pipeAdvanceState from './pipe_advance_state';
 
 // `msg` = {
 //   timestamp  : ""
@@ -17,7 +20,6 @@ class Controller {
 
   // check if key property added to msg and
   // corresponding value is not undefined and not null
-  // `msg` is Immut.Map
   pipeSuccess(mState, key) {
     return {}.hasOwnProperty.call(mState, key) &&
            mState[key] != null;
@@ -29,31 +31,30 @@ class Controller {
   }
 
   // main entry method called by external adapters
-  // `msg` is Immut.Map
   registerMsg(msg) {
     return DBAssist.getCategoryByName('subject', msg.subjectName)
     .then(subject => {
       if (!subject) {
         throw new Error(`Could not find subject ${msg.subjectName}`);
       } else {
-        const mState = {
+        const appState = {
           ...msg,
           subjectID: subject._id,
         };
         // convert adapter specific sender id into app user
-        return this.pipeUser(mState)
+        return this.pipeUser(appState)
         // at this point should have app user information
-        .then(state => PipeSession.pipe(state))
+        .then(state => pipeSession(state))
         // at this point should have session information
-        .then(state => (
-          // need to evaluate msg in context of current state
-          state
-        ));
+        // need to evaluate msg in context of current state
+        .then(state => pipeEval(state))
+        // persist results of msg evaluation
+        .then(state => pipeRecord(state))
+        .then(state => pipeAdvanceState(state));
       }
     });
   }
 
 }
-
 
 export default Controller;

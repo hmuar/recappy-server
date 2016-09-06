@@ -124,7 +124,7 @@ function createNewRecord(userID, note, recordCtx) {
   return NoteRecord.create(newRecord);
 }
 
-function pipe(mState) {
+export default function pipe(mState) {
   // inspect evalCtx
   // grab current note info from `session.noteQueue[session.queueIndex]`
   // update NoteRecord using note info and evalCtx data
@@ -135,7 +135,7 @@ function pipe(mState) {
 
   const session = mState.session;
 
-  if (session.state === SessionState.DONE_SESSION) {
+  if (session.state === SessionState.DONE_QUEUE) {
     return mState;
   }
 
@@ -168,7 +168,6 @@ function pipe(mState) {
       ));
     }
     // need to create new record
-    console.log('creating new record');
     return createNewRecord(mState.userID,
                            note,
                            recordCtx).then(() => (
@@ -179,9 +178,3 @@ function pipe(mState) {
                            ));
   });
 }
-
-const PipeRecord = {
-  pipe,
-};
-
-export default PipeRecord;

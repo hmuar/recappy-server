@@ -7,8 +7,7 @@ function addNewSession(mState) {
   const subjectID = mState.subjectID;
   const userID = mState.userID;
 
-  return getStartingNotes(subjectID,
-                                    TARGET_NUM_NOTES_IN_SESSION)
+  return getStartingNotes(subjectID, TARGET_NUM_NOTES_IN_SESSION)
   .then(noteQueue => {
     const startNoteIndex = 0;
     const startGlobalIndex = 0;
@@ -27,7 +26,7 @@ function addNewSession(mState) {
 
 // find existing user session for given subject and set `session` key
 // to session object. If no session exists, create new session first.
-function pipe(mState) {
+export default function pipe(mState) {
   return SessionAssist.getSessionForUserAndSubject(
                           mState.userID,
                           mState.subjectID)
@@ -41,9 +40,3 @@ function pipe(mState) {
     };
   });
 }
-
-const PipeSession = {
-  pipe,
-};
-
-export default PipeSession;

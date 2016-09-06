@@ -14,7 +14,7 @@ import Answer from '../core/answer';
 //   let session = mState.session;
 //   let newQueueIndex = session.queueIndex + 1;
 //   if(newQueueIndex >= session.noteQueue.length) {
-//     session.state = SessionState.DONE_SESSION;
+//     session.state = SessionState.DONE_QUEUE;
 //   }
 //   else {
 //     session.queueIndex = newQueueIndex;
@@ -35,7 +35,7 @@ function InitContext(mState) {
   // session.queueIndex = 0;
   const evalCtx = {
     answerQuality: Answer.ok,
-    doneContext: false,
+    doneContext: true,
   };
   return {
     ...mState,
@@ -67,8 +67,11 @@ function InfoContext(mState) {
 // Look for ACCEPT or REJECT input type and then advance state
 // Otherwise return original state.
 function RecallContext(mState) {
-  const session = mState.session;
   const input = mState.input;
+  if (!input) {
+    return mState;
+  }
+  const session = mState.session;
   const evalCtx = {
     answerQuality: null,
     doneContext: false,
@@ -85,6 +88,9 @@ function RecallContext(mState) {
 
 function RecallResponseContext(mState) {
   const input = mState.input;
+  if (!input) {
+    return mState;
+  }
   const evalCtx = {
     answerQuality: null,
     doneContext: false,
@@ -104,15 +110,16 @@ function RecallResponseContext(mState) {
 
 
 function InputContext(mState) {
-  const session = mState.session;
   const input = mState.input;
+  if (!input) {
+    return mState;
+  }
+  const session = mState.session;
   const evalCtx = {
     answerQuality: null,
     doneContext: false,
   };
-  // use isNaN to accept both numerical and number as text inputs
   if (input.type === Input.Type.CUSTOM) {
-    // Note should be type "choice"
     const note = session.noteQueue[session.queueIndex];
     const correctAnswer = input.payload === note.answer;
     evalCtx.answerQuality = correctAnswer ? Answer.max : Answer.min;
@@ -127,8 +134,11 @@ function InputContext(mState) {
 }
 
 function MultChoiceContext(mState) {
-  const session = mState.session;
   const input = mState.input;
+  if (!input) {
+    return mState;
+  }
+  const session = mState.session;
   const evalCtx = {
     answerQuality: null,
     doneContext: false,
@@ -176,10 +186,10 @@ function getEvalContext(state) {
       return InputContext;
     case SessionState.MULT_CHOICE:
       return MultChoiceContext;
-    case SessionState.WAIT_NEXT_NOTE:
+    case SessionState.WAIT_NEXT_IN_QUEUE:
       // TODO: implement WaitContext
       return WaitContext;
-    case SessionState.DONE_SESSION:
+    case SessionState.DONE_QUEUE:
       // TODO: implement DoneContext
       return DoneContext;
     default:
@@ -187,7 +197,7 @@ function getEvalContext(state) {
   }
 }
 
-function pipe(mState) {
+export default function pipe(mState) {
   if (!{}.hasOwnProperty.call(mState, 'session')) {
     return mState;
   }
@@ -195,9 +205,3 @@ function pipe(mState) {
   const sState = mState.session.state;
   return getEvalContext(sState)(mState);
 }
-
-const PipeEval = {
-  pipe,
-};
-
-export default PipeEval;

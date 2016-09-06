@@ -1,4 +1,4 @@
-import { NoteRecord, Category } from '../db/collection';
+import { NoteRecord, Category, Note } from '../db/collection';
 
 export const TARGET_NUM_NOTES_IN_SESSION = 3;
 
@@ -19,7 +19,7 @@ export function getOldMaterial(userID, subjectID, numNotes) {
     .then(dueNotes => (
       // map each note to its noteID
       dueNotes.map((item) => item.noteID)))
-    .then(noteIDs => Category.find({ _id: { $in: noteIDs } }));
+    .then(noteIDs => Note.find({ _id: { $in: noteIDs } }));
 }
 
 // Grab new notes user has never seen that are next in line.
@@ -42,9 +42,7 @@ export function getNewMaterial(subjectID, numNotes, lastGlobalIndex) {
         console.log('Could not find next concept, returning 0 new notes');
         return [];
       }
-      return Category.find({ ctype: 'note',
-                            directParent: nextConcept._id })
-                            .sort('order');
+      return Note.find({ directParent: nextConcept._id }).sort('order');
     });
 }
 

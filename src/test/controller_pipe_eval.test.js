@@ -2,7 +2,7 @@
 
 import test from 'blue-tape';
 import TestDatabase from './test_database';
-import PipeEval from '../controller/pipe_eval';
+import pipeEval from '../controller/pipe_eval';
 import { SessionState } from '../core/session_state';
 import Input from '../core/input';
 import Answer from '../core/answer';
@@ -220,10 +220,10 @@ test('eval with init state', t => {
     session: initSession,
   };
 
-  const mEvalState = PipeEval.pipe(mState);
+  const mEvalState = pipeEval(mState);
   const evalCtx = mEvalState.evalCtx;
   t.equal(evalCtx.answerQuality, Answer.ok);
-  t.equal(evalCtx.doneContext, false);
+  t.equal(evalCtx.doneContext, true);
   t.end();
 });
 
@@ -244,7 +244,7 @@ test('eval with info state', t => {
     session: initSession,
   };
 
-  const mEvalState = PipeEval.pipe(mState);
+  const mEvalState = pipeEval(mState);
   const evalCtx = mEvalState.evalCtx;
   t.equal(evalCtx.answerQuality, Answer.ok);
   t.equal(evalCtx.doneContext, true);
@@ -262,7 +262,7 @@ test('eval with info state', t => {
     session: initSession,
   };
 
-  const mEvalStateReject = PipeEval.pipe(mStateReject);
+  const mEvalStateReject = pipeEval(mStateReject);
   const evalCtxReject = mEvalStateReject.evalCtx;
   t.equal(evalCtxReject.answerQuality, null);
   t.equal(evalCtxReject.doneContext, false);
@@ -287,7 +287,7 @@ test('eval with recall state', t => {
     session: initSession,
   };
 
-  const mEvalState = PipeEval.pipe(mState);
+  const mEvalState = pipeEval(mState);
   const evalCtx = mEvalState.evalCtx;
 
   t.equal(mEvalState.session.state, SessionState.RECALL_RESPONSE);
@@ -315,7 +315,7 @@ test('eval with recall response state', t => {
     session: initSession,
   };
 
-  const mEvalState = PipeEval.pipe(mState);
+  const mEvalState = pipeEval(mState);
   const evalCtx = mEvalState.evalCtx;
   t.equal(evalCtx.answerQuality, Answer.max);
   t.equal(evalCtx.doneContext, true);
@@ -333,7 +333,7 @@ test('eval with recall response state', t => {
     session: initSession,
   };
 
-  const mEvalStateReject = PipeEval.pipe(mStateReject);
+  const mEvalStateReject = pipeEval(mStateReject);
   const evalCtxReject = mEvalStateReject.evalCtx;
   t.equal(evalCtxReject.answerQuality, Answer.min);
   t.equal(evalCtxReject.doneContext, true);
@@ -360,7 +360,7 @@ test('eval with choice state', t => {
     session: initSession,
   };
 
-  const mEvalState = PipeEval.pipe(mState);
+  const mEvalState = pipeEval(mState);
   const evalCtx = mEvalState.evalCtx;
   t.equal(evalCtx.answerQuality, Answer.max);
   t.equal(evalCtx.doneContext, true);
@@ -380,7 +380,7 @@ test('eval with choice state', t => {
     session: initSession,
   };
 
-  const mEvalStateString = PipeEval.pipe(mStateString);
+  const mEvalStateString = pipeEval(mStateString);
   const evalCtxString = mEvalStateString.evalCtx;
   t.equal(evalCtxString.answerQuality, Answer.max);
   t.equal(evalCtxString.doneContext, true);
@@ -399,7 +399,7 @@ test('eval with choice state', t => {
     session: initSession,
   };
 
-  const mEvalStateWrong = PipeEval.pipe(mStateWrong);
+  const mEvalStateWrong = pipeEval(mStateWrong);
   const evalCtxWrong = mEvalStateWrong.evalCtx;
   t.equal(evalCtxWrong.answerQuality, Answer.min);
   t.equal(evalCtxWrong.doneContext, true);
@@ -418,7 +418,7 @@ test('eval with choice state', t => {
     session: initSession,
   };
 
-  const mEvalStateWrongString = PipeEval.pipe(mStateWrongString);
+  const mEvalStateWrongString = pipeEval(mStateWrongString);
   const evalCtxWrongString = mEvalStateWrongString.evalCtx;
   t.equal(evalCtxWrongString.answerQuality, Answer.min);
   t.equal(evalCtxWrongString.doneContext, true);
@@ -443,7 +443,7 @@ test('eval with input state', t => {
     session: initSession,
   };
 
-  const mEvalState = PipeEval.pipe(mState);
+  const mEvalState = pipeEval(mState);
   const evalCtx = mEvalState.evalCtx;
   t.equal(evalCtx.answerQuality, Answer.max);
   t.equal(evalCtx.doneContext, true);
@@ -462,7 +462,7 @@ test('eval with input state', t => {
     session: initSession,
   };
 
-  const mEvalStateWrong = PipeEval.pipe(mStateWrong);
+  const mEvalStateWrong = pipeEval(mStateWrong);
   const evalCtxWrong = mEvalStateWrong.evalCtx;
   t.equal(evalCtxWrong.answerQuality, Answer.min);
   t.equal(evalCtxWrong.doneContext, true);
