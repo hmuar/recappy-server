@@ -1,6 +1,7 @@
 import test from 'blue-tape';
 import TestDatabase from './test_database';
-import SessionAssist from '../db/session_assistant';
+import { getSessionForUserAndSubject,
+         createSession } from '../db/session_assistant';
 
 const before = test;
 const after = test;
@@ -21,63 +22,63 @@ before('before session testing',
   () => db.setup().then(() => db.clean()).then(() => db.loadAllFixtures()));
 
 test('find study session for test student',
-  t => SessionAssist.getSessionForUserAndSubject(staticID.userFB,
-                                                staticID.subject)
+  t => getSessionForUserAndSubject(staticID.userFB,
+                                    staticID.subject)
   .then((session) => t.ok(session)));
 
-test('dont find study session for fake student', t => SessionAssist.getSessionForUserAndSubject(
-                            db.createObjectID('7716893a8c8aff3221812147'),
-                            staticID.subject)
+test('dont find study session for fake student',
+      t => getSessionForUserAndSubject(
+                              db.createObjectID('7716893a8c8aff3221812147'),
+                              staticID.subject)
   .then((session) => t.equal(session, null)));
 
-test('dont find session for fake subject', t => SessionAssist.getSessionForUserAndSubject(
-                                             staticID.userFB,
-                                             staticID.newSubject)
+test('dont find session for fake subject',
+      t => getSessionForUserAndSubject(
+                             staticID.userFB,
+                             staticID.newSubject)
   .then((session) => t.equal(session, null)));
 
-test('create study session', t => SessionAssist.getSessionForUserAndSubject(staticID.userFB2,
-                                                staticID.subject)
+test('create study session',
+      t => getSessionForUserAndSubject(staticID.userFB2,
+                                        staticID.subject)
   .then((session) => t.equal(session, null))
   .then(() => (
-    SessionAssist.createSession(staticID.userFB2,
-                               staticID.subject,
-                               staticID.note,
-                               0,
-                               [staticID.note, staticID.note2],
-                               0)
+    createSession(staticID.userFB2,
+                 staticID.subject,
+                 staticID.note,
+                 0,
+                 [staticID.note, staticID.note2],
+                 0)
   ))
   .then(() => (
-    SessionAssist.getSessionForUserAndSubject(staticID.userFB2,
-                                                    staticID.subject)
+    getSessionForUserAndSubject(staticID.userFB2,
+                                staticID.subject)
     .then((session) => t.ok(session))
   )));
 
 test('should append new subject to user session',
-  t => SessionAssist.getSessionForUserAndSubject(staticID.userFB,
-                                                staticID.subject)
+  t => getSessionForUserAndSubject(staticID.userFB,
+                                    staticID.subject)
   .then((session) => {
     t.ok(session);
-    return SessionAssist.getSessionForUserAndSubject(
-                                                  staticID.userFB,
-                                                  staticID.newSubject);
+    return getSessionForUserAndSubject(staticID.userFB,
+                                        staticID.newSubject);
   }).then((session) => {
     t.equal(session, null);
-    return SessionAssist.createSession(staticID.userFB,
-                               staticID.newSubject,
-                               staticID.note,
-                               0,
-                               [staticID.note],
-                               0);
+    return createSession(staticID.userFB,
+                         staticID.newSubject,
+                         staticID.note,
+                         0,
+                         [staticID.note],
+                         0);
   }).then(() => (
-    SessionAssist.getSessionForUserAndSubject(
-                                              staticID.userFB,
-                                              staticID.newSubject)
+    getSessionForUserAndSubject(staticID.userFB,
+                                staticID.newSubject)
   ))
   .then((sessionNewSubj) => {
     t.ok(sessionNewSubj);
-    return SessionAssist.getSessionForUserAndSubject(
-                                                  staticID.userFB,
-                                                  staticID.subject);
+    return getSessionForUserAndSubject(staticID.userFB,
+                                      staticID.subject);
   })
   .then((sessionOldSubj) => {
     t.ok(sessionOldSubj);

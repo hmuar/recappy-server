@@ -3,7 +3,6 @@ import AdapterFB from '../adapter/fbmessenger/fbmessenger';
 import TestDatabase from './test_database';
 import cMod from '../controller/controller';
 import Input from '../core/input';
-import Answer from '../core/answer';
 // import { SessionState } from '../core/session_state';
 
 const before = test;

@@ -1,6 +1,8 @@
 import { SessionState,
          getEntryStateForNoteType } from '../core/session_state';
 
+import { getNextNotes, TARGET_NUM_NOTES_IN_SESSION } from '../core/scheduler';
+
 // Given current info in app state, determine next study state for user.
 // Only need to look at current app state and evalCtx to determine next state.
 
@@ -30,7 +32,7 @@ function setNextState(appState) {
       }
       break;
     default:
-      nextState = SessionState.UNKNOWN;
+      break;
   }
 
   return {
@@ -47,6 +49,37 @@ function advanceState(appState) {
   // if necessary, advance queueIndex
   // set proper next state based on next note
   if (appState.session && appState.nextState) {
+    if (appState.nextState === SessionState.DONE_QUEUE) {
+      // update note queue
+      // update queueIndex
+      // update globalIndex
+      // export function getNextNotes(userID, subjectID, numNotes, lastGlobalIndex) {
+      const { userID, subjectID } = appState;
+      return getNextNotes(userID,
+                   subjectID,
+                   TARGET_NUM_NOTES_IN_SESSION,
+                   appState.session.globalIndex)
+      .then(nextNotesArray => {
+        const [oldNotes, newNotes] = nextNotesArray;
+        const nextNotes = oldNotes.concat(newNotes);
+        if (nextNotes && nextNotes.length > 0) {
+          return {
+            ...appState,
+            nextState: null,
+            session: {
+              ...appState.session,
+              noteQueue: nextNotes,
+              queueIndex: 0,
+              globalIndex: appState.session.globalIndex + 1,
+              state: getEntryStateForNoteType(nextNotes[0].type),
+            },
+          };
+        }
+        // no new notes exist, user has finished everything.
+        return appState;
+      });
+    }
+
     if (appState.nextState === SessionState.WAIT_NEXT_IN_QUEUE ||
         appState.nextState === SessionState.START_QUEUE) {
       const { queueIndex, noteQueue } = appState.session;

@@ -1,8 +1,9 @@
 import DBAssist from '../db/note_assistant';
-import pipeSession from './pipe_session';
+import pipeAddSession from './pipe_add_session';
 import pipeRecord from './pipe_record';
 import pipeEval from './pipe_eval';
 import pipeAdvanceState from './pipe_advance_state';
+import pipeSaveSession from './pipe_save_session';
 
 // `msg` = {
 //   timestamp  : ""
@@ -44,13 +45,16 @@ class Controller {
         // convert adapter specific sender id into app user
         return this.pipeUser(appState)
         // at this point should have app user information
-        .then(state => pipeSession(state))
+        .then(state => pipeAddSession(state))
         // at this point should have session information
         // need to evaluate msg in context of current state
         .then(state => pipeEval(state))
         // persist results of msg evaluation
         .then(state => pipeRecord(state))
-        .then(state => pipeAdvanceState(state));
+        // advance session state
+        .then(state => pipeAdvanceState(state))
+        // record new session state
+        .then(state => pipeSaveSession(state));
       }
     });
   }

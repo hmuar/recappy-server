@@ -9,30 +9,9 @@ import Answer from '../core/answer';
 // to RecallResponse state when appropriate. When local transition has
 // reached end, `doneContext` on `mSTate.evalCtx` will be set to true.
 
-// progress state by advancing note queue
-// function deferToGlobalStateChange(mState) {
-//   let session = mState.session;
-//   let newQueueIndex = session.queueIndex + 1;
-//   if(newQueueIndex >= session.noteQueue.length) {
-//     session.state = SessionState.DONE_QUEUE;
-//   }
-//   else {
-//     session.queueIndex = newQueueIndex;
-//     let nextNote = session.noteQueue[newQueueIndex];
-//     session.state = Session.getEntryStateForNoteType(nextNote.type);
-//   }
-//   return mState.set('session', session);
-// }
 
 // Ignore input and advance state
-// `mState` is Immut.Map
 function InitContext(mState) {
-  // let session = mState.session;
-  // let firstNote = session.noteQueue[0];
-  // // advance session state based on first note in queue
-  // session.state = Session.getEntryStateForNoteType(firstNote.type);
-  // // reset queueIndex to beginning of queue
-  // session.queueIndex = 0;
   const evalCtx = {
     answerQuality: Answer.ok,
     doneContext: true,
@@ -45,7 +24,6 @@ function InitContext(mState) {
 
 // Look for ACCEPT input type and then advance state
 // Otherwise return original state.
-// `mState` is Immut.Map
 function InfoContext(mState) {
   const input = mState.input;
 
@@ -107,7 +85,6 @@ function RecallResponseContext(mState) {
     evalCtx,
   };
 }
-
 
 function InputContext(mState) {
   const input = mState.input;
@@ -190,7 +167,6 @@ function getEvalContext(state) {
       // TODO: implement WaitContext
       return WaitContext;
     case SessionState.DONE_QUEUE:
-      // TODO: implement DoneContext
       return DoneContext;
     default:
       return UnknownContext;

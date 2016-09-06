@@ -7,7 +7,7 @@ import { getStartState } from '../core/session_state';
 // TODO: need to handle case where user exists, but subject does not better.
 // Right now we are hitting the db more than we need to.
 
-function getSessionForUserAndSubject(userID, subjectID) {
+export function getSessionForUserAndSubject(userID, subjectID) {
   return StudentSession.findOne({ userID }).then((session) => {
     if (session) {
       const subjects = session.subjects;
@@ -25,7 +25,7 @@ function getSessionForUserAndSubject(userID, subjectID) {
 }
 
 // return Promise
-function updateSessionForUser(userID,
+export function updateSessionForUser(userID,
                               subjectID,
                               queueIndex,
                               noteQueue,
@@ -48,7 +48,7 @@ function updateSessionForUser(userID,
   });
 }
 
-function createSession(userID,
+export function createSession(userID,
                        subjectID,
                        queueIndex,
                        noteQueue,
@@ -95,11 +95,3 @@ function createSession(userID,
     ));
   });
 }
-
-const SessionAssist = {
-  getSessionForUserAndSubject,
-  updateSessionForUser,
-  createSession,
-};
-
-export default SessionAssist;

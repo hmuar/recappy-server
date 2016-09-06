@@ -51,7 +51,7 @@ export function getNewMaterial(subjectID, numNotes, lastGlobalIndex) {
 // TODO: Detect if two questions have same c-key and only ask one
 // TODO: factor in weighting of concepts
 export function getNextNotes(userID, subjectID, numNotes, lastGlobalIndex) {
-  if (numNotes <= 0) {
+  if (!numNotes || numNotes <= 0) {
     return Promise.resolve([]);
   }
 
