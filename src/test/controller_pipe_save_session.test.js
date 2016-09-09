@@ -7,6 +7,7 @@ import Input from '../core/input';
 import { SessionState } from '../core/session_state';
 import DBAssist from '../db/category_assistant';
 import { getSessionForUserAndSubject } from '../db/session_assistant';
+import { EvalStatus } from '../core/eval';
 
 const before = test;
 const after = test;
@@ -68,7 +69,7 @@ before('before controller pipe record testing', () => (
 test('test pipe save session', t => {
   const appState = getAppState(getSession(0, SessionState.MULT_CHOICE), {
     answerQuality: Answer.ok,
-    doneContext: true,
+    status: EvalStatus.SUCCESS,
   });
   let oldSession = null;
   return getSessionForUserAndSubject(testUser._id, subject._id)

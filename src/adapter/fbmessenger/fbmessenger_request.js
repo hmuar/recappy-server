@@ -1,6 +1,7 @@
 import request from 'request';
 import MessageType from './fbmessage_type';
 import Config from '../../config/config';
+import { log } from '../../logger';
 
 function getReqBodyTemplate(senderID) {
   return {
@@ -82,17 +83,20 @@ function sendPostRequest(body, callback) {
 }
 
 export function sendText(senderID, text, callback) {
+  log(`sending text: ${text}`);
   const bodyCreator = postBodyCreator(MessageType.TEXT);
   sendPostRequest(bodyCreator(senderID, text), callback);
 }
 
 // buttons is list of {title, action}
 export function sendButtons(senderID, text, buttons, callback) {
+  log(`sending buttons: ${text}`);
   const bodyCreator = postBodyCreator(MessageType.POSTBACK);
   sendPostRequest(bodyCreator(senderID, text, buttons), callback);
 }
 
-export function sendImage(senderID, imgUrl, callback) {
+export function sendImage(senderID, imgURL, callback) {
+  log(`sending img: ${imgURL}`);
   const bodyCreator = postBodyCreator(MessageType.IMAGE);
-  sendPostRequest(bodyCreator(senderID, imgUrl), callback);
+  sendPostRequest(bodyCreator(senderID, imgURL), callback);
 }

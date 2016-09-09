@@ -11,3 +11,8 @@ npm run lint
 
 -- Docs ----
 rm -rf docs; docco src/!(test)/**/**/**/**/**.js; docco src/*.js
+
+-- Logging ---
+*** NOTE: Not using Loggly right now***********
+- Loggly setup
+- Log.io setup https://github.com/NarrativeScience/Log.io

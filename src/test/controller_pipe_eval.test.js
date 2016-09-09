@@ -6,14 +6,15 @@ import pipeEval from '../controller/pipe_eval';
 import { SessionState } from '../core/session_state';
 import Input from '../core/input';
 import Answer from '../core/answer';
+import { EvalStatus } from '../core/eval';
 
 const before = test;
 const after = test;
 const db = new TestDatabase();
 
-function getSession() {
+function getSession(queueIndex = 0, state) {
   return {
-    queueIndex: 0,
+    queueIndex,
     noteQueue:
      [{ _id: db.createObjectID('9e16c772556579bd6fc6c222'),
          createdAt: '2016-08-06T00:33:36.808Z',
@@ -197,8 +198,20 @@ function getSession() {
         __v: 0,
         parent: [] },
        ],
-    state: SessionState.INIT,
+    state,
     globalIndex: 0,
+  };
+}
+
+function getAppState(session, input) {
+  return {
+    timestamp: 1,
+    senderID: '2028279607252615',
+    userID: '7716893a8c8aff3221812149',
+    subjectName: 'crash-course-biology',
+    subjectID: db.createObjectID('f64c57184a4ef7f0357f9cd6'),
+    input,
+    session,
   };
 }
 
@@ -206,267 +219,244 @@ before('before controller pipe evaluator testing',
   () => db.setup().then(() => db.clean()).then(() => db.loadAllFixtures()));
 
 test('eval with init state', t => {
-  const initSession = getSession();
-  const mState = {
-    timestamp: 1,
-    senderID: '2028279607252615',
-    userID: '7716893a8c8aff3221812149',
-    input: {
-      type: Input.Type.CUSTOM,
-      payload: 'hey!!',
-    },
-    subjectName: 'crash-course-biology',
-    subjectID: db.createObjectID('f64c57184a4ef7f0357f9cd6'),
-    session: initSession,
-  };
-
+  const mState = getAppState(getSession(0, SessionState.INIT), {
+    type: Input.Type.CUSTOM,
+    payload: 'hey!',
+  });
   const mEvalState = pipeEval(mState);
   const evalCtx = mEvalState.evalCtx;
+  t.equal(mEvalState.session.state, SessionState.INIT);
   t.equal(evalCtx.answerQuality, Answer.ok);
-  t.equal(evalCtx.doneContext, true);
+  t.equal(evalCtx.status, EvalStatus.SUCCESS);
   t.end();
 });
 
-test('eval with info state', t => {
-  const initSession = getSession();
-  initSession.state = SessionState.INFO;
-
-  const mState = {
-    timestamp: 1,
-    senderID: '2028279607252615',
-    userID: '7716893a8c8aff3221812149',
-    input: {
-      type: Input.Type.ACCEPT,
-      payload: null,
-    },
-    subjectName: 'crash-course-biology',
-    subjectID: db.createObjectID('f64c57184a4ef7f0357f9cd6'),
-    session: initSession,
-  };
-
+// -------- INFO ---------------------------------------------------
+test('eval with INFO state and correct input', t => {
+  const mState = getAppState(getSession(0, SessionState.INFO), {
+    type: Input.Type.ACCEPT,
+    payload: null,
+  });
   const mEvalState = pipeEval(mState);
   const evalCtx = mEvalState.evalCtx;
+  t.equal(mEvalState.session.state, SessionState.INFO);
   t.equal(evalCtx.answerQuality, Answer.ok);
-  t.equal(evalCtx.doneContext, true);
-
-  const mStateReject = {
-    timestamp: 1,
-    senderID: '2028279607252615',
-    userID: '7716893a8c8aff3221812149',
-    input: {
-      type: Input.Type.REJECT,
-      payload: null,
-    },
-    subjectName: 'crash-course-biology',
-    subjectID: db.createObjectID('f64c57184a4ef7f0357f9cd6'),
-    session: initSession,
-  };
-
-  const mEvalStateReject = pipeEval(mStateReject);
-  const evalCtxReject = mEvalStateReject.evalCtx;
-  t.equal(evalCtxReject.answerQuality, null);
-  t.equal(evalCtxReject.doneContext, false);
+  t.equal(evalCtx.status, EvalStatus.SUCCESS);
   t.end();
 });
 
-test('eval with recall state', t => {
-  const initSession = getSession();
-  initSession.state = SessionState.RECALL;
-  initSession.queueIndex = 1;
-
-  const mState = {
-    timestamp: 1,
-    senderID: '2028279607252615',
-    userID: '7716893a8c8aff3221812149',
-    input: {
-      type: Input.Type.ACCEPT,
-      payload: null,
-    },
-    subjectName: 'crash-course-biology',
-    subjectID: db.createObjectID('f64c57184a4ef7f0357f9cd6'),
-    session: initSession,
-  };
-
+test('eval with INFO state and invalid input', t => {
+  const mState = getAppState(getSession(0, SessionState.INFO), {
+    type: Input.Type.REJECT,
+    payload: null,
+  });
   const mEvalState = pipeEval(mState);
   const evalCtx = mEvalState.evalCtx;
+  t.equal(mEvalState.session.state, SessionState.INFO);
+  t.equal(evalCtx.answerQuality, null);
+  t.equal(evalCtx.status, EvalStatus.INVALID);
+  t.end();
+});
 
+// --------- RECALL -----------------------------------------------
+test('eval with RECALL state and correct input', t => {
+  const mState = getAppState(getSession(1, SessionState.RECALL), {
+    type: Input.Type.ACCEPT,
+    payload: null,
+  });
+  const mEvalState = pipeEval(mState);
+  const evalCtx = mEvalState.evalCtx;
+  t.equal(mEvalState.session.state, SessionState.RECALL);
+  t.equal(evalCtx.answerQuality, Answer.ok);
+  t.equal(evalCtx.status, EvalStatus.SUCCESS);
+  t.end();
+});
+
+test('eval with RECALL state and invalid input', t => {
+  const mState = getAppState(getSession(1, SessionState.RECALL), {
+    type: Input.Type.REJECT, // invalid input
+    payload: null,
+  });
+  const mEvalState = pipeEval(mState);
+  const evalCtx = mEvalState.evalCtx;
+  t.equal(mEvalState.session.state, SessionState.RECALL);
+  t.equal(evalCtx.answerQuality, null);
+  t.equal(evalCtx.status, EvalStatus.INVALID);
+  t.end();
+});
+
+test('eval with RECALL_RESPONSE state and correct input', t => {
+  const mState = getAppState(getSession(1, SessionState.RECALL_RESPONSE), {
+    type: Input.Type.ACCEPT,
+    payload: null,
+  });
+  const mEvalState = pipeEval(mState);
+  const evalCtx = mEvalState.evalCtx;
   t.equal(mEvalState.session.state, SessionState.RECALL_RESPONSE);
-  t.equal(mEvalState.session.queueIndex, 1);
   t.equal(evalCtx.answerQuality, Answer.ok);
-  t.equal(evalCtx.doneContext, false);
+  t.equal(evalCtx.status, EvalStatus.SUCCESS);
   t.end();
 });
 
-test('eval with recall response state', t => {
-  const initSession = getSession();
-  initSession.state = SessionState.RECALL_RESPONSE;
-  initSession.queueIndex = 1;
-
-  const mState = {
-    timestamp: 1,
-    senderID: '2028279607252615',
-    userID: '7716893a8c8aff3221812149',
-    input: {
-      type: Input.Type.ACCEPT,
-      payload: null,
-    },
-    subjectName: 'crash-course-biology',
-    subjectID: db.createObjectID('f64c57184a4ef7f0357f9cd6'),
-    session: initSession,
-  };
+test('eval with RECALL_RESPONSE state and incorrect input', t => {
+  const mState = getAppState(getSession(1, SessionState.RECALL_RESPONSE), {
+    type: Input.Type.REJECT,
+    payload: null,
+  });
 
   const mEvalState = pipeEval(mState);
   const evalCtx = mEvalState.evalCtx;
-  t.equal(evalCtx.answerQuality, Answer.max);
-  t.equal(evalCtx.doneContext, true);
-
-  const mStateReject = {
-    timestamp: 1,
-    senderID: '2028279607252615',
-    userID: '7716893a8c8aff3221812149',
-    input: {
-      type: Input.Type.REJECT,
-      payload: null,
-    },
-    subjectName: 'crash-course-biology',
-    subjectID: db.createObjectID('f64c57184a4ef7f0357f9cd6'),
-    session: initSession,
-  };
-
-  const mEvalStateReject = pipeEval(mStateReject);
-  const evalCtxReject = mEvalStateReject.evalCtx;
-  t.equal(evalCtxReject.answerQuality, Answer.min);
-  t.equal(evalCtxReject.doneContext, true);
-
-
+  t.equal(mEvalState.session.state, SessionState.RECALL_RESPONSE);
+  t.equal(evalCtx.answerQuality, Answer.min);
+  t.equal(evalCtx.status, EvalStatus.SUCCESS);
   t.end();
 });
 
-test('eval with choice state', t => {
-  const initSession = getSession();
-  initSession.state = SessionState.MULT_CHOICE;
-  initSession.queueIndex = 2;
-
-  const mState = {
-    timestamp: 1,
-    senderID: '2028279607252615',
-    userID: '7716893a8c8aff3221812149',
-    input: {
-      type: Input.Type.CUSTOM,
-      payload: 3,
-    },
-    subjectName: 'crash-course-biology',
-    subjectID: db.createObjectID('f64c57184a4ef7f0357f9cd6'),
-    session: initSession,
-  };
+test('eval with RECALL_RESPONSE state and invalid input', t => {
+  const mState = getAppState(getSession(1, SessionState.RECALL_RESPONSE), {
+    type: Input.Type.CUSTOM,
+    payload: null,
+  });
 
   const mEvalState = pipeEval(mState);
   const evalCtx = mEvalState.evalCtx;
-  t.equal(evalCtx.answerQuality, Answer.max);
-  t.equal(evalCtx.doneContext, true);
-
-  // check if string data '3' is properly accepted
-  // as correct answer choice 3
-  const mStateString = {
-    timestamp: 1,
-    senderID: '2028279607252615',
-    userID: '7716893a8c8aff3221812149',
-    input: {
-      type: Input.Type.CUSTOM,
-      payload: '3',
-    },
-    subjectName: 'crash-course-biology',
-    subjectID: db.createObjectID('f64c57184a4ef7f0357f9cd6'),
-    session: initSession,
-  };
-
-  const mEvalStateString = pipeEval(mStateString);
-  const evalCtxString = mEvalStateString.evalCtx;
-  t.equal(evalCtxString.answerQuality, Answer.max);
-  t.equal(evalCtxString.doneContext, true);
-
-  // check if incorrect answer is correctly evaluated as wrong
-  const mStateWrong = {
-    timestamp: 1,
-    senderID: '2028279607252615',
-    userID: '7716893a8c8aff3221812149',
-    input: {
-      type: Input.Type.CUSTOM,
-      payload: 2,
-    },
-    subjectName: 'crash-course-biology',
-    subjectID: db.createObjectID('f64c57184a4ef7f0357f9cd6'),
-    session: initSession,
-  };
-
-  const mEvalStateWrong = pipeEval(mStateWrong);
-  const evalCtxWrong = mEvalStateWrong.evalCtx;
-  t.equal(evalCtxWrong.answerQuality, Answer.min);
-  t.equal(evalCtxWrong.doneContext, true);
-
-  // check if incorrect answer string is correctly evaluated as wrong
-  const mStateWrongString = {
-    timestamp: 1,
-    senderID: '2028279607252615',
-    userID: '7716893a8c8aff3221812149',
-    input: {
-      type: Input.Type.CUSTOM,
-      payload: '5',
-    },
-    subjectName: 'crash-course-biology',
-    subjectID: db.createObjectID('f64c57184a4ef7f0357f9cd6'),
-    session: initSession,
-  };
-
-  const mEvalStateWrongString = pipeEval(mStateWrongString);
-  const evalCtxWrongString = mEvalStateWrongString.evalCtx;
-  t.equal(evalCtxWrongString.answerQuality, Answer.min);
-  t.equal(evalCtxWrongString.doneContext, true);
+  t.equal(mEvalState.session.state, SessionState.RECALL_RESPONSE);
+  t.equal(evalCtx.answerQuality, null);
+  t.equal(evalCtx.status, EvalStatus.INVALID);
   t.end();
 });
 
-test('eval with input state', t => {
-  const initSession = getSession();
-  initSession.state = SessionState.INPUT;
-  initSession.queueIndex = 3;
+test('eval with CHOICE state and correct input', t => {
+  const mState = getAppState(getSession(2, SessionState.MULT_CHOICE), {
+    type: Input.Type.CUSTOM,
+    payload: 3,
+  });
+  const mEvalState = pipeEval(mState);
+  const evalCtx = mEvalState.evalCtx;
+  t.equal(mEvalState.session.state, SessionState.MULT_CHOICE);
+  t.equal(evalCtx.answerQuality, Answer.max);
+  t.equal(evalCtx.status, EvalStatus.SUCCESS);
+  t.end();
+});
 
-  const mState = {
-    timestamp: 1,
-    senderID: '2028279607252615',
-    userID: '7716893a8c8aff3221812149',
-    input: {
-      type: Input.Type.CUSTOM,
-      payload: 'valence',
-    },
-    subjectName: 'crash-course-biology',
-    subjectID: db.createObjectID('f64c57184a4ef7f0357f9cd6'),
-    session: initSession,
-  };
+// check if string data '3' is properly accepted
+// as correct answer choice 3
+test('eval with CHOICE state and correct string input', t => {
+  const mState = getAppState(getSession(2, SessionState.MULT_CHOICE), {
+    type: Input.Type.CUSTOM,
+    payload: '3',
+  });
 
   const mEvalState = pipeEval(mState);
   const evalCtx = mEvalState.evalCtx;
+  t.equal(mEvalState.session.state, SessionState.MULT_CHOICE);
   t.equal(evalCtx.answerQuality, Answer.max);
-  t.equal(evalCtx.doneContext, true);
+  t.equal(evalCtx.status, EvalStatus.SUCCESS);
+  t.end();
+});
 
-  // check if incorrect answer is correctly evaluated as wrong
-  const mStateWrong = {
-    timestamp: 1,
-    senderID: '2028279607252615',
-    userID: '7716893a8c8aff3221812149',
-    input: {
-      type: Input.Type.CUSTOM,
-      payload: 'hydrogen',
-    },
-    subjectName: 'crash-course-biology',
-    subjectID: db.createObjectID('f64c57184a4ef7f0357f9cd6'),
-    session: initSession,
-  };
+test('eval with CHOICE state and incorrect input', t => {
+  const mState = getAppState(getSession(2, SessionState.MULT_CHOICE), {
+    type: Input.Type.CUSTOM,
+    payload: 2,
+  });
+  const mEvalState = pipeEval(mState);
+  const evalCtx = mEvalState.evalCtx;
+  t.equal(mEvalState.session.state, SessionState.MULT_CHOICE);
+  t.equal(evalCtx.answerQuality, Answer.min);
+  t.equal(evalCtx.status, EvalStatus.SUCCESS);
+  t.end();
+});
 
-  const mEvalStateWrong = pipeEval(mStateWrong);
-  const evalCtxWrong = mEvalStateWrong.evalCtx;
-  t.equal(evalCtxWrong.answerQuality, Answer.min);
-  t.equal(evalCtxWrong.doneContext, true);
+test('eval with CHOICE state and incorrect string input', t => {
+  const mState = getAppState(getSession(2, SessionState.MULT_CHOICE), {
+    type: Input.Type.CUSTOM,
+    payload: '5',
+  });
+  const mEvalState = pipeEval(mState);
+  const evalCtx = mEvalState.evalCtx;
+  t.equal(mEvalState.session.state, SessionState.MULT_CHOICE);
+  t.equal(evalCtx.answerQuality, Answer.min);
+  t.equal(evalCtx.status, EvalStatus.SUCCESS);
+  t.end();
+});
 
+test('eval with CHOICE state and invalid input', t => {
+  const mState = getAppState(getSession(2, SessionState.MULT_CHOICE), {
+    type: Input.Type.ACCEPT,
+    payload: '5',
+  });
+  const mEvalState = pipeEval(mState);
+  const evalCtx = mEvalState.evalCtx;
+  t.equal(mEvalState.session.state, SessionState.MULT_CHOICE);
+  t.equal(evalCtx.answerQuality, null);
+  t.equal(evalCtx.status, EvalStatus.INVALID);
+  t.end();
+});
+
+test('eval with CHOICE state and another invalid input', t => {
+  const mState = getAppState(getSession(2, SessionState.MULT_CHOICE), {
+    type: Input.Type.REJECT,
+    payload: '5',
+  });
+  const mEvalState = pipeEval(mState);
+  const evalCtx = mEvalState.evalCtx;
+  t.equal(mEvalState.session.state, SessionState.MULT_CHOICE);
+  t.equal(evalCtx.answerQuality, null);
+  t.equal(evalCtx.status, EvalStatus.INVALID);
+  t.end();
+});
+
+test('eval with INPUT state and correct input', t => {
+  const mState = getAppState(getSession(3, SessionState.INPUT), {
+    type: Input.Type.CUSTOM,
+    payload: 'valence',
+  });
+  const mEvalState = pipeEval(mState);
+  const evalCtx = mEvalState.evalCtx;
+  t.equal(mEvalState.session.state, SessionState.INPUT);
+  t.equal(evalCtx.answerQuality, Answer.max);
+  t.equal(evalCtx.status, EvalStatus.SUCCESS);
+  t.end();
+});
+
+// check if incorrect answer has proper evaluation as incorrect
+test('eval with INPUT state and incorrect input', t => {
+  const mState = getAppState(getSession(3, SessionState.INPUT), {
+    type: Input.Type.CUSTOM,
+    payload: 'hydrogen',
+  });
+  const mEvalState = pipeEval(mState);
+  const evalCtx = mEvalState.evalCtx;
+  t.equal(mEvalState.session.state, SessionState.INPUT);
+  t.equal(evalCtx.answerQuality, Answer.min);
+  t.equal(evalCtx.status, EvalStatus.SUCCESS);
+  t.end();
+});
+
+test('eval with INPUT state and invalid input', t => {
+  const mState = getAppState(getSession(3, SessionState.INPUT), {
+    type: Input.Type.ACCEPT,
+    payload: 'hydrogen',
+  });
+  const mEvalState = pipeEval(mState);
+  const evalCtx = mEvalState.evalCtx;
+  t.equal(mEvalState.session.state, SessionState.INPUT);
+  t.equal(evalCtx.answerQuality, null);
+  t.equal(evalCtx.status, EvalStatus.INVALID);
+  t.end();
+});
+
+test('eval with INPUT state and another invalid input', t => {
+  const mState = getAppState(getSession(3, SessionState.INPUT), {
+    type: Input.Type.REJECT,
+    payload: 'hydrogen',
+  });
+  const mEvalState = pipeEval(mState);
+  const evalCtx = mEvalState.evalCtx;
+  t.equal(mEvalState.session.state, SessionState.INPUT);
+  t.equal(evalCtx.answerQuality, null);
+  t.equal(evalCtx.status, EvalStatus.INVALID);
   t.end();
 });
 

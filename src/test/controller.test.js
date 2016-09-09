@@ -10,6 +10,9 @@ const after = test;
 const db = new TestDatabase();
 
 const controller = new Controller(AdapterFB);
+controller.sendMessage = () => {
+  console.log('Stubbed out controller.sendMessage');
+};
 
 before('before controller testing',
   () => db.setup().then(() => db.clean()).then(() => db.loadAllFixtures()));
@@ -42,7 +45,8 @@ test('register message with existing session', t => {
     t.notDeepLooseEqual(rMsg.session.globalIndex, null);
     t.ok(rMsg.evalCtx);
     t.ok(rMsg.recordCtx);
-    t.ok(rMsg.nextState);
+    t.ok(rMsg.preEvalState);
+    t.ok(rMsg.postEvalState);
     t.end();
   }).catch((error) => {
     console.error(error);

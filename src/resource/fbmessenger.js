@@ -2,11 +2,13 @@ import AdapterFB from '../adapter/fbmessenger/fbmessenger';
 import Controller from '../controller/controller';
 import getPostBody from '../request';
 
+import { log, logErr } from '../logger';
+
 function getRoutePath(apiVersionPath) {
   return `${apiVersionPath}/fbmessage`;
 }
 
-function routes(apiVersionPath, server) {
+function routes(apiVersionPath) {
   const routePath = getRoutePath(apiVersionPath);
 
   // When initially setting up the webhook for messenger platform,
@@ -25,29 +27,16 @@ function routes(apiVersionPath, server) {
   const routePOST = {
     method: 'POST',
     path: routePath,
-    // config: {
-    //   payload: {
-    //     parse: true,
-    //   },
-    // },
     handler(request, reply) {
       reply('Ok');
       const postBody = getPostBody(request);
-      console.log(postBody);
-      server.log('info', postBody);
       const controller = new Controller(AdapterFB);
       const msg = AdapterFB.parse(postBody);
-      console.log(msg);
       if (msg.input.type != null) {
-        // controller.debugDBAssist(msg);
-        console.log('trying to register message....');
-        controller.registerMsg(msg).then((state) => {
-          console.log('done registering message in controller');
-          controller.sendMessage(state);
-        })
-        .catch((err) => console.log(err));
+        controller.registerMsg(msg)
+        .catch((err) => logErr(err));
       } else {
-        console.log('Unrecognized message...........');
+        log('Unrecognized message');
       }
     },
   };

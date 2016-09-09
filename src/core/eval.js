@@ -1,6 +1,9 @@
-const Eval = {
+export default {
   minResponseQuality: 0.0,
   maxResponseQuality: 5.0,
 };
 
-export default Eval;
+export const EvalStatus = {
+  INVALID: 'invalid',
+  SUCCESS: 'success',
+};

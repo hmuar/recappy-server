@@ -135,7 +135,6 @@ function contentInjector(msgType) {
 // Parse incoming POST body and return a msg object
 // object with standard message data
 function parse(requestBody) {
-  console.log(requestBody);
   const entry = requestBody.entry[0];
   const msg = entry.messaging[0];
 
@@ -165,12 +164,8 @@ export function sendPossibleImage(senderID, note) {
 }
 
 function sendMessageInContext(senderID, session) {
-  console.log('sendMessageInContext *********');
-  console.log(senderID);
-  console.log(session);
   const fbUserID = senderID;
   const note = session.noteQueue[session.queueIndex];
-  console.log(note);
   switch (session.state) {
     case SessionState.INIT:
       sendText(fbUserID, "Let's get started!");
@@ -189,6 +184,7 @@ function sendMessageInContext(senderID, session) {
     }
 
     case SessionState.RECALL_RESPONSE: {
+      sendPossibleImage(fbUserID, note);
       sendText(fbUserID, note.hidden);
       const buttonData = [];
       buttonData.push({
@@ -199,7 +195,6 @@ function sendMessageInContext(senderID, session) {
         title: 'No',
         action: Input.Type.REJECT,
       });
-      sendPossibleImage(fbUserID, note);
       sendButtons(fbUserID,
         'Is that what you were thinking?', buttonData);
       break;
@@ -249,9 +244,7 @@ function sendMessageInContext(senderID, session) {
 }
 
 function sendMessage(state) {
-  console.log('sending message....');
-  console.log(state);
-  sendMessageInContext(state.senderID, state.session);
+  return sendMessageInContext(state.senderID, state.session);
 }
 
 const AdapterFBMessenger = {

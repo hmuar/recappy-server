@@ -1,6 +1,7 @@
 import SpacedRep from '../core/spaced_repetition';
 import { SessionState } from '../core/session_state';
 import { NoteRecord } from '../db/collection';
+import { log } from '../logger';
 
 // Record results of input evaluation using NoteRecord collection
 // This will involve calculating future due date, updating note history
@@ -141,6 +142,10 @@ export default function pipe(mState) {
 
   const note = session.noteQueue[session.queueIndex];
   const evalCtx = mState.evalCtx;
+  if (!session.noteQueue || session.noteQueue.length === 0) {
+    log('No notes in noteQueue, could not record activity.');
+    return mState;
+  }
 
   return NoteRecord.findOne({ userID: mState.userID,
                              noteID: note._id })

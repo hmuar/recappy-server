@@ -5,7 +5,7 @@ and adds a eval context object to message data.
 
 evalCtx: {
   answerQuality: <number>,
-  doneContext: <boolean>
+  status: EvalStatus
 }
 
 response commands - adapters operate with these, know how to translate these

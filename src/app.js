@@ -1,26 +1,27 @@
 import Good from 'good';
 import Server from './server';
+import winston from './logger';
 
 const server = new Server();
 server.setup(5000);
 
-const winston = require('winston');
-
-winston.add(
-  winston.transports.File, {
-    filename: 'logs/server.log',
-    level: 'info',
-    eol: '\n', // for Windows, or `eol: ‘n’,` for *NIX OSs
-    json: true,
-    prettyPrint: true,
-    timestamp: true,
-    colorize: false,
-  }
-  // winston.transports.Console, {
-  //   level: 'info',
-  //   colorize: true,
-  // }
-);
+// const winston = require('winston');
+//
+// winston.add(
+//   winston.transports.File, {
+//     filename: 'logs/server.log',
+//     level: 'info',
+//     eol: '\n', // for Windows, or `eol: ‘n’,` for *NIX OSs
+//     json: true,
+//     prettyPrint: true,
+//     timestamp: true,
+//     colorize: false,
+//   }
+//   // winston.transports.Console, {
+//   //   level: 'info',
+//   //   colorize: true,
+//   // }
+// );
 
 server.start([
   {

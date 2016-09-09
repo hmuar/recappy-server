@@ -17,7 +17,7 @@ export default class Server {
     });
     // map routes to resources
     resources.map((resource) => (
-      resource.routes('/api/v1', this.server)
+      resource.routes('/api/v1')
         .map(routeData => this.server.route(routeData))
     ));
   }

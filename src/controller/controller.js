@@ -4,6 +4,8 @@ import pipeRecord from './pipe_record';
 import pipeEval from './pipe_eval';
 import pipeAdvanceState from './pipe_advance_state';
 import pipeSaveSession from './pipe_save_session';
+import { log, logErr, logState } from '../logger';
+
 
 // `msg` = {
 //   timestamp  : ""
@@ -34,20 +36,18 @@ export default class Controller {
   debugDBAssist(msg) {
     DBAssist.getCategoryByName('subject', msg.subjectName)
     .then((subject) => {
-      console.log(subject);
+      log(subject);
     })
     .catch((err) => {
-      console.log('error finding category by name');
-      console.log(err);
+      logErr('error finding category by name');
+      logErr(err);
     });
   }
 
   // main entry method called by external adapters
   registerMsg(msg) {
-    console.log('controller registerMsg');
     return DBAssist.getCategoryByName('subject', msg.subjectName)
     .then(subject => {
-      console.log('found subject');
       if (!subject) {
         throw new Error(`Could not find subject ${msg.subjectName}`);
       } else {
@@ -59,50 +59,51 @@ export default class Controller {
         return this.pipeUser(appState)
         // at this point should have app user information
         .then(state => pipeAddSession(state))
-        .then(state => {
-          console.log('added session');
-          console.log(state);
-          return state;
-        })
+        // .then(state => {
+        //   log('added session');
+        //   return state;
+        // })
         // at this point should have session information
         // need to evaluate msg in context of current state
         .then(state => pipeEval(state))
-        .then(state => {
-          console.log('added eval');
-          console.log(state);
-          return state;
-        })
+        // .then(state => {
+        //   log('added eval');
+        //   return state;
+        // })
         // persist results of msg evaluation
         .then(state => pipeRecord(state))
-        .then(state => {
-          console.log('added record');
-          console.log(state);
-          return state;
-        })
+        // .then(state => {
+        //   log('added record');
+        //   return state;
+        // })
         // advance session state
         .then(state => pipeAdvanceState(state))
-        .then(state => {
-          console.log('added advance state');
-          console.log(state);
-          return state;
-        })
+        // .then(state => {
+        //   log('added advance state');
+        //   return state;
+        // })
         // record new session state
         .then(state => pipeSaveSession(state))
         .then(state => {
-          console.log('added save session');
-          console.log(state);
+          // log('added save session');
+          logState(state);
+          // log('********************************************************');
+          return state;
+        })
+        .then(state => {
+          this.sendMessage(state);
           return state;
         });
       }
     })
     .catch((err) => {
-      console.log('error registering message in controller');
-      console.log(err);
+      logErr('error registering message in controller');
+      logErr(err);
     });
   }
 
-  sendMessage(senderID, msg) {
-    this.adapter.sendMessage(senderID, msg);
+  sendMessage(state) {
+    this.adapter.sendMessage(state);
   }
 
 }

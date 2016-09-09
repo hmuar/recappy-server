@@ -1,152 +1,145 @@
 import { SessionState } from '../core/session_state';
 import Input from '../core/input';
 import Answer from '../core/answer';
+import { EvalStatus } from '../core/eval';
 
 // Evaluate user input in the context of user's current session state.
 // Add a `evalCtx` object to message data.
-// Each evaluation context has knowledge about how to transition among
-// local state. For example, the RecallContext knows how to transition
-// to RecallResponse state when appropriate. When local transition has
-// reached end, `doneContext` on `mSTate.evalCtx` will be set to true.
 
+// function advanceToEvalState(appState) {
+//   const state = appState.session.state;
+//   if (state === SessionState.INFO ||
+//       state === SessionState.RECALL ||
+//       state === SessionState.RECALL_RESPONSE ||
+//       state === SessionState.INPUT ||
+//       state === SessionState.MULT_CHOICE
+//     ) {
+//     if (appState.evalCtx && appState.evalCtx.success) {
+//       return {
+//         ...appState,
+//         session: {
+//           ...appState.session,
+//           state: SessionState.EVAL_SUCCESS,
+//         },
+//       };
+//     }
+//   }
+//   return appState;
+// }
 
-// Ignore input and advance state
-function InitContext(mState) {
-  const evalCtx = {
-    answerQuality: Answer.ok,
-    doneContext: true,
-  };
+function invalidEval() {
   return {
-    ...mState,
+    answerQuality: null,
+    status: EvalStatus.INVALID,
+  };
+}
+
+function successEval(answerQuality) {
+  return {
+    answerQuality,
+    status: EvalStatus.SUCCESS,
+  };
+}
+
+function insertEval(state, evalCtx) {
+  return {
+    ...state,
     evalCtx,
   };
+}
+
+// Ignore input and advance state
+function InitContext(appState) {
+  if (!appState.input) {
+    return appState;
+  }
+  return insertEval(appState, successEval(Answer.ok));
 }
 
 // Look for ACCEPT input type and then advance state
 // Otherwise return original state.
-function InfoContext(mState) {
-  const input = mState.input;
-
-  const evalCtx = {
-    answerQuality: null,
-    doneContext: false,
-  };
-
-  if (input.type === Input.Type.ACCEPT) {
-    evalCtx.answerQuality = Answer.ok;
-    evalCtx.doneContext = true;
+function InfoContext(appState) {
+  const input = appState.input;
+  if (!input) {
+    return appState;
   }
-  return {
-    ...mState,
-    evalCtx,
-  };
+
+  return insertEval(appState, input.type === Input.Type.ACCEPT ?
+    successEval(Answer.ok) : invalidEval());
 }
 
 // Look for ACCEPT or REJECT input type and then advance state
 // Otherwise return original state.
-function RecallContext(mState) {
-  const input = mState.input;
+function RecallContext(appState) {
+  const input = appState.input;
   if (!input) {
-    return mState;
+    return appState;
   }
-  const session = mState.session;
-  const evalCtx = {
-    answerQuality: null,
-    doneContext: false,
-  };
-  const newState = { ...mState };
-  if (input.type === Input.Type.ACCEPT) {
-    evalCtx.answerQuality = Answer.ok;
-    session.state = SessionState.RECALL_RESPONSE;
-    newState.session = session;
-  }
-  newState.evalCtx = evalCtx;
-  return newState;
+
+  return insertEval(appState, input.type === Input.Type.ACCEPT ?
+    successEval(Answer.ok) : invalidEval());
 }
 
-function RecallResponseContext(mState) {
-  const input = mState.input;
+function RecallResponseContext(appState) {
+  const input = appState.input;
   if (!input) {
-    return mState;
+    return appState;
   }
-  const evalCtx = {
-    answerQuality: null,
-    doneContext: false,
-  };
-  if (input.type === Input.Type.ACCEPT) {
-    evalCtx.answerQuality = Answer.max;
-    evalCtx.doneContext = true;
-  } else if (input.type === Input.Type.REJECT) {
-    evalCtx.answerQuality = Answer.min;
-    evalCtx.doneContext = true;
+
+  switch (input.type) {
+    case Input.Type.ACCEPT:
+      return insertEval(appState, successEval(Answer.max));
+    case Input.Type.REJECT:
+      return insertEval(appState, successEval(Answer.min));
+    default:
+      return insertEval(appState, invalidEval());
   }
-  return {
-    ...mState,
-    evalCtx,
-  };
 }
 
-function InputContext(mState) {
-  const input = mState.input;
+function InputContext(appState) {
+  const input = appState.input;
   if (!input) {
-    return mState;
+    return appState;
   }
-  const session = mState.session;
-  const evalCtx = {
-    answerQuality: null,
-    doneContext: false,
-  };
   if (input.type === Input.Type.CUSTOM) {
+    const session = appState.session;
     const note = session.noteQueue[session.queueIndex];
     const correctAnswer = input.payload === note.answer;
-    evalCtx.answerQuality = correctAnswer ? Answer.max : Answer.min;
-    evalCtx.doneContext = true;
+    return insertEval(appState,
+      successEval(correctAnswer ? Answer.max : Answer.min));
   }
-
-  // didn't find proper input type so return as is without advancing state
-  return {
-    ...mState,
-    evalCtx,
-  };
+  return insertEval(appState, invalidEval());
 }
 
-function MultChoiceContext(mState) {
-  const input = mState.input;
+function MultChoiceContext(appState) {
+  const input = appState.input;
   if (!input) {
-    return mState;
+    return appState;
   }
-  const session = mState.session;
-  const evalCtx = {
-    answerQuality: null,
-    doneContext: false,
-  };
   // use isNaN to accept both numerical and number as text inputs
   if (input.type === Input.Type.CUSTOM && !isNaN(input.payload)) {
+    const session = appState.session;
     const dataAsNum = parseInt(input.payload, 10);
     // Note should be type "choice"
     const note = session.noteQueue[session.queueIndex];
     const correctAnswer = dataAsNum === note.answer;
-    evalCtx.answerQuality = correctAnswer ? Answer.max : Answer.min;
-    evalCtx.doneContext = true;
+    return insertEval(appState,
+      successEval(correctAnswer ? Answer.max : Answer.min));
   }
 
-  // didn't find proper input type so return as is without advancing state
-  return {
-    ...mState,
-    evalCtx,
-  };
+  return insertEval(appState, invalidEval());
 }
 
-function WaitContext(mState) {
-  return mState;
+function WaitContext(appState) {
+  return appState;
 }
 
-function DoneContext(mState) {
-  return mState;
+function DoneContext(appState) {
+  return appState;
 }
 
-function UnknownContext(mState) {
-  return mState;
+function UnknownContext(appState) {
+  return appState;
 }
 
 function getEvalContext(state) {
@@ -173,11 +166,12 @@ function getEvalContext(state) {
   }
 }
 
-export default function pipe(mState) {
-  if (!{}.hasOwnProperty.call(mState, 'session')) {
-    return mState;
+export default function pipe(appState) {
+  if (!{}.hasOwnProperty.call(appState, 'session')) {
+    return appState;
   }
 
-  const sState = mState.session.state;
-  return getEvalContext(sState)(mState);
+  const sState = appState.session.state;
+  return getEvalContext(sState)(appState);
+  // return advanceToEvalState(newState);
 }

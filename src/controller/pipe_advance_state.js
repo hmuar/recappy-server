@@ -2,33 +2,56 @@ import { SessionState,
          getEntryStateForNoteType } from '../core/session_state';
 
 import { getNextNotes, TARGET_NUM_NOTES_IN_SESSION } from '../core/scheduler';
+import { EvalStatus } from '../core/eval';
 
 // Given current info in app state, determine next study state for user.
-// Only need to look at current app state and evalCtx to determine next state.
+// Only need to look at current session state to determine next state.
 
-function setNextState(appState) {
+// set current app state as the pre eval state
+function setPreEvalState(appState) {
+  if (!appState.session || !appState.session.state) {
+    return appState;
+  }
+  return {
+    ...appState,
+    preEvalState: appState.session.state,
+  };
+}
+
+function isValidEval(appState) {
+  if (!appState || !appState.evalCtx) {
+    return false;
+  }
+  return appState.evalCtx.status !== EvalStatus.INVALID;
+}
+
+function setPostEvalState(appState) {
   if (!appState.session || !appState.session.state ||
       !appState.evalCtx) {
     return appState;
   }
 
   const sessionState = appState.session.state;
-  const { doneContext } = appState.evalCtx;
-  let nextState = sessionState;
+  let postEvalState = sessionState;
+  const validEval = isValidEval(appState);
 
   switch (sessionState) {
     case SessionState.INIT:
-      if (doneContext) {
-        nextState = SessionState.START_QUEUE;
+      if (validEval) {
+        postEvalState = SessionState.START_QUEUE;
+      }
+      break;
+    case SessionState.RECALL:
+      if (validEval) {
+        postEvalState = SessionState.RECALL_RESPONSE;
       }
       break;
     case SessionState.INFO:
-    case SessionState.RECALL:
-    case SessionState.RECALL_RESPONSE:
     case SessionState.INPUT:
+    case SessionState.RECALL_RESPONSE:
     case SessionState.MULT_CHOICE:
-      if (doneContext) {
-        nextState = SessionState.WAIT_NEXT_IN_QUEUE;
+      if (validEval) {
+        postEvalState = SessionState.WAIT_NEXT_IN_QUEUE;
       }
       break;
     default:
@@ -37,19 +60,19 @@ function setNextState(appState) {
 
   return {
     ...appState,
-    nextState,
+    postEvalState,
   };
 }
 
-// if nextState === WAIT_NEXT_IN_QUEUE, need to advance noteQueue, next state
+// if postEvalState === WAIT_NEXT_IN_QUEUE, need to advance noteQueue, next state
 function advanceState(appState) {
   if (!appState) {
     return appState;
   }
   // if necessary, advance queueIndex
   // set proper next state based on next note
-  if (appState.session && appState.nextState) {
-    if (appState.nextState === SessionState.DONE_QUEUE) {
+  if (appState.session && appState.postEvalState) {
+    if (appState.postEvalState === SessionState.DONE_QUEUE) {
       // update note queue
       // update queueIndex
       // update globalIndex
@@ -65,7 +88,7 @@ function advanceState(appState) {
         if (nextNotes && nextNotes.length > 0) {
           return {
             ...appState,
-            nextState: null,
+            postEvalState: null,
             session: {
               ...appState.session,
               noteQueue: nextNotes,
@@ -80,16 +103,16 @@ function advanceState(appState) {
       });
     }
 
-    if (appState.nextState === SessionState.WAIT_NEXT_IN_QUEUE ||
-        appState.nextState === SessionState.START_QUEUE) {
+    if (appState.postEvalState === SessionState.WAIT_NEXT_IN_QUEUE ||
+        appState.postEvalState === SessionState.START_QUEUE) {
       const { queueIndex, noteQueue } = appState.session;
-      let nextSessionState = appState.nextState;
+      let nextSessionState = appState.postEvalState;
       let nextQueueIndex = queueIndex;
 
       if (noteQueue && queueIndex != null) {
         // only advance queue if waiting for next in queue
         // (e.g. shouldn't advance note if we are just START_QUEUE)
-        if (appState.nextState === SessionState.WAIT_NEXT_IN_QUEUE) {
+        if (appState.postEvalState === SessionState.WAIT_NEXT_IN_QUEUE) {
           nextQueueIndex = queueIndex + 1;
         }
         if (nextQueueIndex < noteQueue.length) {
@@ -109,12 +132,12 @@ function advanceState(appState) {
         },
       };
     }
-    if (appState.nextState) {
+    if (appState.postEvalState) {
       return {
         ...appState,
         session: {
           ...appState.session,
-          state: appState.nextState,
+          state: appState.postEvalState,
         },
       };
     }
@@ -124,7 +147,8 @@ function advanceState(appState) {
 }
 
 export default function pipe(appState) {
-  let nextAppState = setNextState(appState);
+  let nextAppState = setPreEvalState(appState);
+  nextAppState = setPostEvalState(nextAppState);
   nextAppState = advanceState(nextAppState);
   return nextAppState;
 }
