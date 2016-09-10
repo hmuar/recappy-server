@@ -227,6 +227,7 @@ test('eval with init state', t => {
   const evalCtx = mEvalState.evalCtx;
   t.equal(mEvalState.session.state, SessionState.INIT);
   t.equal(evalCtx.answerQuality, Answer.ok);
+  t.equal(evalCtx.correctAnswer, null);
   t.equal(evalCtx.status, EvalStatus.SUCCESS);
   t.end();
 });
@@ -241,6 +242,7 @@ test('eval with INFO state and correct input', t => {
   const evalCtx = mEvalState.evalCtx;
   t.equal(mEvalState.session.state, SessionState.INFO);
   t.equal(evalCtx.answerQuality, Answer.ok);
+  t.equal(evalCtx.correctAnswer, null);
   t.equal(evalCtx.status, EvalStatus.SUCCESS);
   t.end();
 });
@@ -254,6 +256,7 @@ test('eval with INFO state and invalid input', t => {
   const evalCtx = mEvalState.evalCtx;
   t.equal(mEvalState.session.state, SessionState.INFO);
   t.equal(evalCtx.answerQuality, null);
+  t.equal(evalCtx.correctAnswer, null);
   t.equal(evalCtx.status, EvalStatus.INVALID);
   t.end();
 });
@@ -268,6 +271,7 @@ test('eval with RECALL state and correct input', t => {
   const evalCtx = mEvalState.evalCtx;
   t.equal(mEvalState.session.state, SessionState.RECALL);
   t.equal(evalCtx.answerQuality, Answer.ok);
+  t.equal(evalCtx.correctAnswer, null);
   t.equal(evalCtx.status, EvalStatus.SUCCESS);
   t.end();
 });
@@ -281,6 +285,7 @@ test('eval with RECALL state and invalid input', t => {
   const evalCtx = mEvalState.evalCtx;
   t.equal(mEvalState.session.state, SessionState.RECALL);
   t.equal(evalCtx.answerQuality, null);
+  t.equal(evalCtx.correctAnswer, null);
   t.equal(evalCtx.status, EvalStatus.INVALID);
   t.end();
 });
@@ -294,6 +299,7 @@ test('eval with RECALL_RESPONSE state and correct input', t => {
   const evalCtx = mEvalState.evalCtx;
   t.equal(mEvalState.session.state, SessionState.RECALL_RESPONSE);
   t.equal(evalCtx.answerQuality, Answer.ok);
+  t.equal(evalCtx.correctAnswer, null);
   t.equal(evalCtx.status, EvalStatus.SUCCESS);
   t.end();
 });
@@ -308,6 +314,7 @@ test('eval with RECALL_RESPONSE state and incorrect input', t => {
   const evalCtx = mEvalState.evalCtx;
   t.equal(mEvalState.session.state, SessionState.RECALL_RESPONSE);
   t.equal(evalCtx.answerQuality, Answer.min);
+  t.equal(evalCtx.correctAnswer, null);
   t.equal(evalCtx.status, EvalStatus.SUCCESS);
   t.end();
 });
@@ -322,6 +329,7 @@ test('eval with RECALL_RESPONSE state and invalid input', t => {
   const evalCtx = mEvalState.evalCtx;
   t.equal(mEvalState.session.state, SessionState.RECALL_RESPONSE);
   t.equal(evalCtx.answerQuality, null);
+  t.equal(evalCtx.correctAnswer, null);
   t.equal(evalCtx.status, EvalStatus.INVALID);
   t.end();
 });
@@ -335,6 +343,7 @@ test('eval with CHOICE state and correct input', t => {
   const evalCtx = mEvalState.evalCtx;
   t.equal(mEvalState.session.state, SessionState.MULT_CHOICE);
   t.equal(evalCtx.answerQuality, Answer.max);
+  t.equal(evalCtx.correctAnswer, '(3) slightly charged sides of a molecule');
   t.equal(evalCtx.status, EvalStatus.SUCCESS);
   t.end();
 });
@@ -351,6 +360,7 @@ test('eval with CHOICE state and correct string input', t => {
   const evalCtx = mEvalState.evalCtx;
   t.equal(mEvalState.session.state, SessionState.MULT_CHOICE);
   t.equal(evalCtx.answerQuality, Answer.max);
+  t.equal(evalCtx.correctAnswer, '(3) slightly charged sides of a molecule');
   t.equal(evalCtx.status, EvalStatus.SUCCESS);
   t.end();
 });
@@ -364,6 +374,7 @@ test('eval with CHOICE state and incorrect input', t => {
   const evalCtx = mEvalState.evalCtx;
   t.equal(mEvalState.session.state, SessionState.MULT_CHOICE);
   t.equal(evalCtx.answerQuality, Answer.min);
+  t.equal(evalCtx.correctAnswer, '(3) slightly charged sides of a molecule');
   t.equal(evalCtx.status, EvalStatus.SUCCESS);
   t.end();
 });
@@ -377,6 +388,7 @@ test('eval with CHOICE state and incorrect string input', t => {
   const evalCtx = mEvalState.evalCtx;
   t.equal(mEvalState.session.state, SessionState.MULT_CHOICE);
   t.equal(evalCtx.answerQuality, Answer.min);
+  t.equal(evalCtx.correctAnswer, '(3) slightly charged sides of a molecule');
   t.equal(evalCtx.status, EvalStatus.SUCCESS);
   t.end();
 });
@@ -390,6 +402,7 @@ test('eval with CHOICE state and invalid input', t => {
   const evalCtx = mEvalState.evalCtx;
   t.equal(mEvalState.session.state, SessionState.MULT_CHOICE);
   t.equal(evalCtx.answerQuality, null);
+  t.equal(evalCtx.correctAnswer, '(3) slightly charged sides of a molecule');
   t.equal(evalCtx.status, EvalStatus.INVALID);
   t.end();
 });
@@ -403,6 +416,7 @@ test('eval with CHOICE state and another invalid input', t => {
   const evalCtx = mEvalState.evalCtx;
   t.equal(mEvalState.session.state, SessionState.MULT_CHOICE);
   t.equal(evalCtx.answerQuality, null);
+  t.equal(evalCtx.correctAnswer, '(3) slightly charged sides of a molecule');
   t.equal(evalCtx.status, EvalStatus.INVALID);
   t.end();
 });
@@ -416,6 +430,7 @@ test('eval with INPUT state and correct input', t => {
   const evalCtx = mEvalState.evalCtx;
   t.equal(mEvalState.session.state, SessionState.INPUT);
   t.equal(evalCtx.answerQuality, Answer.max);
+  t.equal(evalCtx.correctAnswer, 'valence');
   t.equal(evalCtx.status, EvalStatus.SUCCESS);
   t.end();
 });
@@ -430,6 +445,7 @@ test('eval with INPUT state and incorrect input', t => {
   const evalCtx = mEvalState.evalCtx;
   t.equal(mEvalState.session.state, SessionState.INPUT);
   t.equal(evalCtx.answerQuality, Answer.min);
+  t.equal(evalCtx.correctAnswer, 'valence');
   t.equal(evalCtx.status, EvalStatus.SUCCESS);
   t.end();
 });
@@ -443,6 +459,7 @@ test('eval with INPUT state and invalid input', t => {
   const evalCtx = mEvalState.evalCtx;
   t.equal(mEvalState.session.state, SessionState.INPUT);
   t.equal(evalCtx.answerQuality, null);
+  t.equal(evalCtx.correctAnswer, 'valence');
   t.equal(evalCtx.status, EvalStatus.INVALID);
   t.end();
 });
@@ -456,7 +473,22 @@ test('eval with INPUT state and another invalid input', t => {
   const evalCtx = mEvalState.evalCtx;
   t.equal(mEvalState.session.state, SessionState.INPUT);
   t.equal(evalCtx.answerQuality, null);
+  t.equal(evalCtx.correctAnswer, 'valence');
   t.equal(evalCtx.status, EvalStatus.INVALID);
+  t.end();
+});
+
+test('eval with DONE_QUEUE state and valid input', t => {
+  const mState = getAppState(getSession(10, SessionState.DONE_QUEUE), {
+    type: Input.Type.CUSTOM,
+    payload: 'extend',
+  });
+  const mEvalState = pipeEval(mState);
+  const evalCtx = mEvalState.evalCtx;
+  t.equal(mEvalState.session.state, SessionState.DONE_QUEUE);
+  t.equal(evalCtx.answerQuality, Answer.ok);
+  t.equal(evalCtx.correctAnswer, null);
+  t.equal(evalCtx.status, EvalStatus.SUCCESS);
   t.end();
 });
 

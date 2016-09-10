@@ -13,8 +13,8 @@ const after = test;
 const db = new TestDatabase();
 
 const SUBJECT_NAME = 'crash-course-biology';
-let subject = null; // eslint-disable-line
-let testUser = null; // eslint-disable-line
+let subject = null;
+let testUser = null;
 
 function getSession(queueIndex, state) {
   return {
@@ -219,6 +219,7 @@ test('test transition from done queue', t => {
                                validEval(Answer.ok));
   return pipeStateTransition(appState)
   .then(ns => {
+    t.ok(ns.session.state);
     t.notEqual(ns.session.state, SessionState.DONE_QUEUE);
     t.equal(ns.session.noteQueue.length, 3);
     t.equal(ns.session.queueIndex, 0);

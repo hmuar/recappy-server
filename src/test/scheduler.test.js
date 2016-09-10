@@ -33,12 +33,12 @@ test('schedule old notes based on due date', (t) => (
   })
 ));
 
-test('schedule new notes', t => getNewMaterial(subject._id, 20, -1)
+test('schedule new notes', t => getNewMaterial(subject._id, 20, 0)
 .then(nextNotes => {
   t.equal(nextNotes.length, 22);
 }));
 
-test('schedule combined old and new notes', t => getNextNotes(testUser._id, subject._id, 20, -1)
+test('schedule combined old and new notes', t => getNextNotes(testUser._id, subject._id, 20, 0)
 .then((nextNotes) => {
   const oldNotes = nextNotes[0];
   const newNotes = nextNotes[1];

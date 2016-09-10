@@ -44,6 +44,16 @@ export default class Controller {
     });
   }
 
+  sendResponse(state) {
+    this.adapter.sendResponse(state);
+    return state;
+  }
+
+  sendFeedbackResponse(state) {
+    this.adapter.sendFeedbackResponse(state);
+    return state;
+  }
+
   // main entry method called by external adapters
   registerMsg(msg) {
     return DBAssist.getCategoryByName('subject', msg.subjectName)
@@ -59,51 +69,24 @@ export default class Controller {
         return this.pipeUser(appState)
         // at this point should have app user information
         .then(state => pipeAddSession(state))
-        // .then(state => {
-        //   log('added session');
-        //   return state;
-        // })
         // at this point should have session information
         // need to evaluate msg in context of current state
         .then(state => pipeEval(state))
-        // .then(state => {
-        //   log('added eval');
-        //   return state;
-        // })
+        .then(state => this.sendFeedbackResponse(state))
         // persist results of msg evaluation
         .then(state => pipeRecord(state))
-        // .then(state => {
-        //   log('added record');
-        //   return state;
-        // })
         // advance session state
         .then(state => pipeAdvanceState(state))
-        // .then(state => {
-        //   log('added advance state');
-        //   return state;
-        // })
         // record new session state
         .then(state => pipeSaveSession(state))
-        .then(state => {
-          // log('added save session');
-          logState(state);
-          // log('********************************************************');
-          return state;
-        })
-        .then(state => {
-          this.sendMessage(state);
-          return state;
-        });
+        .then(state => logState(state))
+        .then(state => this.sendResponse(state));
       }
     })
     .catch((err) => {
       logErr('error registering message in controller');
       logErr(err);
     });
-  }
-
-  sendMessage(state) {
-    this.adapter.sendMessage(state);
   }
 
 }

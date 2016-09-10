@@ -27,16 +27,18 @@ import { EvalStatus } from '../core/eval';
 //   return appState;
 // }
 
-function invalidEval() {
+function invalidEval(correctAnswer = null) {
   return {
     answerQuality: null,
+    correctAnswer,
     status: EvalStatus.INVALID,
   };
 }
 
-function successEval(answerQuality) {
+function successEval(answerQuality, correctAnswer = null) {
   return {
     answerQuality,
+    correctAnswer,
     status: EvalStatus.SUCCESS,
   };
 }
@@ -101,14 +103,14 @@ function InputContext(appState) {
   if (!input) {
     return appState;
   }
+  const session = appState.session;
+  const note = session.noteQueue[session.queueIndex];
   if (input.type === Input.Type.CUSTOM) {
-    const session = appState.session;
-    const note = session.noteQueue[session.queueIndex];
     const correctAnswer = input.payload === note.answer;
     return insertEval(appState,
-      successEval(correctAnswer ? Answer.max : Answer.min));
+      successEval(correctAnswer ? Answer.max : Answer.min, note.answer));
   }
-  return insertEval(appState, invalidEval());
+  return insertEval(appState, invalidEval(note.answer));
 }
 
 function MultChoiceContext(appState) {
@@ -116,18 +118,21 @@ function MultChoiceContext(appState) {
   if (!input) {
     return appState;
   }
+  const session = appState.session;
+  const note = session.noteQueue[session.queueIndex];
+  const choiceAnswerKey = `choice${note.answer}`;
+  const ansFormatted = `(${note.answer}) ${note[choiceAnswerKey]}`;
   // use isNaN to accept both numerical and number as text inputs
   if (input.type === Input.Type.CUSTOM && !isNaN(input.payload)) {
-    const session = appState.session;
     const dataAsNum = parseInt(input.payload, 10);
     // Note should be type "choice"
-    const note = session.noteQueue[session.queueIndex];
     const correctAnswer = dataAsNum === note.answer;
+    // XXX: Hardcoded convention for how mult_choice notes store answer
     return insertEval(appState,
-      successEval(correctAnswer ? Answer.max : Answer.min));
+      successEval(correctAnswer ? Answer.max : Answer.min, ansFormatted));
   }
 
-  return insertEval(appState, invalidEval());
+  return insertEval(appState, invalidEval(ansFormatted));
 }
 
 function WaitContext(appState) {
@@ -135,7 +140,12 @@ function WaitContext(appState) {
 }
 
 function DoneContext(appState) {
-  return appState;
+  const input = appState.input;
+  if (!input) {
+    return appState;
+  }
+
+  return insertEval(appState, successEval(Answer.ok));
 }
 
 function UnknownContext(appState) {
@@ -157,7 +167,6 @@ function getEvalContext(state) {
     case SessionState.MULT_CHOICE:
       return MultChoiceContext;
     case SessionState.WAIT_NEXT_IN_QUEUE:
-      // TODO: implement WaitContext
       return WaitContext;
     case SessionState.DONE_QUEUE:
       return DoneContext;
@@ -173,5 +182,4 @@ export default function pipe(appState) {
 
   const sState = appState.session.state;
   return getEvalContext(sState)(appState);
-  // return advanceToEvalState(newState);
 }

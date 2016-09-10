@@ -10,12 +10,30 @@ const after = test;
 const db = new TestDatabase();
 
 const controller = new Controller(AdapterFB);
-controller.sendMessage = () => {
-  console.log('Stubbed out controller.sendMessage');
+controller.sendResponse = (state) => {
+  console.log('Stubbed out controller.sendResponse');
+  return state;
+};
+controller.sendFeedbackResponse = (state) => {
+  console.log('Stubbed out controller.sendFeedbackResponse');
+  return state;
 };
 
 before('before controller testing',
   () => db.setup().then(() => db.clean()).then(() => db.loadAllFixtures()));
+
+test('controller pipe user', t => {
+  const mData = {
+    senderID: '1028279607252642',
+    subjectName: 'crash-course-biology',
+  };
+  controller.pipeUser(mData).then((mDataWithUser) => {
+    t.ok(mDataWithUser);
+    t.ok(mDataWithUser.userID);
+    t.equal(mDataWithUser.userID.toString(), '5716893a8c8aff3221812148');
+    t.end();
+  });
+});
 
 test('register message with existing session', t => {
   // `msg` = {

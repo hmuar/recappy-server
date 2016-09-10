@@ -28,11 +28,13 @@ export default winston;
 export function log(msg) {
   // console.log(msg);
   winston.log('info', msg);
+  return msg;
 }
 
 export function logErr(msg) {
   // console.log(msg);
   winston.log('error', msg);
+  return msg;
 }
 
 export function logState(appState) {
@@ -41,9 +43,9 @@ export function logState(appState) {
           senderID,
           session,
           evalCtx,
-          nextState,
-          prevState } = appState;
-  const { queueIndex, state } = session;
+          preEvalState,
+          postEvalState } = appState;
+  const { queueIndex, state, globalIndex } = session;
   let noteType = 'None';
   const maxQueueIndex = session.noteQueue.length - 1;
   if (queueIndex <= maxQueueIndex) {
@@ -54,7 +56,9 @@ export function logState(appState) {
     note: `${queueIndex}: (${queueIndex + 1}/${maxQueueIndex + 1}) ${noteType}`,
     input,
     evalCtx,
-    state: `${prevState} --> ${nextState} --> ${state}`,
+    state: `${preEvalState} --> ${postEvalState} --> ${state}`,
+    globalIndex,
   };
   winston.log('info', tState);
+  return appState;
 }

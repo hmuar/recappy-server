@@ -73,19 +73,23 @@ function advanceState(appState) {
   // set proper next state based on next note
   if (appState.session && appState.postEvalState) {
     if (appState.postEvalState === SessionState.DONE_QUEUE) {
+      console.log('getting new notes for done_queue');
+      console.log(`globalIndex: ${appState.session.globalIndex}`);
       // update note queue
       // update queueIndex
       // update globalIndex
       // export function getNextNotes(userID, subjectID, numNotes, lastGlobalIndex) {
       const { userID, subjectID } = appState;
+      const nextGlobalIndex = appState.session.globalIndex + 1;
       return getNextNotes(userID,
                    subjectID,
                    TARGET_NUM_NOTES_IN_SESSION,
-                   appState.session.globalIndex)
+                   nextGlobalIndex)
       .then(nextNotesArray => {
         const [oldNotes, newNotes] = nextNotesArray;
         const nextNotes = oldNotes.concat(newNotes);
         if (nextNotes && nextNotes.length > 0) {
+          console.log(`got ${nextNotes.length} new notes`);
           return {
             ...appState,
             postEvalState: null,
@@ -93,7 +97,7 @@ function advanceState(appState) {
               ...appState.session,
               noteQueue: nextNotes,
               queueIndex: 0,
-              globalIndex: appState.session.globalIndex + 1,
+              globalIndex: nextGlobalIndex,
               state: getEntryStateForNoteType(nextNotes[0].type),
             },
           };

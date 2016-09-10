@@ -10,7 +10,7 @@ const userSchema = new mongoose.Schema({
   facebookMessageID: String,
 });
 
-export const User = mongoose.model('User', userSchema, 'users');
+export const User = mongoose.model('User', userSchema, 'user');
 
 // StudentSession
 // --------------

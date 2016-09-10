@@ -1,7 +1,7 @@
 const minQuality = 0;
 const maxQuality = 5;
 
-const Answer = {
+export default {
   min: minQuality,
   max: maxQuality,
   // a way of answering as confirmation,
@@ -9,5 +9,3 @@ const Answer = {
   ok: maxQuality,
   no: minQuality,
 };
-
-export default Answer;

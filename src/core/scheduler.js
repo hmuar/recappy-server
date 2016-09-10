@@ -27,15 +27,13 @@ export function getOldMaterial(userID, subjectID, numNotes) {
 // on given lastGlobalIndex. Note lastGlobalIndex is actually
 // globalIndex of the next concept that should be introduced to user.
 // Get all notes associated with this concept.
-export function getNewMaterial(subjectID, numNotes, lastGlobalIndex) {
+export function getNewMaterial(subjectID, numNotes, globalIndex = 0) {
   if (!subjectID || numNotes <= 0) {
     return Promise.resolve([]);
   }
 
-  const lastIndex = lastGlobalIndex || -1;
-
   return Category.findOne({ ctype: 'concept',
-                           globalIndex: lastIndex + 1,
+                           globalIndex,
                            subjectParent: subjectID })
     .then(nextConcept => {
       if (!nextConcept) {
@@ -50,12 +48,11 @@ export function getNewMaterial(subjectID, numNotes, lastGlobalIndex) {
 // return [oldNotes, newNotes]
 // TODO: Detect if two questions have same c-key and only ask one
 // TODO: factor in weighting of concepts
-export function getNextNotes(userID, subjectID, numNotes, lastGlobalIndex) {
+export function getNextNotes(userID, subjectID, numNotes, globalIndex = 0) {
   if (!numNotes || numNotes <= 0) {
     return Promise.resolve([]);
   }
 
-  const lastIndex = lastGlobalIndex || -1;
   const oldNotesNum = Math.ceil(numNotes);
   const result = [];
 
@@ -67,7 +64,7 @@ export function getNextNotes(userID, subjectID, numNotes, lastGlobalIndex) {
       result.push(oldNotes);
       const newNotesNum = numNotes - oldNotes.length;
       if (newNotesNum > 0) {
-        return getNewMaterial(subjectID, newNotesNum, lastIndex);
+        return getNewMaterial(subjectID, newNotesNum, globalIndex);
       }
       return [];
     }).then((newNotes) => {
