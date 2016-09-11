@@ -35,9 +35,9 @@ test('test add session with no user', t => {
   const existingSenderID = '1028279607252642';
   return pipeAddSession(
     getAppState(null,
-    existingSenderID)).then((state) => {
-      t.notOk(state.session);
-    });
+    existingSenderID)).then((state) => (
+      t.notOk(state.session)
+    ));
 });
 
 test('test add session when user has no existing session', t => {

@@ -336,7 +336,8 @@ function addNoteRecords(defNoteIds) {
 
   // half will be due in the past, half in the future
   for (let i = 0; i < 10; i++) {
-    const newDueDate = new Date(dueDate.getTime() + (i - 5) * minToMillisecFactor); //eslint-disable-line
+    // add 20 miliseconds to make sure when i=0, the date will be in future
+    const newDueDate = new Date(dueDate.getTime() + (i - 5) * minToMillisecFactor + 20); //eslint-disable-line
     const newNoteRecord = getDefNoteRecordData(noteTemplateA,
                                                noteTemplateAIds[i],
                                                newDueDate);

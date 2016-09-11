@@ -84,7 +84,8 @@ export default class TestDatabase {
   getStaticIDs() {
     return fixture.getStaticIDs();
   }
+
   getTestUser() {
-    return User.findOne();
+    return User.findOne(ObjectID('5716893a8c8aff3221812148'));
   }
 }

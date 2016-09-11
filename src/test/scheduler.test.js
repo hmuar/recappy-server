@@ -26,7 +26,7 @@ before('before scheduler testing', () => (
   })
 ));
 
-test('schedule old notes based on due date', (t) => (
+test('schedule old notes based on due date', t => (
   getOldMaterial(testUser._id, subject._id, 20)
   .then(nextNotes => {
     t.equal(nextNotes.length, 14);

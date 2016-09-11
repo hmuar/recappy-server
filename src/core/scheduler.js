@@ -1,4 +1,5 @@
 import { NoteRecord, Category, Note } from '../db/collection';
+import { log } from '../logger';
 
 export const TARGET_NUM_NOTES_IN_SESSION = 3;
 
@@ -37,7 +38,7 @@ export function getNewMaterial(subjectID, numNotes, globalIndex = 0) {
                            subjectParent: subjectID })
     .then(nextConcept => {
       if (!nextConcept) {
-        console.log('Could not find next concept, returning 0 new notes');
+        log('Could not find next concept, returning 0 new notes');
         return [];
       }
       return Note.find({ directParent: nextConcept._id }).sort('order');

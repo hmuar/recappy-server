@@ -11,30 +11,33 @@ import { getStartState } from '../core/session_state';
 export function getSessionForUserAndSubject(userID, subjectID) {
   // Do sync code checking params and throwing errors inside Promise
   // so that errors are properly caught
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     if (!userID) {
-      throw new Error('No userID specified, cannot find session');
+      reject(new Error('No userID specified, cannot find session'));
     }
     if (!subjectID) {
-      throw new Error('No subjectID specified, cannot find session');
+      reject(new Error('No subjectID specified, cannot find session'));
     }
     resolve();
   })
   .then(() => {
-    StudentSession.findOne({ userID }).then((session) => {
-      if (session) {
-        const subjects = session.subjects;
-        const subjectIDString = subjectID.valueOf();
-        if (subjects && subjectIDString in subjects) {
-          return subjects[subjectIDString];
+    if (userID && subjectID) {
+      return StudentSession.findOne({ userID }).then((session) => {
+        if (session) {
+          const subjects = session.subjects;
+          const subjectIDString = subjectID.valueOf();
+          if (subjects && subjectIDString in subjects) {
+            return subjects[subjectIDString];
+          }
+        // TODO: should return entire session here
+        //       so that we can use it to update subjects later,
+        //       instead of having to query for session again.
+          return null;
         }
-      // TODO: should return entire session here
-      //       so that we can use it to update subjects later,
-      //       instead of having to query for session again.
         return null;
-      }
-      return null;
-    });
+      });
+    }
+    return null;
   });
 }
 
