@@ -2,6 +2,7 @@ import { createSession,
          getSessionForUserAndSubject } from '../db/session_assistant';
 import { getStartingNotes,
          TARGET_NUM_NOTES_IN_SESSION } from '../core/scheduler.js';
+import { logErr } from '../logger';
 
 function addNewSession(mState) {
   // get new notes
@@ -39,5 +40,10 @@ export default function pipe(mState) {
       ...mState,
       session,
     };
+  })
+  .catch((err) => {
+    logErr(`Error finding session for user ${mState.userID}`);
+    logErr(err);
+    return mState;
   });
 }

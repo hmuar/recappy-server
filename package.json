@@ -6,8 +6,9 @@
   "scripts": {
     "lint": "esw -w src",
     "test-watch": "watch 'clear && npm run test' src",
-    "test": "blue-tape -r babel-register src/test/*.test.js | tap-summary",
-    "test-single": "blue-tape -r babel-register src/test/controller_pipe_advance_state.test.js | tap-summary",
+    "test": "clear && blue-tape -r babel-register src/test/*.test.js | tap-summary",
+    "test-single": "clear && blue-tape -r babel-register src/test/controller_pipe_add_session.test.js | tap-summary",
+    "test-single-controller": "clear && blue-tape -r babel-register src/test/controller.test.js | tap-summary",
     "docs": "watch 'rm -rf docs && docco src/**/**.js && rm -rf docs/*.test.html' src",
     "start": "nodemon register.js",
     "start-clean": "npm run clean-logs && npm run start",

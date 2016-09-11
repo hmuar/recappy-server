@@ -7,20 +7,34 @@ import { getStartState } from '../core/session_state';
 // TODO: need to handle case where user exists, but subject does not better.
 // Right now we are hitting the db more than we need to.
 
+// return Promise
 export function getSessionForUserAndSubject(userID, subjectID) {
-  return StudentSession.findOne({ userID }).then((session) => {
-    if (session) {
-      const subjects = session.subjects;
-      const subjectIDString = subjectID.valueOf();
-      if (subjects && subjectIDString in subjects) {
-        return subjects[subjectIDString];
-      }
+  // Do sync code checking params and throwing errors inside Promise
+  // so that errors are properly caught
+  return new Promise((resolve) => {
+    if (!userID) {
+      throw new Error('No userID specified, cannot find session');
+    }
+    if (!subjectID) {
+      throw new Error('No subjectID specified, cannot find session');
+    }
+    resolve();
+  })
+  .then(() => {
+    StudentSession.findOne({ userID }).then((session) => {
+      if (session) {
+        const subjects = session.subjects;
+        const subjectIDString = subjectID.valueOf();
+        if (subjects && subjectIDString in subjects) {
+          return subjects[subjectIDString];
+        }
       // TODO: should return entire session here
       //       so that we can use it to update subjects later,
       //       instead of having to query for session again.
+        return null;
+      }
       return null;
-    }
-    return null;
+    });
   });
 }
 
@@ -54,7 +68,6 @@ export function createSession(userID,
                        noteQueue,
                        conceptGlobalIndex) {
   const conceptIndex = conceptGlobalIndex || 0;
-
   return StudentSession.findOne({ userID }).then((session) => {
     const subjectIDString = subjectID.valueOf();
 

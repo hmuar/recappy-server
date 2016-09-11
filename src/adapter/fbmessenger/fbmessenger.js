@@ -33,16 +33,15 @@ function senderToUser(msgData) {
   }
 }
 
-// create user based with new Facebook Messenger
-// specific ID. `msgData` is Immututable.Map()
-function createUser(msgData) {
-  const fbUserID = msgData.senderID;
+// create user with new Facebook Messenger ID
+function createUser(mData) {
+  const fbUserID = mData.senderID;
   if (!fbUserID) {
     return Promise.error(null);
   }
   return Account.createUserWithFacebookMsgID(fbUserID)
   .then((user) => ({
-    ...msgData,
+    ...mData,
     userID: user._id,
   }));
 }

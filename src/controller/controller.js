@@ -6,7 +6,6 @@ import pipeAdvanceState from './pipe_advance_state';
 import pipeSaveSession from './pipe_save_session';
 import { log, logErr, logState } from '../logger';
 
-
 // `msg` = {
 //   timestamp  : ""
 //   senderID   : "",
@@ -30,7 +29,14 @@ export default class Controller {
 
   // convert adapter specific sender id into app user id
   pipeUser(mState) {
-    return this.adapter.senderToUser(mState);
+    return this.adapter.senderToUser(mState).then(newState => {
+      // create a new user if user could not be found
+      if (!newState.userID) {
+        return this.adapter.createUser(newState);
+      }
+      return newState;
+    });
+    // return this.adapter.senderToUser(mState);
   }
 
   debugDBAssist(msg) {

@@ -35,7 +35,7 @@ test('controller pipe user', t => {
   });
 });
 
-test('register message with existing session', t => {
+test('register message with existing user, existing session', t => {
   // `msg` = {
   //   timestamp  : ""
   //   senderID   : "",
@@ -56,6 +56,7 @@ test('register message with existing session', t => {
   };
 
   controller.registerMsg(msg).then((rMsg) => {
+    t.ok(rMsg.userID);
     t.ok(rMsg.session);
     t.notDeepLooseEqual(rMsg.session.queueIndex, null);
     t.ok(rMsg.session.noteQueue);
@@ -73,29 +74,52 @@ test('register message with existing session', t => {
   });
 });
 
-// senderID doesn't have an existing session in test database
+// senderID has existing user, but no existing session in test database
 // so this tests process of session creation
-// test('register message for new session', t => {
-//   const msg = {
-//     timestamp: 1,
-//     senderID: '2028279607252615',
-//     userID: null,
-//     text: 'hello',
-//     action: null,
-//     subjectName: 'crash-course-biology',
-//   };
-//
-//   controller.registerMsg(msg).then((rMsg) => {
-//     t.ok(rMsg.session);
-//     t.ok(rMsg.session.noteQueue.length > 0);
-//     t.equal(rMsg.session.state, SessionState.INFO);
-//     t.end();
-//   }).catch((error) => {
-//     console.error(error);
-//     t.fail('could not register message');
-//     t.end();
-//   });
-// });
+test('register message for existing user, no existing session', t => {
+  const msg = {
+    timestamp: 1,
+    senderID: '2028279607252615',
+    userID: null,
+    text: 'hello',
+    action: null,
+    subjectName: 'crash-course-biology',
+  };
 
+  controller.registerMsg(msg).then((rMsg) => {
+    t.ok(rMsg.userID);
+    t.ok(rMsg.session);
+    t.ok(rMsg.session.noteQueue.length > 0);
+    t.end();
+  }).catch((error) => {
+    console.error(error);
+    t.fail('could not register message');
+    t.end();
+  });
+});
+
+// senderID has existing user, but no existing session in test database
+// so this tests process of session creation
+test('register message for no existing user, no existing session', t => {
+  const msg = {
+    timestamp: 1,
+    senderID: '9028279607252619',
+    userID: null,
+    text: 'hello',
+    action: null,
+    subjectName: 'crash-course-biology',
+  };
+
+  controller.registerMsg(msg).then((rMsg) => {
+    t.ok(rMsg.userID);
+    t.ok(rMsg.session);
+    t.ok(rMsg.session.noteQueue.length > 0);
+    t.end();
+  }).catch((error) => {
+    console.error(error);
+    t.fail('could not register message');
+    t.end();
+  });
+});
 
 after('after controller testing', () => db.close());
