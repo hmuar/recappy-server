@@ -1,7 +1,7 @@
 import test from 'blue-tape';
-import AdapterFB from '../adapter/fbmessenger/fbmessenger';
+import AdapterFB from '~/adapter/fbmessenger/fbmessenger';
+import Input from '~/core/input';
 import TestDatabase from './test_database';
-import Input from '../core/input';
 
 const before = test;
 const after = test;

@@ -1,7 +1,7 @@
-import { SessionState } from '../core/session_state';
-import Input from '../core/input';
-import Answer from '../core/answer';
-import { EvalStatus } from '../core/eval';
+import { SessionState } from '~/core/session_state';
+import Input from '~/core/input';
+import Answer from '~/core/answer';
+import { EvalStatus } from '~/core/eval';
 
 // Evaluate user input in the context of user's current session state.
 // Add a `evalCtx` object to message data.

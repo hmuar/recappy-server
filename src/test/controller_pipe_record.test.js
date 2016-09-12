@@ -1,10 +1,10 @@
 /* eslint-disable max-len */
 import test from 'blue-tape';
+import Answer from '~/core/answer';
+import pipeRecord from '~/controller/pipe_record';
+import Input from '~/core/input';
+import { SessionState } from '~/core/session_state';
 import TestDatabase from './test_database';
-import Answer from '../core/answer';
-import pipeRecord from '../controller/pipe_record';
-import Input from '../core/input';
-import { SessionState } from '../core/session_state';
 
 const db = new TestDatabase();
 const before = test;

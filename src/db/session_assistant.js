@@ -1,5 +1,5 @@
-import { StudentSession } from '../db/collection';
-import { getStartState } from '../core/session_state';
+import { StudentSession } from '~/db/collection';
+import { getStartState } from '~/core/session_state';
 
 // Return a session if user exists and they have a session already for
 // `subjectID` subject.

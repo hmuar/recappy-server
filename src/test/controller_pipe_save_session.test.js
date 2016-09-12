@@ -1,13 +1,13 @@
 /* eslint-disable max-len */
 import test from 'blue-tape';
+import Answer from '~/core/answer';
+import pipeSaveSession from '~/controller/pipe_save_session';
+import Input from '~/core/input';
+import { SessionState } from '~/core/session_state';
+import DBAssist from '~/db/category_assistant';
+import { getSessionForUserAndSubject } from '~/db/session_assistant';
+import { EvalStatus } from '~/core/eval';
 import TestDatabase from './test_database';
-import Answer from '../core/answer';
-import pipeSaveSession from '../controller/pipe_save_session';
-import Input from '../core/input';
-import { SessionState } from '../core/session_state';
-import DBAssist from '../db/category_assistant';
-import { getSessionForUserAndSubject } from '../db/session_assistant';
-import { EvalStatus } from '../core/eval';
 
 const before = test;
 const after = test;

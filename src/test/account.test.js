@@ -1,6 +1,6 @@
 import test from 'blue-tape';
+import Account from '~/account/account';
 import TestDatabase from './test_database';
-import Account from '../account/account';
 
 const before = test;
 const after = test;

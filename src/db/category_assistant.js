@@ -1,4 +1,4 @@
-import { Category } from '../db/collection';
+import { Category } from '~/db/collection';
 
 // function getParentIdList(parentCategories) {
 //   return parentCategories.map(function(obj) {

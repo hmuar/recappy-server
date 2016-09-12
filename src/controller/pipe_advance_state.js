@@ -1,8 +1,8 @@
 import { SessionState,
-         getEntryStateForNoteType } from '../core/session_state';
+         getEntryStateForNoteType } from '~/core/session_state';
 
-import { getNextNotes, TARGET_NUM_NOTES_IN_SESSION } from '../core/scheduler';
-import { EvalStatus } from '../core/eval';
+import { getNextNotes, TARGET_NUM_NOTES_IN_SESSION } from '~/core/scheduler';
+import { EvalStatus } from '~/core/eval';
 
 // Given current info in app state, determine next study state for user.
 // Only need to look at current session state to determine next state.

@@ -1,6 +1,6 @@
 import test from 'blue-tape';
-import { calcWeight } from '../core/knowledge';
-import SRCore from '../core/spaced_repetition';
+import { calcWeight } from '~/core/knowledge';
+import SRCore from '~/core/spaced_repetition';
 
 test('Schedule Core Factor Calculation', t => {
   t.equal(SRCore.calcFactor(2, 0), 1.3);

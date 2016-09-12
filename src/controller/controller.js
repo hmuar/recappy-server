@@ -1,10 +1,10 @@
-import DBAssist from '../db/category_assistant';
+import DBAssist from '~/db/category_assistant';
+import { log, logErr, logState } from '~/logger';
 import pipeAddSession from './pipe_add_session';
 import pipeRecord from './pipe_record';
 import pipeEval from './pipe_eval';
 import pipeAdvanceState from './pipe_advance_state';
 import pipeSaveSession from './pipe_save_session';
-import { log, logErr, logState } from '../logger';
 
 // `msg` = {
 //   timestamp  : ""

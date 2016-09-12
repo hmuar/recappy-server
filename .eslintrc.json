@@ -6,7 +6,8 @@
       "no-unused-vars": 1,
       "new-cap": 0,
       "no-console": "off",
-      "import/no-extraneous-dependencies": ["error", {"devDependencies": true}]
+      "import/no-extraneous-dependencies": ["error", { "devDependencies": true }],
+      "import/no-unresolved": ["error", { "ignore": ["^[~]"] }]
     },
     "parserOptions":{
       "ecmaFeatures": {
@@ -14,8 +15,8 @@
       }
     },
     "plugins": [
-        "react",
-        "jsx-a11y",
-        "import"
+      "react",
+      "jsx-a11y",
+      "import"
     ]
 }

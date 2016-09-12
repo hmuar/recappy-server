@@ -1,7 +1,7 @@
-import SpacedRep from '../core/spaced_repetition';
-import { SessionState } from '../core/session_state';
-import { NoteRecord } from '../db/collection';
-import { log } from '../logger';
+import SpacedRep from '~/core/spaced_repetition';
+import { SessionState } from '~/core/session_state';
+import { NoteRecord } from '~/db/collection';
+import { log } from '~/logger';
 
 // Record results of input evaluation using NoteRecord collection
 // This will involve calculating future due date, updating note history

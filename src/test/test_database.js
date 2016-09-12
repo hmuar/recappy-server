@@ -1,11 +1,11 @@
 import mongoose from 'mongoose';
 import Promise from 'bluebird';
-import fixture from './test_fixture';
 import { NoteRecord,
          Category,
          StudentSession,
          User,
-         ObjectID } from '../db/collection';
+         ObjectID } from '~/db/collection';
+import fixture from './test_fixture';
 
 Promise.promisifyAll(mongoose);
 

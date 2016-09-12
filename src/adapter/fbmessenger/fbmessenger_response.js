@@ -1,8 +1,8 @@
+import Input from '~/core/input';
+import { SessionState } from '~/core/session_state';
+import generateQuestion from '~/speech';
+import Answer from '~/core/answer';
 import { sendText, sendButtons, sendImage } from './fbmessenger_request';
-import Input from '../../core/input';
-import { SessionState } from '../../core/session_state';
-import generateQuestion from '../../speech';
-import Answer from '../../core/answer';
 
 export function sendPossibleImage(senderID, note) {
   if ('imgUrl' in note) {

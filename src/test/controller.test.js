@@ -1,9 +1,8 @@
 import test from 'blue-tape';
-import AdapterFB from '../adapter/fbmessenger/fbmessenger';
+import AdapterFB from '~/adapter/fbmessenger/fbmessenger';
+import Controller from '~/controller/controller';
+import Input from '~/core/input';
 import TestDatabase from './test_database';
-import Controller from '../controller/controller';
-import Input from '../core/input';
-// import { SessionState } from '../core/session_state';
 
 const before = test;
 const after = test;

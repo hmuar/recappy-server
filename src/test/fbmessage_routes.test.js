@@ -1,5 +1,5 @@
 import test from 'blue-tape';
-import FBmessage from '../resource/fbmessenger';
+import FBmessage from '~/resource/fbmessenger';
 import server from './test_server';
 
 // const before = test;

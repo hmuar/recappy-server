@@ -1,8 +1,8 @@
-import AdapterFB from '../adapter/fbmessenger/fbmessenger';
-import Controller from '../controller/controller';
-import getPostBody from '../request';
+import AdapterFB from '~/adapter/fbmessenger/fbmessenger';
+import Controller from '~/controller/controller';
+import getPostBody from '~/request';
 
-import { log, logErr } from '../logger';
+import { log, logErr } from '~/logger';
 
 function getRoutePath(apiVersionPath) {
   return `${apiVersionPath}/fbmessage`;

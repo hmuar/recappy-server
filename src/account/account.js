@@ -1,4 +1,4 @@
-import { User } from '../db/collection';
+import { User } from '~/db/collection';
 
 // `fbMsgID` is string used by Facebook to identify users
 function getUserByFacebookMsgID(fbMsgID) {

@@ -1,13 +1,13 @@
 /* eslint-disable max-len */
 
-import { SessionState } from '../core/session_state';
+import { SessionState } from '~/core/session_state';
 import { ObjectID,
          User,
          Note,
          Category,
          StudentSession,
-         NoteRecord } from '../db/collection';
-import SRCore from '../core/spaced_repetition';
+         NoteRecord } from '~/db/collection';
+import SRCore from '~/core/spaced_repetition';
 
 // ******* User *******************************
 const testUserFBMessenger = {

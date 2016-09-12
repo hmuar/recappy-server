@@ -1,7 +1,7 @@
 import test from 'blue-tape';
-import TestDatabase from './test_database';
 import { getSessionForUserAndSubject,
-         createSession } from '../db/session_assistant';
+         createSession } from '~/db/session_assistant';
+import TestDatabase from './test_database';
 
 const before = test;
 const after = test;

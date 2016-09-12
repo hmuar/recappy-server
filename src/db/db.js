@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import Promise from 'bluebird';
-import { ObjectID } from '../db/collection';
+import { ObjectID } from '~/db/collection';
 
 // const mongoose = Promise.promisifyAll(require('mongoose'));
 Promise.promisifyAll(mongoose);

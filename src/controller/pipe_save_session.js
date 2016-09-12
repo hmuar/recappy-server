@@ -1,4 +1,4 @@
-import { updateSessionForUser } from '../db/session_assistant';
+import { updateSessionForUser } from '~/db/session_assistant';
 
 // Returns promise
 export default function pipe(appState) {

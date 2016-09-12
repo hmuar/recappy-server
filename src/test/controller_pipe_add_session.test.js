@@ -1,6 +1,6 @@
 import test from 'blue-tape';
-import TestDatabase from './test_database';
-import pipeAddSession from '../controller/pipe_add_session';
+import TestDatabase from '~/test/test_database';
+import pipeAddSession from '~/controller/pipe_add_session';
 
 const before = test;
 const after = test;

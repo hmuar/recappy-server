@@ -1,8 +1,8 @@
-import Account from '../../account/account';
-import Input from '../../core/input';
+import Account from '~/account/account';
+import Input from '~/core/input';
+import { EvalStatus } from '~/core/eval';
 import MessageType from './fbmessage_type';
 import sendResp, { sendFeedbackResp } from './fbmessenger_response';
-import { EvalStatus } from '../../core/eval';
 
 // Adapter for parsing incoming requests and responding
 // if user is using Facebook Messenger platform.

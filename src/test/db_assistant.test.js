@@ -1,6 +1,6 @@
 import test from 'blue-tape';
+import DBAssist from '~/db/category_assistant';
 import TestDatabase from './test_database';
-import DBAssist from '../db/category_assistant';
 
 const before = test;
 const after = test;

@@ -1,12 +1,12 @@
 /* eslint-disable max-len */
 
 import test from 'blue-tape';
+import pipeEval from '~/controller/pipe_eval';
+import { SessionState } from '~/core/session_state';
+import Input from '~/core/input';
+import Answer from '~/core/answer';
+import { EvalStatus } from '~/core/eval';
 import TestDatabase from './test_database';
-import pipeEval from '../controller/pipe_eval';
-import { SessionState } from '../core/session_state';
-import Input from '../core/input';
-import Answer from '../core/answer';
-import { EvalStatus } from '../core/eval';
 
 const before = test;
 const after = test;

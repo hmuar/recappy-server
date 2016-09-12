@@ -1,7 +1,7 @@
 import request from 'request';
+import Config from '~/config/config';
+import { log } from '~/logger';
 import MessageType from './fbmessage_type';
-import Config from '../../config/config';
-import { log } from '../../logger';
 
 function getReqBodyTemplate(senderID) {
   return {

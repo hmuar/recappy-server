@@ -1,5 +1,5 @@
-import { NoteRecord, Category, Note } from '../db/collection';
-import { log } from '../logger';
+import { NoteRecord, Category, Note } from '~/db/collection';
+import { log } from '~/logger';
 
 export const TARGET_NUM_NOTES_IN_SESSION = 3;
 

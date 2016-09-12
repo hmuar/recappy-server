@@ -1,9 +1,9 @@
 import test from 'blue-tape';
-import TestDatabase from './test_database';
 import { getOldMaterial,
          getNewMaterial,
-         getNextNotes } from '../core/scheduler';
-import DBAssist from '../db/category_assistant';
+         getNextNotes } from '~/core/scheduler';
+import DBAssist from '~/db/category_assistant';
+import TestDatabase from './test_database';
 
 const before = test;
 const after = test;
