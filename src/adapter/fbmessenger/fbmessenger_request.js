@@ -1,4 +1,4 @@
-import request from 'request';
+import request from 'request-promise';
 import Config from '~/config/config';
 import { log } from '~/logger';
 import MessageType from './fbmessage_type';
@@ -73,30 +73,30 @@ function postBodyCreator(msgType) {
   return null;
 }
 
-function sendPostRequest(body, callback) {
+function sendPostRequest(body) {
   const options = {
     json: true,
     url: `https://graph.facebook.com/v2.6/me/messages?access_token=${Config.FBToken}`,
     body,
   };
-  request.post(options, callback);
+  return request.post(options);
 }
 
-export function sendText(senderID, text, callback) {
+export function sendText(senderID, text) {
   log(`sending text: ${text}`);
   const bodyCreator = postBodyCreator(MessageType.TEXT);
-  sendPostRequest(bodyCreator(senderID, text), callback);
+  return sendPostRequest(bodyCreator(senderID, text));
 }
 
 // buttons is list of {title, action}
-export function sendButtons(senderID, text, buttons, callback) {
+export function sendButtons(senderID, text, buttons) {
   log(`sending buttons: ${text}`);
   const bodyCreator = postBodyCreator(MessageType.POSTBACK);
-  sendPostRequest(bodyCreator(senderID, text, buttons), callback);
+  return sendPostRequest(bodyCreator(senderID, text, buttons));
 }
 
-export function sendImage(senderID, imgURL, callback) {
+export function sendImage(senderID, imgURL) {
   log(`sending img: ${imgURL}`);
   const bodyCreator = postBodyCreator(MessageType.IMAGE);
-  sendPostRequest(bodyCreator(senderID, imgURL), callback);
+  return sendPostRequest(bodyCreator(senderID, imgURL));
 }

@@ -51,13 +51,11 @@ export default class Controller {
   }
 
   sendResponse(state) {
-    this.adapter.sendResponse(state);
-    return state;
+    return this.adapter.sendResponse(state);
   }
 
   sendFeedbackResponse(state) {
-    this.adapter.sendFeedbackResponse(state);
-    return state;
+    return this.adapter.sendFeedbackResponse(state);
   }
 
   // main entry method called by external adapters

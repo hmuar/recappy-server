@@ -2,24 +2,35 @@ import Input from '~/core/input';
 import { SessionState } from '~/core/session_state';
 import generateQuestion from '~/speech';
 import Answer from '~/core/answer';
+import { logErr } from '~/logger';
 import { sendText, sendButtons, sendImage } from './fbmessenger_request';
 
 export function sendPossibleImage(senderID, note) {
   if ('imgUrl' in note) {
     if (note.imgUrl != null) {
-      sendImage(senderID, note.imgUrl);
+      return sendImage(senderID, note.imgUrl);
     }
   }
+  return Promise.resolve(0);
 }
 
-export default function sendResponse(state) {
+function sendResponseInContext(state) {
   const fbUserID = state.senderID;
   const session = state.session;
   const note = session.noteQueue[session.queueIndex];
   switch (session.state) {
     case SessionState.INIT:
-      sendText(fbUserID, "Let's get started!");
-      break;
+      return sendText(fbUserID, "Let's get started!").then(() => state);
+
+    case SessionState.INFO: {
+      const buttonData = [];
+      buttonData.push({
+        title: 'Ok keep going',
+        action: Input.Type.ACCEPT,
+      });
+      return sendPossibleImage(fbUserID, note)
+      .then(() => sendButtons(fbUserID, note.displayRaw, buttonData));
+    }
 
     case SessionState.RECALL: {
       const buttonData = [];
@@ -27,15 +38,12 @@ export default function sendResponse(state) {
         title: 'Tell me the answer',
         action: Input.Type.ACCEPT,
       });
-      sendPossibleImage(fbUserID, note);
       const questionText = generateQuestion(note);
-      sendButtons(fbUserID, questionText, buttonData);
-      break;
+      return sendPossibleImage(fbUserID, note)
+      .then(() => sendButtons(fbUserID, questionText, buttonData));
     }
 
     case SessionState.RECALL_RESPONSE: {
-      sendPossibleImage(fbUserID, note);
-      sendText(fbUserID, note.hidden);
       const buttonData = [];
       buttonData.push({
         title: 'Yes',
@@ -45,53 +53,55 @@ export default function sendResponse(state) {
         title: 'No',
         action: Input.Type.REJECT,
       });
-      sendButtons(fbUserID,
-        'Is that what you were thinking?', buttonData);
-      break;
+      return sendPossibleImage(fbUserID, note)
+      .then(() => sendText(fbUserID, note.hidden))
+      .then(() => (
+        sendButtons(fbUserID, 'Is that what you were thinking?', buttonData)));
     }
 
     case SessionState.INPUT: {
-      sendPossibleImage(fbUserID, note);
       const questionText = generateQuestion(note);
-      sendText(fbUserID, questionText);
-      break;
+      return sendPossibleImage(fbUserID, note)
+      .then(() => sendText(fbUserID, questionText));
     }
 
     case SessionState.MULT_CHOICE: {
-      let choicesText = '';
-      choicesText += `(1) ${note.choice1}\n`;
-      choicesText += `(2) ${note.choice2}\n`;
-      choicesText += `(3) ${note.choice3}\n`;
-      choicesText += `(4) ${note.choice4}\n`;
-      choicesText += `(5) ${note.choice5}`;
-
-      sendPossibleImage(fbUserID, note);
       const questionText = generateQuestion(note);
-      sendText(fbUserID, questionText);
+      return sendPossibleImage(fbUserID, note)
+      .then(() => sendText(fbUserID, questionText))
+      .then(() => {
+        let choicesText = '';
+        choicesText += `(1) ${note.choice1}\n`;
+        choicesText += `(2) ${note.choice2}\n`;
+        choicesText += `(3) ${note.choice3}\n`;
+        choicesText += `(4) ${note.choice4}\n`;
+        choicesText += `(5) ${note.choice5}`;
+        sendText(fbUserID, choicesText);
+      });
       // sendButtons(fbUserID, note.displayRaw, buttonData);
-      sendText(fbUserID, choicesText);
-      break;
     }
 
-    case SessionState.INFO: {
-      const buttonData = [];
-      buttonData.push({
-        title: 'Ok keep going',
-        action: Input.Type.ACCEPT,
-      });
-      sendPossibleImage(fbUserID, note);
-      sendButtons(fbUserID, note.displayRaw, buttonData);
-      break;
-    }
     case SessionState.DONE_QUEUE:
-      sendText(fbUserID,
+      return sendText(fbUserID,
         'No more to learn for today, all done! Check back in tomorrow :)');
-      break;
 
     default:
       break;
   }
   return state;
+}
+
+export default function sendResponse(state) {
+  return sendResponseInContext(state)
+  .then(() => state)
+  .catch((err) => {
+    if (state.session) {
+      logErr(`Error sending response from ${state.session.state} state`);
+    } else {
+      logErr('Error sending response');
+    }
+    logErr(err);
+  });
 }
 
 function posFeedback() {
@@ -107,9 +117,10 @@ function sendFeedbackText(toID, isPositive, correctMsg = null) {
   if (!isPositive && correctMsg) {
     msg = `${msg} It's actually - ${correctMsg}`;
   }
-  sendText(toID, msg);
+  return sendText(toID, msg);
 }
 
+// return state
 export function sendFeedbackResp(state) {
   const fbUserID = state.senderID;
   const isCorrect = state.evalCtx.answerQuality === Answer.max;
@@ -118,8 +129,8 @@ export function sendFeedbackResp(state) {
     case SessionState.RECALL_RESPONSE:
     case SessionState.INPUT:
     case SessionState.MULT_CHOICE:
-      sendFeedbackText(fbUserID, isCorrect, state.evalCtx.correctAnswer);
-      break;
+      return sendFeedbackText(fbUserID, isCorrect, state.evalCtx.correctAnswer)
+            .then(() => state);
     default:
       break;
   }
