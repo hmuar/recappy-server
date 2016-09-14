@@ -125,29 +125,29 @@ function createNewRecord(userID, note, recordCtx) {
   return NoteRecord.create(newRecord);
 }
 
-export default function pipe(mState) {
+export default function pipe(appState) {
   // inspect evalCtx
   // grab current note info from `session.noteQueue[session.queueIndex]`
   // update NoteRecord using note info and evalCtx data
 
-  if (!{}.hasOwnProperty.call(mState, 'evalCtx')) {
-    return mState;
+  if (!{}.hasOwnProperty.call(appState, 'evalCtx')) {
+    return appState;
   }
 
-  const session = mState.session;
+  const session = appState.session;
 
   if (session.state === SessionState.DONE_QUEUE) {
-    return mState;
+    return appState;
   }
 
   const note = session.noteQueue[session.queueIndex];
-  const evalCtx = mState.evalCtx;
+  const evalCtx = appState.evalCtx;
   if (!session.noteQueue || session.noteQueue.length === 0) {
     log('No notes in noteQueue, could not record activity.');
-    return mState;
+    return appState;
   }
 
-  return NoteRecord.findOne({ userID: mState.userID,
+  return NoteRecord.findOne({ userID: appState.userID,
                              noteID: note._id })
   .then(record => {
     let recordCtx = {};
@@ -156,7 +156,7 @@ export default function pipe(mState) {
                                  evalCtx);
 
 
-    // record = createNewRecord(mState.userID,
+    // record = createNewRecord(appState.userID,
     //                          note,
     //                          recUpdate);
 
@@ -167,17 +167,17 @@ export default function pipe(mState) {
     if (record) {
       return record.update(recordCtx).then(() => (
         {
-          ...mState,
+          ...appState,
           recordCtx,
         }
       ));
     }
     // need to create new record
-    return createNewRecord(mState.userID,
+    return createNewRecord(appState.userID,
                            note,
                            recordCtx).then(() => (
                              {
-                               ...mState,
+                               ...appState,
                                recordCtx,
                              }
                            ));

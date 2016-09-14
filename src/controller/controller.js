@@ -22,21 +22,21 @@ export default class Controller {
 
   // check if key property added to msg and
   // corresponding value is not undefined and not null
-  pipeSuccess(mState, key) {
-    return {}.hasOwnProperty.call(mState, key) &&
-           mState[key] != null;
+  pipeSuccess(appState, key) {
+    return {}.hasOwnProperty.call(appState, key) &&
+           appState[key] != null;
   }
 
   // convert adapter specific sender id into app user id
-  pipeUser(mState) {
-    return this.adapter.senderToUser(mState).then(newState => {
+  pipeUser(appState) {
+    return this.adapter.senderToUser(appState).then(newState => {
       // create a new user if user could not be found
       if (!newState.userID) {
         return this.adapter.createUser(newState);
       }
       return newState;
     });
-    // return this.adapter.senderToUser(mState);
+    // return this.adapter.senderToUser(appState);
   }
 
   debugDBAssist(msg) {

@@ -101,7 +101,7 @@ before('before controller pipe record testing',
 test('update existing note record', t => {
   const userID = db.getStaticIDs().userFB;
 
-  const mState = {
+  const appState = {
     timestamp: 1,
     senderID: '2028279607252615',
     userID,
@@ -118,7 +118,7 @@ test('update existing note record', t => {
     },
   };
 
-  return pipeRecord(mState)
+  return pipeRecord(appState)
   .then(state => {
     t.ok({}.hasOwnProperty.call(state, 'recordCtx'));
     const recordCtx = state.recordCtx;
@@ -138,7 +138,7 @@ test('create new note record', t => {
   const session = getSession();
   session.queueIndex = 2;
 
-  const mState = {
+  const appState = {
     timestamp: 1,
     senderID: '2028279607252615',
     userID,
@@ -155,7 +155,7 @@ test('create new note record', t => {
     },
   };
 
-  return pipeRecord(mState)
+  return pipeRecord(appState)
   .then(state => {
     t.ok({}.hasOwnProperty.call(state, 'recordCtx'));
     const recordCtx = state.recordCtx;

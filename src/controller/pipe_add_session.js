@@ -4,10 +4,10 @@ import { getStartingNotes,
          TARGET_NUM_NOTES_IN_SESSION } from '~/core/scheduler.js';
 import { logErr } from '~/logger';
 
-function addNewSession(mState) {
+function addNewSession(appState) {
   // get new notes
-  const subjectID = mState.subjectID;
-  const userID = mState.userID;
+  const subjectID = appState.subjectID;
+  const userID = appState.userID;
 
   return getStartingNotes(subjectID, TARGET_NUM_NOTES_IN_SESSION)
   .then(noteQueue => {
@@ -20,7 +20,7 @@ function addNewSession(mState) {
                         startGlobalIndex);
   }).then(session => (
     {
-      ...mState,
+      ...appState,
       session,
     }
   ));
@@ -28,22 +28,22 @@ function addNewSession(mState) {
 
 // find existing user session for given subject and set `session` key
 // to session object. If no session exists, create new session first.
-export default function pipe(mState) {
+export default function pipe(appState) {
   return getSessionForUserAndSubject(
-                          mState.userID,
-                          mState.subjectID)
+                          appState.userID,
+                          appState.subjectID)
   .then(session => {
     if (!session) {
-      return addNewSession(mState);
+      return addNewSession(appState);
     }
     return {
-      ...mState,
+      ...appState,
       session,
     };
   })
   .catch((err) => {
-    logErr(`Error finding session for user ${mState.userID}`);
+    logErr(`Error finding session for user ${appState.userID}`);
     logErr(err);
-    return mState;
+    return appState;
   });
 }

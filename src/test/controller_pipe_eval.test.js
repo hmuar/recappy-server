@@ -219,11 +219,11 @@ before('before controller pipe evaluator testing',
   () => db.setup().then(() => db.clean()).then(() => db.loadAllFixtures()));
 
 test('eval with init state', t => {
-  const mState = getAppState(getSession(0, SessionState.INIT), {
+  const appState = getAppState(getSession(0, SessionState.INIT), {
     type: Input.Type.CUSTOM,
     payload: 'hey!',
   });
-  const mEvalState = pipeEval(mState);
+  const mEvalState = pipeEval(appState);
   const evalCtx = mEvalState.evalCtx;
   t.equal(mEvalState.session.state, SessionState.INIT);
   t.equal(evalCtx.answerQuality, Answer.ok);
@@ -234,11 +234,11 @@ test('eval with init state', t => {
 
 // -------- INFO ---------------------------------------------------
 test('eval with INFO state and correct input', t => {
-  const mState = getAppState(getSession(0, SessionState.INFO), {
+  const appState = getAppState(getSession(0, SessionState.INFO), {
     type: Input.Type.ACCEPT,
     payload: null,
   });
-  const mEvalState = pipeEval(mState);
+  const mEvalState = pipeEval(appState);
   const evalCtx = mEvalState.evalCtx;
   t.equal(mEvalState.session.state, SessionState.INFO);
   t.equal(evalCtx.answerQuality, Answer.ok);
@@ -248,11 +248,11 @@ test('eval with INFO state and correct input', t => {
 });
 
 test('eval with INFO state and invalid input', t => {
-  const mState = getAppState(getSession(0, SessionState.INFO), {
+  const appState = getAppState(getSession(0, SessionState.INFO), {
     type: Input.Type.REJECT,
     payload: null,
   });
-  const mEvalState = pipeEval(mState);
+  const mEvalState = pipeEval(appState);
   const evalCtx = mEvalState.evalCtx;
   t.equal(mEvalState.session.state, SessionState.INFO);
   t.equal(evalCtx.answerQuality, null);
@@ -263,11 +263,11 @@ test('eval with INFO state and invalid input', t => {
 
 // --------- RECALL -----------------------------------------------
 test('eval with RECALL state and correct input', t => {
-  const mState = getAppState(getSession(1, SessionState.RECALL), {
+  const appState = getAppState(getSession(1, SessionState.RECALL), {
     type: Input.Type.ACCEPT,
     payload: null,
   });
-  const mEvalState = pipeEval(mState);
+  const mEvalState = pipeEval(appState);
   const evalCtx = mEvalState.evalCtx;
   t.equal(mEvalState.session.state, SessionState.RECALL);
   t.equal(evalCtx.answerQuality, Answer.ok);
@@ -277,11 +277,11 @@ test('eval with RECALL state and correct input', t => {
 });
 
 test('eval with RECALL state and invalid input', t => {
-  const mState = getAppState(getSession(1, SessionState.RECALL), {
+  const appState = getAppState(getSession(1, SessionState.RECALL), {
     type: Input.Type.REJECT, // invalid input
     payload: null,
   });
-  const mEvalState = pipeEval(mState);
+  const mEvalState = pipeEval(appState);
   const evalCtx = mEvalState.evalCtx;
   t.equal(mEvalState.session.state, SessionState.RECALL);
   t.equal(evalCtx.answerQuality, null);
@@ -291,11 +291,11 @@ test('eval with RECALL state and invalid input', t => {
 });
 
 test('eval with RECALL_RESPONSE state and correct input', t => {
-  const mState = getAppState(getSession(1, SessionState.RECALL_RESPONSE), {
+  const appState = getAppState(getSession(1, SessionState.RECALL_RESPONSE), {
     type: Input.Type.ACCEPT,
     payload: null,
   });
-  const mEvalState = pipeEval(mState);
+  const mEvalState = pipeEval(appState);
   const evalCtx = mEvalState.evalCtx;
   t.equal(mEvalState.session.state, SessionState.RECALL_RESPONSE);
   t.equal(evalCtx.answerQuality, Answer.ok);
@@ -305,12 +305,12 @@ test('eval with RECALL_RESPONSE state and correct input', t => {
 });
 
 test('eval with RECALL_RESPONSE state and incorrect input', t => {
-  const mState = getAppState(getSession(1, SessionState.RECALL_RESPONSE), {
+  const appState = getAppState(getSession(1, SessionState.RECALL_RESPONSE), {
     type: Input.Type.REJECT,
     payload: null,
   });
 
-  const mEvalState = pipeEval(mState);
+  const mEvalState = pipeEval(appState);
   const evalCtx = mEvalState.evalCtx;
   t.equal(mEvalState.session.state, SessionState.RECALL_RESPONSE);
   t.equal(evalCtx.answerQuality, Answer.min);
@@ -320,12 +320,12 @@ test('eval with RECALL_RESPONSE state and incorrect input', t => {
 });
 
 test('eval with RECALL_RESPONSE state and invalid input', t => {
-  const mState = getAppState(getSession(1, SessionState.RECALL_RESPONSE), {
+  const appState = getAppState(getSession(1, SessionState.RECALL_RESPONSE), {
     type: Input.Type.CUSTOM,
     payload: null,
   });
 
-  const mEvalState = pipeEval(mState);
+  const mEvalState = pipeEval(appState);
   const evalCtx = mEvalState.evalCtx;
   t.equal(mEvalState.session.state, SessionState.RECALL_RESPONSE);
   t.equal(evalCtx.answerQuality, null);
@@ -335,11 +335,11 @@ test('eval with RECALL_RESPONSE state and invalid input', t => {
 });
 
 test('eval with CHOICE state and correct input', t => {
-  const mState = getAppState(getSession(2, SessionState.MULT_CHOICE), {
+  const appState = getAppState(getSession(2, SessionState.MULT_CHOICE), {
     type: Input.Type.CUSTOM,
     payload: 3,
   });
-  const mEvalState = pipeEval(mState);
+  const mEvalState = pipeEval(appState);
   const evalCtx = mEvalState.evalCtx;
   t.equal(mEvalState.session.state, SessionState.MULT_CHOICE);
   t.equal(evalCtx.answerQuality, Answer.max);
@@ -351,12 +351,12 @@ test('eval with CHOICE state and correct input', t => {
 // check if string data '3' is properly accepted
 // as correct answer choice 3
 test('eval with CHOICE state and correct string input', t => {
-  const mState = getAppState(getSession(2, SessionState.MULT_CHOICE), {
+  const appState = getAppState(getSession(2, SessionState.MULT_CHOICE), {
     type: Input.Type.CUSTOM,
     payload: '3',
   });
 
-  const mEvalState = pipeEval(mState);
+  const mEvalState = pipeEval(appState);
   const evalCtx = mEvalState.evalCtx;
   t.equal(mEvalState.session.state, SessionState.MULT_CHOICE);
   t.equal(evalCtx.answerQuality, Answer.max);
@@ -366,11 +366,11 @@ test('eval with CHOICE state and correct string input', t => {
 });
 
 test('eval with CHOICE state and incorrect input', t => {
-  const mState = getAppState(getSession(2, SessionState.MULT_CHOICE), {
+  const appState = getAppState(getSession(2, SessionState.MULT_CHOICE), {
     type: Input.Type.CUSTOM,
     payload: 2,
   });
-  const mEvalState = pipeEval(mState);
+  const mEvalState = pipeEval(appState);
   const evalCtx = mEvalState.evalCtx;
   t.equal(mEvalState.session.state, SessionState.MULT_CHOICE);
   t.equal(evalCtx.answerQuality, Answer.min);
@@ -380,11 +380,11 @@ test('eval with CHOICE state and incorrect input', t => {
 });
 
 test('eval with CHOICE state and incorrect string input', t => {
-  const mState = getAppState(getSession(2, SessionState.MULT_CHOICE), {
+  const appState = getAppState(getSession(2, SessionState.MULT_CHOICE), {
     type: Input.Type.CUSTOM,
     payload: '5',
   });
-  const mEvalState = pipeEval(mState);
+  const mEvalState = pipeEval(appState);
   const evalCtx = mEvalState.evalCtx;
   t.equal(mEvalState.session.state, SessionState.MULT_CHOICE);
   t.equal(evalCtx.answerQuality, Answer.min);
@@ -394,11 +394,11 @@ test('eval with CHOICE state and incorrect string input', t => {
 });
 
 test('eval with CHOICE state and invalid input', t => {
-  const mState = getAppState(getSession(2, SessionState.MULT_CHOICE), {
+  const appState = getAppState(getSession(2, SessionState.MULT_CHOICE), {
     type: Input.Type.ACCEPT,
     payload: '5',
   });
-  const mEvalState = pipeEval(mState);
+  const mEvalState = pipeEval(appState);
   const evalCtx = mEvalState.evalCtx;
   t.equal(mEvalState.session.state, SessionState.MULT_CHOICE);
   t.equal(evalCtx.answerQuality, null);
@@ -408,11 +408,11 @@ test('eval with CHOICE state and invalid input', t => {
 });
 
 test('eval with CHOICE state and another invalid input', t => {
-  const mState = getAppState(getSession(2, SessionState.MULT_CHOICE), {
+  const appState = getAppState(getSession(2, SessionState.MULT_CHOICE), {
     type: Input.Type.REJECT,
     payload: '5',
   });
-  const mEvalState = pipeEval(mState);
+  const mEvalState = pipeEval(appState);
   const evalCtx = mEvalState.evalCtx;
   t.equal(mEvalState.session.state, SessionState.MULT_CHOICE);
   t.equal(evalCtx.answerQuality, null);
@@ -422,11 +422,11 @@ test('eval with CHOICE state and another invalid input', t => {
 });
 
 test('eval with INPUT state and correct input', t => {
-  const mState = getAppState(getSession(3, SessionState.INPUT), {
+  const appState = getAppState(getSession(3, SessionState.INPUT), {
     type: Input.Type.CUSTOM,
     payload: 'valence',
   });
-  const mEvalState = pipeEval(mState);
+  const mEvalState = pipeEval(appState);
   const evalCtx = mEvalState.evalCtx;
   t.equal(mEvalState.session.state, SessionState.INPUT);
   t.equal(evalCtx.answerQuality, Answer.max);
@@ -437,11 +437,11 @@ test('eval with INPUT state and correct input', t => {
 
 // check if incorrect answer has proper evaluation as incorrect
 test('eval with INPUT state and incorrect input', t => {
-  const mState = getAppState(getSession(3, SessionState.INPUT), {
+  const appState = getAppState(getSession(3, SessionState.INPUT), {
     type: Input.Type.CUSTOM,
     payload: 'hydrogen',
   });
-  const mEvalState = pipeEval(mState);
+  const mEvalState = pipeEval(appState);
   const evalCtx = mEvalState.evalCtx;
   t.equal(mEvalState.session.state, SessionState.INPUT);
   t.equal(evalCtx.answerQuality, Answer.min);
@@ -451,11 +451,11 @@ test('eval with INPUT state and incorrect input', t => {
 });
 
 test('eval with INPUT state and invalid input', t => {
-  const mState = getAppState(getSession(3, SessionState.INPUT), {
+  const appState = getAppState(getSession(3, SessionState.INPUT), {
     type: Input.Type.ACCEPT,
     payload: 'hydrogen',
   });
-  const mEvalState = pipeEval(mState);
+  const mEvalState = pipeEval(appState);
   const evalCtx = mEvalState.evalCtx;
   t.equal(mEvalState.session.state, SessionState.INPUT);
   t.equal(evalCtx.answerQuality, null);
@@ -465,11 +465,11 @@ test('eval with INPUT state and invalid input', t => {
 });
 
 test('eval with INPUT state and another invalid input', t => {
-  const mState = getAppState(getSession(3, SessionState.INPUT), {
+  const appState = getAppState(getSession(3, SessionState.INPUT), {
     type: Input.Type.REJECT,
     payload: 'hydrogen',
   });
-  const mEvalState = pipeEval(mState);
+  const mEvalState = pipeEval(appState);
   const evalCtx = mEvalState.evalCtx;
   t.equal(mEvalState.session.state, SessionState.INPUT);
   t.equal(evalCtx.answerQuality, null);
@@ -479,11 +479,11 @@ test('eval with INPUT state and another invalid input', t => {
 });
 
 test('eval with DONE_QUEUE state and valid input', t => {
-  const mState = getAppState(getSession(10, SessionState.DONE_QUEUE), {
+  const appState = getAppState(getSession(10, SessionState.DONE_QUEUE), {
     type: Input.Type.CUSTOM,
     payload: 'extend',
   });
-  const mEvalState = pipeEval(mState);
+  const mEvalState = pipeEval(appState);
   const evalCtx = mEvalState.evalCtx;
   t.equal(mEvalState.session.state, SessionState.DONE_QUEUE);
   t.equal(evalCtx.answerQuality, Answer.ok);
