@@ -6,27 +6,6 @@ import { EvalStatus } from '~/core/eval';
 // Evaluate user input in the context of user's current session state.
 // Add a `evalCtx` object to message data.
 
-// function advanceToEvalState(appState) {
-//   const state = appState.session.state;
-//   if (state === SessionState.INFO ||
-//       state === SessionState.RECALL ||
-//       state === SessionState.RECALL_RESPONSE ||
-//       state === SessionState.INPUT ||
-//       state === SessionState.MULT_CHOICE
-//     ) {
-//     if (appState.evalCtx && appState.evalCtx.success) {
-//       return {
-//         ...appState,
-//         session: {
-//           ...appState.session,
-//           state: SessionState.EVAL_SUCCESS,
-//         },
-//       };
-//     }
-//   }
-//   return appState;
-// }
-
 function invalidEval(correctAnswer = null) {
   return {
     answerQuality: null,
@@ -98,6 +77,36 @@ function RecallResponseContext(appState) {
   }
 }
 
+
+function fuzzyAnswerEval(input, answer) {
+  // lowercase response
+  let inputClean = input.toLowerCase().trim();
+  let answerClean = answer.toLowerCase().trim();
+  if (inputClean !== answerClean) {
+    if (inputClean.length === answerClean.length) {
+      return false;
+    }
+    if (inputClean.length > answerClean.length) {
+      inputClean = inputClean.replace(/s\s*$/, '');
+    } else {
+      answerClean = answerClean.replace(/s\s*$/, '');
+    }
+    return inputClean === answerClean;
+  }
+  return true;
+}
+
+function evalNoteWithRawInput(input, note) {
+  const answers = note.answer.split(',').map((s) => s.trim());
+  for (let i = 0; i < answers.length; i++) {
+    if (fuzzyAnswerEval(input, answers[i])) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 function InputContext(appState) {
   const input = appState.input;
   if (!input) {
@@ -106,7 +115,7 @@ function InputContext(appState) {
   const session = appState.session;
   const note = session.noteQueue[session.queueIndex];
   if (input.type === Input.Type.CUSTOM) {
-    const correctAnswer = input.payload === note.answer;
+    const correctAnswer = evalNoteWithRawInput(input.payload, note);
     return insertEval(appState,
       successEval(correctAnswer ? Answer.max : Answer.min, note.answer));
   }
