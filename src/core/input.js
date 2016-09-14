@@ -9,4 +9,8 @@ const Input = {
   Type: InputType,
 };
 
+export function getChoiceInput(num) {
+  return `choice-${num}`;
+}
+
 export default Input;

@@ -38,6 +38,34 @@ function getReqPayloadBody(text, buttons) {
   };
 }
 
+function getReqQuickReplyBody(text, replies) {
+  const replyData = replies.map((reply) => (
+    {
+      content_type: 'text',
+      title: reply.title,
+      payload: reply.action,
+    }
+  ));
+
+  // "text":"Pick a color:",
+  // "quick_replies":[
+  //   {
+  //     "content_type":"text",
+  //     "title":"Red",
+  //     "payload":"DEVELOPER_DEFINED_PAYLOAD_FOR_PICKING_RED"
+  //   },
+  //   {
+  //     "content_type":"text",
+  //     "title":"Green",
+  //     "payload":"DEVELOPER_DEFINED_PAYLOAD_FOR_PICKING_GREEN"
+  //   }
+    // ]
+  return {
+    text,
+    quick_replies: replyData,
+  };
+}
+
 function getReqImageBody(imgUrl) {
   return {
     attachment: {
@@ -63,6 +91,12 @@ function postBodyCreator(msgType) {
       req.message = getReqPayloadBody(text, buttons);
       return req;
     };
+  } else if (msgType === MessageType.QUICK_REPLY) {
+    return (senderID, text, replies) => {
+      const req = getReqBodyTemplate(senderID);
+      req.message = getReqQuickReplyBody(text, replies);
+      return req;
+    };
   } else if (msgType === MessageType.IMAGE) {
     return (senderID, imgUrl) => {
       const req = getReqBodyTemplate(senderID);
@@ -86,6 +120,13 @@ export function sendText(senderID, text) {
   log(`sending text: ${text}`);
   const bodyCreator = postBodyCreator(MessageType.TEXT);
   return sendPostRequest(bodyCreator(senderID, text));
+}
+
+// replies is list of {title, action}
+export function sendQuickReply(senderID, text, replies) {
+  log(`sending replies: ${text}`);
+  const bodyCreator = postBodyCreator(MessageType.QUICK_REPLY);
+  return sendPostRequest(bodyCreator(senderID, text, replies));
 }
 
 // buttons is list of {title, action}

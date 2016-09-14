@@ -48,6 +48,9 @@ function createUser(mData) {
 
 function getMsgType(msg) {
   if ('message' in msg) {
+    if ('quick_reply' in msg.message) {
+      return MessageType.QUICK_REPLY;
+    }
     return MessageType.TEXT;
   }
   if ('postback' in msg) {
@@ -66,6 +69,7 @@ function contentExtractor(msgType) {
   const extMap = {};
   extMap[MessageType.TEXT] = getNestedProp('message', 'text');
   extMap[MessageType.POSTBACK] = getNestedProp('postback', 'payload');
+  extMap[MessageType.QUICK_REPLY] = (obj) => obj.message.quick_reply.payload;
   extMap[MessageType.UNKNOWN] = () => null;
   return extMap[msgType];
 }
@@ -89,7 +93,8 @@ function contentInjector(msgType) {
         },
       }
     );
-  } else if (msgType === MessageType.POSTBACK) {
+  } else if (msgType === MessageType.POSTBACK ||
+             msgType === MessageType.QUICK_REPLY) {
     return (msg, content) => {
       let mtype = null;
       let dataVal = null;
@@ -145,6 +150,7 @@ function parse(requestBody) {
     subjectName: HARDCODED_SUBJ_NAME,
     input: null,
   };
+  console.log(msg);
 
   const msgType = getMsgType(msg);
   const content = contentExtractor(msgType)(msg);

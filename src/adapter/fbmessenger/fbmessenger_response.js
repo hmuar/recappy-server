@@ -1,9 +1,11 @@
-import Input from '~/core/input';
+import Input, { getChoiceInput } from '~/core/input';
 import { SessionState } from '~/core/session_state';
 import generateQuestion from '~/speech';
 import Answer from '~/core/answer';
 import { logErr } from '~/logger';
-import { sendText, sendButtons, sendImage } from './fbmessenger_request';
+import { sendText,
+         sendImage,
+         sendQuickReply } from './fbmessenger_request';
 
 export function sendPossibleImage(senderID, note) {
   if ('imgUrl' in note) {
@@ -23,40 +25,40 @@ function sendResponseInContext(state) {
       return sendText(fbUserID, "Let's get started!").then(() => state);
 
     case SessionState.INFO: {
-      const buttonData = [];
-      buttonData.push({
+      const quickReplyData = [];
+      quickReplyData.push({
         title: 'Ok keep going',
         action: Input.Type.ACCEPT,
       });
       return sendPossibleImage(fbUserID, note)
-      .then(() => sendButtons(fbUserID, note.displayRaw, buttonData));
+      .then(() => sendQuickReply(fbUserID, note.displayRaw, quickReplyData));
     }
 
     case SessionState.RECALL: {
-      const buttonData = [];
-      buttonData.push({
+      const quickReplyData = [];
+      quickReplyData.push({
         title: 'Tell me the answer',
         action: Input.Type.ACCEPT,
       });
       const questionText = generateQuestion(note);
       return sendPossibleImage(fbUserID, note)
-      .then(() => sendButtons(fbUserID, questionText, buttonData));
+      .then(() => sendQuickReply(fbUserID, questionText, quickReplyData));
     }
 
     case SessionState.RECALL_RESPONSE: {
-      const buttonData = [];
-      buttonData.push({
+      const quickReplyData = [];
+      quickReplyData.push({
         title: 'Yes',
         action: Input.Type.ACCEPT,
       });
-      buttonData.push({
+      quickReplyData.push({
         title: 'No',
         action: Input.Type.REJECT,
       });
       return sendPossibleImage(fbUserID, note)
       .then(() => sendText(fbUserID, note.hidden))
       .then(() => (
-        sendButtons(fbUserID, 'Is that what you were thinking?', buttonData)));
+        sendQuickReply(fbUserID, 'Is that what you were thinking?', quickReplyData)));
     }
 
     case SessionState.INPUT: {
@@ -76,9 +78,14 @@ function sendResponseInContext(state) {
         choicesText += `(3) ${note.choice3}\n`;
         choicesText += `(4) ${note.choice4}\n`;
         choicesText += `(5) ${note.choice5}`;
-        sendText(fbUserID, choicesText);
+        const quickReplyData = [1, 2, 3, 4, 5].map((num) => (
+          {
+            title: `${num}`,
+            action: getChoiceInput(num),
+          }
+        ));
+        return sendQuickReply(fbUserID, choicesText, quickReplyData);
       });
-      // sendButtons(fbUserID, note.displayRaw, buttonData);
     }
 
     case SessionState.DONE_QUEUE:
