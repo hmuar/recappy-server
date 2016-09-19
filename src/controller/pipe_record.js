@@ -98,20 +98,6 @@ function pipeHealth(recordCtx) {
 }
 
 function createNewRecord(userID, note, recordCtx) {
-  // let noteRecordSchema = new mongoose.Schema({
-  //   userID : mongoose.Schema.Types.ObjectId,
-  //   noteID : mongoose.Schema.Types.ObjectId,
-  //   noteType : String,
-  //   count : Number,
-  //   factor : Number,
-  //   interval : Number,
-  //   subjectParent : mongoose.Schema.Types.ObjectId,
-  //   lastDone : Date,
-  //   due : Date,
-  //   history : [Number],
-  //   health : Number
-  // });
-
   const recData = {
     userID,
     noteID: note._id,

@@ -1,4 +1,5 @@
 import DBAssist from '~/db/category_assistant';
+import updateKnowledgeModel from '~/knowledge';
 import { log, logErr, logState } from '~/logger';
 import pipeAddSession from './pipe_add_session';
 import pipeRecord from './pipe_record';
@@ -84,7 +85,10 @@ export default class Controller {
         // record new session state
         .then(state => pipeSaveSession(state))
         .then(state => logState(state))
-        .then(state => this.sendResponse(state));
+        .then(state => {
+          updateKnowledgeModel(state);
+          return this.sendResponse(state);
+        });
       }
     })
     .catch((err) => {

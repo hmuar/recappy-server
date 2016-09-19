@@ -4,6 +4,7 @@ import { NoteRecord,
          Category,
          StudentSession,
          User,
+         StudentModel,
          ObjectID } from '~/db/collection';
 import fixture from './test_fixture';
 
@@ -51,6 +52,9 @@ export default class TestDatabase {
       .then(() => (
         NoteRecord.remove({})
       ))
+      .then(() => (
+        StudentModel.remove({})
+      ))
     ));
   }
 
@@ -79,6 +83,10 @@ export default class TestDatabase {
     }
 
     return fixture.addUsers();
+  }
+
+  loadStudentModelFixtures() {
+    return fixture.addStudentModel();
   }
 
   getStaticIDs() {

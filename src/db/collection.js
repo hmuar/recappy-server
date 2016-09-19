@@ -95,4 +95,15 @@ export const NoteRecord = mongoose.model('NoteRecord',
                                  noteRecordSchema,
                                  'noterecord');
 
+const studentModelSchema = new mongoose.Schema({
+  userID: mongoose.Schema.Types.ObjectId,
+  catID: mongoose.Schema.Types.ObjectId,
+  weight: Number,
+  ctype: String,
+});
+
+export const StudentModel = mongoose.model('StudentModel',
+                                  studentModelSchema,
+                                  'studentmodel');
+
 export const ObjectID = mongoose.Types.ObjectId;

@@ -1,5 +1,5 @@
 import test from 'blue-tape';
-import { calcWeight } from '~/core/knowledge';
+import calcWeightDelta, { limitWeight } from '~/core/knowledge';
 import SRCore from '~/core/spaced_repetition';
 
 test('Schedule Core Factor Calculation', t => {
@@ -52,6 +52,6 @@ test('should calculate interval for wrong response', t => {
 });
 
 test('should not have weight less than 0', t => {
-  t.ok(calcWeight(0, 0.2, 3) > -0.001);
+  t.ok(limitWeight(2.0 + calcWeightDelta(0, 0.2, 3)) > -0.001);
   t.end();
 });

@@ -6,7 +6,8 @@ import { ObjectID,
          Note,
          Category,
          StudentSession,
-         NoteRecord } from '~/db/collection';
+         NoteRecord,
+         StudentModel } from '~/db/collection';
 import SRCore from '~/core/spaced_repetition';
 
 // ******* User *******************************
@@ -368,6 +369,26 @@ function addNoteRecords(defNoteIds) {
   return pChain;
 }
 
+function addStudentModel() {
+  console.log('adding student model...');
+  const noteData = {
+    userID: testUserFBMessenger._id,
+    catID: noteA._id,
+    weight: 0.5,
+    ctype: 'note',
+  };
+  const conceptData = {
+    userID: testUserFBMessenger._id,
+    catID: defaultConcept._id,
+    weight: 0.1,
+    ctype: 'concept',
+  };
+  const note = new StudentModel(noteData);
+  const concept = new StudentModel(conceptData);
+
+  return note.save(() => concept.save());
+}
+
 const Fixture = {
 
   addAll() {
@@ -379,6 +400,9 @@ const Fixture = {
     ))
     .then(() => (
       addSessions()
+    ))
+    .then(() => (
+      addStudentModel()
     ));
   },
 
@@ -386,6 +410,7 @@ const Fixture = {
   addNotes,
   addSessions,
   addNoteRecords,
+  addStudentModel,
 
   getStaticIDs() {
     return {

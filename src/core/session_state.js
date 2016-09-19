@@ -30,6 +30,17 @@ export function getEntryStateForNoteType(ntype) {
   }
 }
 
+export function getCurrentNote(session) {
+  if (session.queueIndex != null &&
+      session.noteQueue) {
+    const { queueIndex, noteQueue } = session;
+    if (queueIndex < noteQueue.length) {
+      return noteQueue[queueIndex];
+    }
+  }
+  return null;
+}
+
 export function getStartState() {
   return SessionState.INIT;
 }

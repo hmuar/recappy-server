@@ -23,7 +23,7 @@ export default class Database {
     return new Promise((resolve, reject) => {
       if (!this.loaded) {
         const connection =
-          mongoose.connect('mongodb://127.0.0.1:3001/meteor').connection;
+            mongoose.connect('mongodb://127.0.0.1:3001/meteor').connection;
         connection.on('error', () => reject('Could not connect to database'));
         connection.on('open', () => {
           this.loaded = true;
