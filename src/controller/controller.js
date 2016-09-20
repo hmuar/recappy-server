@@ -1,11 +1,11 @@
 import DBAssist from '~/db/category_assistant';
-import updateKnowledgeModel from '~/knowledge';
 import { log, logErr, logState } from '~/logger';
 import pipeAddSession from './pipe_add_session';
 import pipeRecord from './pipe_record';
 import pipeEval from './pipe_eval';
 import pipeAdvanceState from './pipe_advance_state';
 import pipeSaveSession from './pipe_save_session';
+import pipeStudentModel from './pipe_student_model';
 
 // `msg` = {
 //   timestamp  : ""
@@ -86,7 +86,9 @@ export default class Controller {
         .then(state => pipeSaveSession(state))
         .then(state => logState(state))
         .then(state => {
-          updateKnowledgeModel(state);
+          // don't include this in return chain because this final udpate
+          // can happen asynchronously
+          pipeStudentModel(state);
           return this.sendResponse(state);
         });
       }

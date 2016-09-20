@@ -1,6 +1,6 @@
 /* eslint-disable max-len */
 import test from 'blue-tape';
-import { SessionState } from '~/core/session_state';
+import { SessionState, getCurrentNote } from '~/core/session_state';
 import Answer from '~/core/answer';
 import Input from '~/core/input';
 import pipeStudentModel from '~/controller/pipe_student_model';
@@ -124,6 +124,7 @@ test('Handle note that does not exist', t => {
   const userID = db.getStaticIDs().userFB;
   const appState = getAppState(userID, 2, SessionState.MULT_CHOICE);
   const catID = db.createObjectID('ff7cbfb397fb2794827739ad');
+  const parents = getCurrentNote(appState.session).parent;
 
   return StudentModel.findOne({ userID, catID }).then((model) => {
     t.notOk(model);
@@ -132,6 +133,26 @@ test('Handle note that does not exist', t => {
       .then((newModel) => {
         t.ok(newModel);
         t.ok(Math.abs(newModel.weight - 0.128) < Number.EPSILON);
+      })
+      .then(() => StudentModel.findOne({ userID, catID: parents[0] }))
+      .then((parent) => {
+        t.ok(parent);
+        t.ok(Math.abs(parent.weight - 0.128) < Number.EPSILON);
+      })
+      .then(() => StudentModel.findOne({ userID, catID: parents[1] }))
+      .then((parent) => {
+        t.ok(parent);
+        t.ok(Math.abs(parent.weight - 0.128) < Number.EPSILON);
+      })
+      .then(() => StudentModel.findOne({ userID, catID: parents[2] }))
+      .then((parent) => {
+        t.ok(parent);
+        t.ok(Math.abs(parent.weight - 0.128) < Number.EPSILON);
+      })
+      .then(() => StudentModel.findOne({ userID, catID: parents[3] }))
+      .then((parent) => {
+        t.ok(parent);
+        t.ok(Math.abs(parent.weight - 0.228) < Number.EPSILON);
       });
   });
 });
@@ -139,6 +160,7 @@ test('Handle note that does not exist', t => {
 test('Handle note that already exists', t => {
   const { userFB: userID, note: catID } = db.getStaticIDs();
   const appState = getAppState(userID, 0, SessionState.INFO);
+  const parents = getCurrentNote(appState.session).parent;
 
   return StudentModel.findOne({ userID, catID })
     .then((model) => {
@@ -149,6 +171,26 @@ test('Handle note that already exists', t => {
       .then((newModel) => {
         t.ok(newModel);
         t.ok(Math.abs(newModel.weight - 0.7) < Number.EPSILON);
+      })
+      .then(() => StudentModel.findOne({ userID, catID: parents[0] }))
+      .then((parent) => {
+        t.ok(parent);
+        t.ok(Math.abs(parent.weight - 0.328) < Number.EPSILON);
+      })
+      .then(() => StudentModel.findOne({ userID, catID: parents[1] }))
+      .then((parent) => {
+        t.ok(parent);
+        t.ok(Math.abs(parent.weight - 0.328) < Number.EPSILON);
+      })
+      .then(() => StudentModel.findOne({ userID, catID: parents[2] }))
+      .then((parent) => {
+        t.ok(parent);
+        t.ok(Math.abs(parent.weight - 0.328) < Number.EPSILON);
+      })
+      .then(() => StudentModel.findOne({ userID, catID: parents[3] }))
+      .then((parent) => {
+        t.ok(parent);
+        t.ok(Math.abs(parent.weight - 0.428) < Number.EPSILON);
       });
     });
 });

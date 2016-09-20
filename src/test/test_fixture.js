@@ -94,21 +94,21 @@ const defaultConcept = {
   subjectParent: defaultSubject._id,
 };
 
-// const defaultConcept2 = {
-//   _id: ObjectID('7980227254feb46732ca491e'),
-//   createdAt: new Date(),
-//   order: 2,
-//   ctype: 'concept',
-//   ckey: 'molecule',
-//   parent: [
-//     ObjectID('f64c57184a4ef7f0357f9cd6'),
-//     ObjectID('0850e4270c2aadd7ccdc1ca1'),
-//     ObjectID('5e28c07bb4d307d667fe83e8'),
-//   ],
-//   weight: 1,
-//   globalIndex: 1,
-//   subjectParent: defaultSubject._id,
-// };
+const defaultConcept2 = {
+  _id: ObjectID('2980227254feb46732ca491e'),
+  createdAt: new Date(),
+  order: 2,
+  ctype: 'concept',
+  ckey: 'molecule',
+  parent: [
+    ObjectID('f64c57184a4ef7f0357f9cd6'),
+    ObjectID('0850e4270c2aadd7ccdc1ca1'),
+    ObjectID('5e28c07bb4d307d667fe83e8'),
+  ],
+  weight: 1,
+  globalIndex: 1,
+  subjectParent: defaultSubject._id,
+};
 
 const noteParent = [ObjectID('f64c57184a4ef7f0357f9cd6'),
     ObjectID('0850e4270c2aadd7ccdc1ca1'),
@@ -118,7 +118,7 @@ const noteParent = [ObjectID('f64c57184a4ef7f0357f9cd6'),
 const noteParentOtherConcept = [ObjectID('f64c57184a4ef7f0357f9cd6'),
     ObjectID('0850e4270c2aadd7ccdc1ca1'),
     ObjectID('5e28c07bb4d307d667fe83e8'),
-    ObjectID('7980227254feb46732ca491e')];
+    ObjectID('2980227254feb46732ca491e')];
 
 const noteA = {
   _id: ObjectID('9e16c772556579bd6fc6c222'),
@@ -285,6 +285,7 @@ function addNotes() {
     .then(() => (new Category(defaultUnit)).save())
     .then(() => (new Category(defaultTopic)).save())
     .then(() => (new Category(defaultConcept)).save())
+    .then(() => (new Category(defaultConcept2)).save())
     .then(() => (new Note(noteA)).save())
     .then(() => (new Note(noteB)).save())
     .then(() => Note.create(cloneNote(noteC, 10)))
@@ -370,7 +371,6 @@ function addNoteRecords(defNoteIds) {
 }
 
 function addStudentModel() {
-  console.log('adding student model...');
   const noteData = {
     userID: testUserFBMessenger._id,
     catID: noteA._id,
@@ -419,6 +419,7 @@ const Fixture = {
       subject: defaultSubject._id,
       note: noteA._id,
       note2: noteB._id,
+      note3: noteC._id,
     };
   },
 

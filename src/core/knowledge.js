@@ -1,4 +1,18 @@
-export default function calcWeightDelta(prevWeight, level, responseQuality) {
+function limitWeight(weight) {
+  return Math.max(Math.min(weight, 1.0), 0);
+}
+
+export default function calcWeight(prevWeight, weightDelta) {
+  if (!prevWeight && weightDelta) {
+    return limitWeight(weightDelta);
+  }
+  if (!weightDelta && prevWeight) {
+    return limitWeight(prevWeight);
+  }
+  return limitWeight(prevWeight + weightDelta);
+}
+
+export function calcWeightDelta(level, responseQuality) {
   let weightFactor = 0;
   let weightDelta = 0;
   if (responseQuality < 4) {
@@ -9,12 +23,7 @@ export default function calcWeightDelta(prevWeight, level, responseQuality) {
     weightDelta = responseQuality / 5;
   }
   const finalWeightDelta = weightFactor * weightDelta * 0.2;
-  // const finalWeight = prevWeight + finalWeightDelta;
   return finalWeightDelta;
-}
-
-export function limitWeight(weight) {
-  return Math.max(Math.min(weight, 1.0), 0);
 }
 
 export const DEFAULT_WEIGHT = 0;

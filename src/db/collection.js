@@ -98,7 +98,7 @@ export const NoteRecord = mongoose.model('NoteRecord',
 const studentModelSchema = new mongoose.Schema({
   userID: mongoose.Schema.Types.ObjectId,
   catID: mongoose.Schema.Types.ObjectId,
-  weight: Number,
+  weight: { type: Number, min: 0, max: 1 },
   ctype: String,
 });
 

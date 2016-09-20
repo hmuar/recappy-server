@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "lint": "esw -w src",
-    "test-watch": "watch 'clear && npm run test' src",
-    "test": "clear && blue-tape -r babel-register src/test/*.test.js | tap-summary",
+    "test-watch": "watch 'npm run test' src",
+    "test": "blue-tape -r babel-register src/test/*.test.js | tap-summary",
     "test-single": "clear && blue-tape -r babel-register src/test/controller_pipe_add_session.test.js | tap-summary",
     "test-single-controller": "clear && blue-tape -r babel-register src/test/controller.test.js | tap-summary",
     "test-single-graph": "clear && blue-tape -r babel-register src/test/graph_db.test.js",
