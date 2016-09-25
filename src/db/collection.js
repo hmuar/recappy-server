@@ -87,8 +87,12 @@ const noteRecordSchema = new mongoose.Schema({
   subjectParent: mongoose.Schema.Types.ObjectId,
   lastDone: Date,
   due: Date,
-  history: [Number],
+  responseHistory: [Number],
   health: Number,
+  factorHistory: [Number],
+  intervalHistory: [Number],
+  dueHistory: [Date],
+  lastDoneHistory: [Date],
 });
 
 export const NoteRecord = mongoose.model('NoteRecord',

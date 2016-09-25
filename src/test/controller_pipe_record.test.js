@@ -127,8 +127,12 @@ test('update existing note record', t => {
     t.ok({}.hasOwnProperty.call(recordCtx, 'count'));
     t.ok({}.hasOwnProperty.call(recordCtx, 'due'));
     t.ok({}.hasOwnProperty.call(recordCtx, 'lastDone'));
-    t.ok({}.hasOwnProperty.call(recordCtx, 'history'));
+    t.ok({}.hasOwnProperty.call(recordCtx, 'responseHistory'));
     t.ok({}.hasOwnProperty.call(recordCtx, 'health'));
+    t.ok({}.hasOwnProperty.call(recordCtx, 'factorHistory'));
+    t.ok({}.hasOwnProperty.call(recordCtx, 'intervalHistory'));
+    t.ok({}.hasOwnProperty.call(recordCtx, 'dueHistory'));
+    t.ok({}.hasOwnProperty.call(recordCtx, 'lastDoneHistory'));
   });
 });
 
@@ -164,8 +168,12 @@ test('create new note record', t => {
     t.ok(hasOwnProperty.call(recordCtx, 'count'));
     t.ok(hasOwnProperty.call(recordCtx, 'due'));
     t.ok(hasOwnProperty.call(recordCtx, 'lastDone'));
-    t.ok(hasOwnProperty.call(recordCtx, 'history'));
+    t.ok(hasOwnProperty.call(recordCtx, 'responseHistory'));
     t.ok(hasOwnProperty.call(recordCtx, 'health'));
+    t.ok({}.hasOwnProperty.call(recordCtx, 'factorHistory'));
+    t.ok({}.hasOwnProperty.call(recordCtx, 'intervalHistory'));
+    t.ok({}.hasOwnProperty.call(recordCtx, 'dueHistory'));
+    t.ok({}.hasOwnProperty.call(recordCtx, 'lastDoneHistory'));
   });
 });
 

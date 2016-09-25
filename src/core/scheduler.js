@@ -1,7 +1,7 @@
 import { NoteRecord, Category, Note } from '~/db/collection';
 import { log } from '~/logger';
 
-export const TARGET_NUM_NOTES_IN_SESSION = 3;
+export const TARGET_NUM_NOTES_IN_SESSION = 10;
 
 // Grab old notes user has already seen that are now
 // due according to note's due date.
@@ -63,6 +63,11 @@ export function getNextNotes(userID, subjectID, numNotes, globalIndex = 0) {
                         oldNotesNum)
     .then((oldNotes) => {
       result.push(oldNotes);
+      // XXX: THIS IGNORES ALL NEW NOTES - only using for testing!
+      // TODO: Remove this if statement
+      // if (oldNotes.length > 0) {
+      //   return [];
+      // }
       const newNotesNum = numNotes - oldNotes.length;
       if (newNotesNum > 0) {
         return getNewMaterial(subjectID, newNotesNum, globalIndex);

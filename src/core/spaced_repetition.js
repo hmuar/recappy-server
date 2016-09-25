@@ -1,7 +1,9 @@
 import Eval from './eval';
 
 const intervalToMinutesFactor = 1;
+const intervalToSecondsFactor = 1;
 const minToMillisecFactor = 60000;
+const secToMillisecFactor = 1000;
 
 // Calculate factor used to calculate spaced interval
 // 'previousFactor' From 1.3 (hardest) to 2.5 (easiest)
@@ -51,11 +53,17 @@ function intervalInMinutes(interval) {
   return interval * intervalToMinutesFactor;
 }
 
+function intervalInSeconds(interval) {
+  return interval * intervalToSecondsFactor;
+}
+
 // TODO: write a test for this function
 function calcDueDate(interval) {
   const dueDate = new Date();
-  const intervalMin = intervalInMinutes(interval);
-  return new Date(dueDate.getTime() + (intervalMin * minToMillisecFactor));
+  // const intervalMin = intervalInMinutes(interval);
+  const intervalMin = intervalInSeconds(interval);
+  // return new Date(dueDate.getTime() + (intervalMin * minToMillisecFactor));
+  return new Date(dueDate.getTime() + (intervalMin * secToMillisecFactor));
 }
 
 

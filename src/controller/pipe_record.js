@@ -56,44 +56,54 @@ function pipeSpaceRepVals(recordCtx,
                                            newFactor,
                                            newCount,
                                            responseQuality);
+  const factorHistory = rec.factorHistory || [];
+  const intervalHistory = rec.intervalHistory || [];
+
   return {
     ...recordCtx,
     factor: newFactor,
     interval: newInterval,
     count: newCount,
+    factorHistory: [...factorHistory, newFactor],
+    intervalHistory: [...intervalHistory, newInterval],
   };
 }
 
-function pipeDates(recordCtx) {
+function pipeDates(recordCtx, record) {
   const due = SpacedRep.calcDueDate(recordCtx.interval);
+  const lastDoneDate = new Date();
+  const dueHistory = record ? record.dueHistory || [] : [];
+  const lastDoneHistory = record ? record.lastDoneHistory || [] : [];
   return {
     ...recordCtx,
     due,
-    lastDone: new Date(),
+    lastDone: lastDoneDate,
+    dueHistory: [...dueHistory, due],
+    lastDoneHistory: [...lastDoneHistory, lastDoneDate],
   };
 }
 
-function pipeHistory(recordCtx, record, evalCtx) {
+function pipeResponseHistory(recordCtx, record, evalCtx) {
   if (!record) {
-    const history = [evalCtx.answerQuality];
+    const responseHistory = [evalCtx.answerQuality];
     return {
       ...recordCtx,
-      history,
+      responseHistory,
     };
   }
-  const history = record.history;
-  history.push(evalCtx.answerQuality);
+  const responseHistory = record.responseHistory;
+  responseHistory.push(evalCtx.answerQuality);
   return {
     ...recordCtx,
-    history,
+    responseHistory,
   };
 }
 
-// recordCtx needs to have history
+// recordCtx needs to have responseHistory
 function pipeHealth(recordCtx) {
   return {
     ...recordCtx,
-    health: calcNoteHealth(recordCtx.history),
+    health: calcNoteHealth(recordCtx.responseHistory),
   };
 }
 
@@ -146,8 +156,8 @@ export default function pipe(appState) {
     //                          note,
     //                          recUpdate);
 
-    recordCtx = pipeDates(recordCtx);
-    recordCtx = pipeHistory(recordCtx, record, evalCtx);
+    recordCtx = pipeDates(recordCtx, record);
+    recordCtx = pipeResponseHistory(recordCtx, record, evalCtx);
     recordCtx = pipeHealth(recordCtx, record, evalCtx);
 
     if (record) {
