@@ -64,6 +64,7 @@ const noteSchema = new mongoose.Schema({
   choice4: String,
   choice5: String,
   parent: [mongoose.Schema.Types.ObjectId],
+  phrase: Object,
   ckey: String,
   displayRaw: String,
   globalIndex: Number,

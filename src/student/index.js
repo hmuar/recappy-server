@@ -41,7 +41,7 @@ export function updateCatParentsForUser(userID, parents, weightDelta) {
 export default function updateModelForUser(userID, note, evalCtx) {
   if (!userID || !note || !evalCtx) {
     logErr('no userID or note or evalCtx. Failed to updateModelForUser');
-    return null;
+    return Promise.reject(null);
   }
   const weightDelta = calcWeightDelta(note.level, evalCtx.answerQuality);
   return updateCategoryForUser(userID, note._id, note.ctype, weightDelta)

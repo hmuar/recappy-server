@@ -80,9 +80,11 @@ test('register message for existing user, no existing session', t => {
     timestamp: 1,
     senderID: '2028279607252615',
     userID: null,
-    text: 'hello',
-    action: null,
     subjectName: 'crash-course-biology',
+    input: {
+      type: Input.Type.CUSTOM,
+      payload: 'halllooo',
+    },
   };
 
   controller.registerMsg(msg).then((rMsg) => {
@@ -97,16 +99,18 @@ test('register message for existing user, no existing session', t => {
   });
 });
 
-// senderID has existing user, but no existing session in test database
+// senderID has no existing user, but no existing session in test database
 // so this tests process of session creation
 test('register message for no existing user, no existing session', t => {
   const msg = {
     timestamp: 1,
     senderID: '9028279607252619',
     userID: null,
-    text: 'hello',
-    action: null,
     subjectName: 'crash-course-biology',
+    input: {
+      type: Input.Type.CUSTOM,
+      payload: 'halllooo',
+    },
   };
 
   controller.registerMsg(msg).then((rMsg) => {
