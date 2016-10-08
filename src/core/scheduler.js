@@ -1,5 +1,6 @@
 import { NoteRecord, Category, Note } from '~/db/collection';
 import { log } from '~/logger';
+import _ from 'lodash';
 
 export const TARGET_NUM_NOTES_IN_SESSION = 10;
 
@@ -51,34 +52,38 @@ export function getNewMaterial(subjectID, numNotes, globalIndex = 0) {
 // TODO: factor in weighting of concepts
 export function getNextNotes(userID,
                              subjectID,
-                             numNotes = TARGET_NUM_NOTES_IN_SESSION,
-                             globalIndex = 0) {
+                             globalIndex = 0,
+                             numNotes = TARGET_NUM_NOTES_IN_SESSION
+                             ) {
   if (!numNotes || numNotes <= 0) {
     return Promise.resolve([]);
   }
 
   const oldNotesNum = Math.ceil(numNotes);
-  const result = [];
-
+  let result = [];
 
   return getOldMaterial(userID,
                         subjectID,
                         oldNotesNum)
     .then((oldNotes) => {
-      result.push(oldNotes);
-      // XXX: THIS IGNORES ALL NEW NOTES - only using for testing!
-      // TODO: Remove this if statement
-      // if (oldNotes.length > 0) {
-      //   return [];
-      // }
+      result = [...result, ...oldNotes.map((note) => {
+        note.queueStatus = 'old'; // eslint-disable-line no-param-reassign
+        return note;
+      })];
+      // result = [...result, ...oldNotes];
       const newNotesNum = numNotes - oldNotes.length;
       if (newNotesNum > 0) {
         return getNewMaterial(subjectID, newNotesNum, globalIndex);
       }
       return [];
     }).then((newNotes) => {
-      result.push(newNotes);
-      return result;
+      result = [...result, ...newNotes.map((note) => {
+        note.queueStatus = 'new'; // eslint-disable-line no-param-reassign
+        return note;
+      })];
+      // remove duplicate notes that were in both old and new lists
+      const uniqResult = _.uniqBy(result, (elem) => elem._id.toString());
+      return uniqResult;
     });
 }
 

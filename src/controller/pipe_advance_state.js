@@ -83,11 +83,12 @@ function advanceState(appState) {
       const nextGlobalIndex = appState.session.globalIndex + 1;
       return getNextNotes(userID,
                    subjectID,
-                   TARGET_NUM_NOTES_IN_SESSION,
-                   nextGlobalIndex)
+                   nextGlobalIndex,
+                   TARGET_NUM_NOTES_IN_SESSION)
       .then(nextNotesArray => {
-        const [oldNotes, newNotes] = nextNotesArray;
-        const nextNotes = oldNotes.concat(newNotes);
+        // const [oldNotes, newNotes] = nextNotesArray;
+        // const nextNotes = oldNotes.concat(newNotes);
+        const nextNotes = nextNotesArray;
         if (nextNotes && nextNotes.length > 0) {
           console.log(`got ${nextNotes.length} new notes`);
           return {

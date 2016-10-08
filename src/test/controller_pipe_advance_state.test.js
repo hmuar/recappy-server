@@ -6,6 +6,7 @@ import Input from '~/core/input';
 import { SessionState } from '~/core/session_state';
 import DBAssist from '~/db/category_assistant';
 import { EvalStatus } from '~/core/eval';
+import { TARGET_NUM_NOTES_IN_SESSION } from '~/core/scheduler';
 import TestDatabase from './test_database';
 
 const before = test;
@@ -221,7 +222,7 @@ test('test transition from done queue', t => {
   .then(ns => {
     t.ok(ns.session.state);
     t.notEqual(ns.session.state, SessionState.DONE_QUEUE);
-    t.equal(ns.session.noteQueue.length, 3);
+    t.equal(ns.session.noteQueue.length, TARGET_NUM_NOTES_IN_SESSION);
     t.equal(ns.session.queueIndex, 0);
     t.equal(ns.session.globalIndex, 1);
   });

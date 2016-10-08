@@ -38,11 +38,11 @@ test('schedule new notes', t => getNewMaterial(subject._id, 20, 0)
   t.equal(nextNotes.length, 22);
 }));
 
-test('schedule combined old and new notes', t => getNextNotes(testUser._id, subject._id, 20, 0)
+test('schedule combined old and new notes', t => getNextNotes(testUser._id, subject._id, 0, 20)
 .then((nextNotes) => {
-  const oldNotes = nextNotes[0];
-  const newNotes = nextNotes[1];
-  t.equal(oldNotes.length + newNotes.length, 36);
+  // const oldNotes = nextNotes[0];
+  // const newNotes = nextNotes[1];
+  t.equal(nextNotes.length, 22);
 }));
 
 after('after scheduler testing', () => db.close());

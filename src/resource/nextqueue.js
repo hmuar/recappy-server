@@ -17,11 +17,20 @@ function routes(apiVersionPath) {
     method: 'GET',
     path: routePath,
     handler(request, reply) {
-      console.log('got queue request........');
       if (request.query && request.query.uid && request.query.sid) {
-        getNextNotes(ObjectID(request.query.uid), ObjectID(request.query.sid))
-        .then((nextNoteList) => {
-          const nextNotes = [...nextNoteList[0], ...nextNoteList[1]];
+        getNextNotes(ObjectID(request.query.uid),
+                     ObjectID(request.query.sid),
+                     request.query.ind)
+        .then((resNotes) => {
+          const nextNotes = resNotes.map((note) => (
+            {
+              _id: note._id,
+              type: note.type,
+              displayRaw: note.displayRaw,
+              directParent: note.directParent,
+              queueStatus: note.queueStatus,
+            }
+          ));
           const conceptMap = {};
           let pChain = Promise.resolve(0);
           nextNotes.forEach((note) => {
@@ -35,18 +44,10 @@ function routes(apiVersionPath) {
             }
           });
           pChain.then(() => {
-            console.log('resolving pchain, final concept map keys:');
-            console.log(Object.keys(conceptMap));
             reply(nextNotes.map((note) => {
               const conceptParent = conceptMap[note.directParent.valueOf()];
-              console.log('-------------------------------');
-              console.log(note.directParent.valueOf());
-              console.log(conceptParent.ckey);
-              console.log(conceptParent._id);
-              console.log(conceptParent.ctype);
               return {
-                type: note.type,
-                displayRaw: note.displayRaw,
+                ...note,
                 conceptName: conceptParent.ckey,
                 conceptIndex: conceptParent.globalIndex,
               };

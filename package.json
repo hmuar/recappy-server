@@ -30,6 +30,7 @@
     "hapi": "^13.5.0",
     "hapi-cors": "^1.0.1",
     "immutable": "^3.8.1",
+    "lodash": "^4.16.4",
     "loggly": "^1.1.0",
     "mongoose": "^4.5.7",
     "neo4j-driver": "^1.0.4",
