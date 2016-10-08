@@ -45,6 +45,5 @@ function routes(apiVersionPath) {
 }
 
 export default {
-  getRoutePath,
   routes,
 };

@@ -2,6 +2,8 @@ import Good from 'good';
 import Server from './server';
 import winston from './logger';
 
+const hapicors = require('hapi-cors');
+
 const server = new Server();
 server.setup(5000);
 
@@ -40,5 +42,11 @@ server.start([
         }],
       },
     },
+  },
+  {
+    register: hapicors,
+    // options: {
+    //   origins: ['http://localhost:4200'],
+    // },
   },
 ]);

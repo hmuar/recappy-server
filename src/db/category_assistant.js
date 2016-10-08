@@ -66,7 +66,7 @@ function getNotesInOrder(subjectID, unitID, topicID, conceptID) {
   return Category.find({ ctype: 'note', $and: parentQuery }).sort('order');
 }
 
-const NoteAssistant = {
+const CategoryAssistant = {
   // getParentList: getParentIdList,
   getCategoryByName,
   // getParentQuery: getParentQuery,
@@ -78,4 +78,4 @@ const NoteAssistant = {
   getNotesInOrder,
 };
 
-export default NoteAssistant;
+export default CategoryAssistant;
