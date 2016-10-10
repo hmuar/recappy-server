@@ -11,17 +11,36 @@ export function getOldMaterial(userID, subjectID, numNotes) {
     return Promise.resolve([]);
   }
 
+  const dueMap = {};
+
   // dont query info notes
   return NoteRecord.find({ userID,
                           subjectParent: subjectID,
                           due: { $lte: new Date() },
                           noteType: { $ne: 'info' } })
-    .select({ _id: 0, noteID: 1 })
+    .select({ _id: 0, noteID: 1, due: 1 })
     .limit(numNotes)
     .then(dueNotes => (
-      // map each note to its noteID
-      dueNotes.map((item) => item.noteID)))
-    .then(noteIDs => Note.find({ _id: { $in: noteIDs } }));
+      dueNotes.map((item) => {
+        // create map of noteID to due date so it can be ordered later
+        dueMap[item.noteID.toString()] = item.due;
+        // map each note to its noteID
+        return item.noteID;
+      }))
+    )
+    .then(noteIDs => Note.find({ _id: { $in: noteIDs } }))
+    .then(notes => notes.map((note) => {
+      const noteIDString = note._id.toString();
+      note.dueDate = dueMap[noteIDString]; // eslint-disable-line no-param-reassign
+      return note;
+    }))
+    .then(notes => _.sortBy(notes, (note) => {
+      const noteIDString = note._id.toString();
+      if ({}.hasOwnProperty.call(dueMap, noteIDString)) {
+        return dueMap[noteIDString];
+      }
+      return 0;
+    }));
 }
 
 // Grab new notes user has never seen that are next in line.

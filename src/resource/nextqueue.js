@@ -29,6 +29,7 @@ function routes(apiVersionPath) {
               displayRaw: note.displayRaw,
               directParent: note.directParent,
               queueStatus: note.queueStatus,
+              dueDate: note.dueDate,
             }
           ));
           const conceptMap = {};
