@@ -10,17 +10,23 @@ function getRoutePath(apiVersionPath) {
 function routes(apiVersionPath) {
   const routePath = getRoutePath(apiVersionPath);
 
-  // When initially setting up the webhook for messenger platform,
-  // Facebook sends a GET request with challenge text that must
-  // be responded with a parseInt version of that text.
+  // request can have:
+  // uid - user id,
+  // sid - subject id,
+  // ind - global concept index,
+  // d - cutoff date,
+
   const routeGET = {
     method: 'GET',
     path: routePath,
     handler(request, reply) {
       if (request.query && request.query.uid && request.query.sid) {
+        const cutoffDate = request.query.d ? new Date(request.query.d) : null;
         getNextNotes(ObjectID(request.query.uid),
                      ObjectID(request.query.sid),
-                     request.query.ind)
+                     request.query.ind,
+                     null,
+                     cutoffDate)
         .then((resNotes) => {
           const nextNotes = resNotes.map((note) => (
             {

@@ -6,17 +6,23 @@ export const TARGET_NUM_NOTES_IN_SESSION = 10;
 
 // Grab old notes user has already seen that are now
 // due according to note's due date.
-export function getOldMaterial(userID, subjectID, numNotes) {
+export function getOldMaterial(userID,
+                               subjectID,
+                               numNotes,
+                               dueDate) {
   if (!subjectID || numNotes <= 0 || !userID) {
     return Promise.resolve([]);
   }
 
+  const dateCutoff = dueDate || new Date();
+  console.log('using date cutoff');
+  console.log(dateCutoff);
   const dueMap = {};
 
   // dont query info notes
   return NoteRecord.find({ userID,
                           subjectParent: subjectID,
-                          due: { $lte: new Date() },
+                          due: { $lte: dateCutoff },
                           noteType: { $ne: 'info' } })
     .select({ _id: 0, noteID: 1, due: 1 })
     .limit(numNotes)
@@ -72,9 +78,11 @@ export function getNewMaterial(subjectID, numNotes, globalIndex = 0) {
 export function getNextNotes(userID,
                              subjectID,
                              globalIndex = 0,
-                             numNotes = TARGET_NUM_NOTES_IN_SESSION
+                             num = TARGET_NUM_NOTES_IN_SESSION,
+                             dueDate = null
                              ) {
-  if (!numNotes || numNotes <= 0) {
+  const numNotes = num == null ? TARGET_NUM_NOTES_IN_SESSION : num;
+  if (numNotes <= 0) {
     return Promise.resolve([]);
   }
 
@@ -83,7 +91,8 @@ export function getNextNotes(userID,
 
   return getOldMaterial(userID,
                         subjectID,
-                        oldNotesNum)
+                        oldNotesNum,
+                        dueDate)
     .then((oldNotes) => {
       result = [...result, ...oldNotes.map((note) => {
         note.queueStatus = 'old'; // eslint-disable-line no-param-reassign
