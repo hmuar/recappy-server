@@ -15,8 +15,6 @@ export function getOldMaterial(userID,
   }
 
   const dateCutoff = dueDate || new Date();
-  console.log('using date cutoff');
-  console.log(dateCutoff);
   const dueMap = {};
 
   // dont query info notes

@@ -1,6 +1,6 @@
 import { SessionState,
          getEntryStateForNoteType } from '~/core/session_state';
-
+import Input from '~/core/input';
 import { getNextNotes, TARGET_NUM_NOTES_IN_SESSION } from '~/core/scheduler';
 import { EvalStatus } from '~/core/eval';
 
@@ -73,18 +73,31 @@ function advanceState(appState) {
   // set proper next state based on next note
   if (appState.session && appState.postEvalState) {
     if (appState.postEvalState === SessionState.DONE_QUEUE) {
-      console.log('getting new notes for done_queue');
-      console.log(`globalIndex: ${appState.session.globalIndex}`);
       // update note queue
       // update queueIndex
       // update globalIndex
       // export function getNextNotes(userID, subjectID, numNotes, lastGlobalIndex) {
       const { userID, subjectID } = appState;
       const nextGlobalIndex = appState.session.globalIndex + 1;
+
+      // XXX Dev loophole to allow date control
+      // Check if user inupt was a number. If so, treat it as an offset
+      // for number of days from current Date, and then use that date
+      // as cutoff date when getting next note queue from scheduler.
+      const cutoffDate = new Date();
+      const input = appState.input;
+      if (input.type === Input.Type.CUSTOM) {
+        const tryInt = parseInt(input.payload, 10);
+        if (!isNaN(tryInt)) {
+          cutoffDate.setDate(cutoffDate.getDate() + tryInt);
+        }
+      }
+
       return getNextNotes(userID,
                    subjectID,
                    nextGlobalIndex,
-                   TARGET_NUM_NOTES_IN_SESSION)
+                   TARGET_NUM_NOTES_IN_SESSION,
+                   cutoffDate)
       .then(nextNotesArray => {
         // const [oldNotes, newNotes] = nextNotesArray;
         // const nextNotes = oldNotes.concat(newNotes);
