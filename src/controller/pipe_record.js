@@ -6,6 +6,13 @@ import { log } from '~/logger';
 // Record results of input evaluation using NoteRecord collection
 // This will involve calculating future due date, updating note history
 
+const recordableStates = [
+  SessionState.RECALL_RESPONSE,
+  SessionState.INPUT,
+  SessionState.MULT_CHOICE,
+  SessionState.INFO,
+];
+
 function calcNoteHealth(responseHistory) {
   if (responseHistory.length === 0) {
     return 0;
@@ -132,7 +139,7 @@ export default function pipe(appState) {
 
   const session = appState.session;
 
-  if (session.state === SessionState.DONE_QUEUE) {
+  if (!recordableStates.includes(session.state)) {
     return appState;
   }
 
@@ -150,11 +157,6 @@ export default function pipe(appState) {
     recordCtx = pipeSpaceRepVals(recordCtx,
                                  record,
                                  evalCtx);
-
-
-    // record = createNewRecord(appState.userID,
-    //                          note,
-    //                          recUpdate);
 
     recordCtx = pipeDates(recordCtx, record);
     recordCtx = pipeResponseHistory(recordCtx, record, evalCtx);
