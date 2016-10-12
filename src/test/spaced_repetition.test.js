@@ -17,12 +17,12 @@ test('Schedule Core Factor Calculation', t => {
 test('should calculate correct interval', t => {
   t.equal(SRCore.calcInterval(2, 2, 0, 5), 0);
   t.equal(SRCore.calcInterval(2, 2.1, 1, 5), 1);
-  t.equal(SRCore.calcInterval(2, 2.2, 2, 5), 2);
-  t.equal(SRCore.calcInterval(2, 2.3, 3, 5), 4);
-  t.equal(SRCore.calcInterval(2, 2.4, 4, 5), 4);
+  t.equal(SRCore.calcInterval(2, 2.2, 2, 5), 3);
+  t.equal(SRCore.calcInterval(2, 2.3, 3, 5), 4.6);
+  t.equal(SRCore.calcInterval(2, 2.4, 4, 5), 4.8);
   t.equal(SRCore.calcInterval(2, 2.5, 5, 5), 5);
-  t.equal(SRCore.calcInterval(2, 2.6, 6, 5), 5);
-  t.equal(SRCore.calcInterval(2, 2.7, 7, 5), 5);
+  t.equal(SRCore.calcInterval(2, 2.6, 6, 5), 5.2);
+  t.equal(SRCore.calcInterval(2, 2.7, 7, 5), 5.4);
   t.end();
 });
 

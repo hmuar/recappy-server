@@ -1,4 +1,4 @@
-import Eval from './eval';
+import Eval, { isFailResponse } from './eval';
 
 const minToMillisecFactor = 60000;
 const secToMillisecFactor = 1000;
@@ -37,12 +37,8 @@ function calcIntervalCore(prevInterval, factor, count) {
   return prevInterval * factor;
 }
 
-function isBadResponse(responseQuality) {
-  return responseQuality < Eval.maxResponseQuality / 2.0;
-}
-
 function calcInterval(prevInterval, factor, count, responseQuality) {
-  if (isBadResponse(responseQuality)) {
+  if (isFailResponse(responseQuality)) {
     if (count < 1) {
       return calcIntervalCore(prevInterval, factor, count);
     }
@@ -70,7 +66,6 @@ function calcDueDate(interval) {
   // return new Date(dueDate.getTime() + (intervalMin * secToMillisecFactor));
 }
 
-
 const SRCore = {
   defaultFactor: 2.5,
   defaultInterval: 1.0,
@@ -79,7 +74,6 @@ const SRCore = {
   calcInterval,
   intervalInMinutes,
   calcDueDate,
-  isBadResponse,
 };
 
 export default SRCore;
