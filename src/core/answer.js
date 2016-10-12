@@ -1,11 +1,12 @@
-const minQuality = 0;
-const maxQuality = 5;
+import Eval from '~/core/eval';
+
+const { minResponseQuality, maxResponseQuality } = Eval;
 
 export default {
-  min: minQuality,
-  max: maxQuality,
+  min: minResponseQuality,
+  max: maxResponseQuality,
   // a way of answering as confirmation,
   // effectively considered max quality
-  ok: maxQuality,
-  no: minQuality,
+  ok: maxResponseQuality,
+  no: minResponseQuality,
 };

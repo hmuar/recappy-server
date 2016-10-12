@@ -1,6 +1,7 @@
 import SpacedRep from '~/core/spaced_repetition';
 import { SessionState } from '~/core/session_state';
 import { NoteRecord } from '~/db/collection';
+import { EvalStatus } from '~/core/eval';
 import { log } from '~/logger';
 
 // Record results of input evaluation using NoteRecord collection
@@ -134,6 +135,11 @@ export default function pipe(appState) {
   // update NoteRecord using note info and evalCtx data
 
   if (!{}.hasOwnProperty.call(appState, 'evalCtx')) {
+    return appState;
+  }
+
+  if (appState.evalCtx.status === EvalStatus.INVALID) {
+    log('Invalid evaluation, skipping record activity.');
     return appState;
   }
 

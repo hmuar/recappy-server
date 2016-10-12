@@ -65,7 +65,10 @@ export function getNewMaterial(subjectID, numNotes, globalIndex = 0) {
         log('Could not find next concept, returning 0 new notes');
         return [];
       }
-      return Note.find({ directParent: nextConcept._id }).sort('order');
+      // XXX: during dev, skip info notes
+      // return Note.find({ directParent: nextConcept._id }).sort('order');
+      return Note.find({ directParent: nextConcept._id,
+                          type: { $ne: 'info' } }).sort('order');
     });
 }
 

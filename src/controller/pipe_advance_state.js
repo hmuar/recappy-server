@@ -78,10 +78,12 @@ function advanceState(appState) {
       // update globalIndex
       // export function getNextNotes(userID, subjectID, numNotes, lastGlobalIndex) {
       const { userID, subjectID } = appState;
+      // XXX: Temp hardcode global index to 0
+      // const nextGlobalIndex = 0;
       const nextGlobalIndex = appState.session.globalIndex + 1;
 
       // XXX Dev loophole to allow date control
-      // Check if user inupt was a number. If so, treat it as an offset
+      // Check if user input was a number. If so, treat it as an offset
       // for number of days from current Date, and then use that date
       // as cutoff date when getting next note queue from scheduler.
       const cutoffDate = new Date();
@@ -103,7 +105,6 @@ function advanceState(appState) {
         // const nextNotes = oldNotes.concat(newNotes);
         const nextNotes = nextNotesArray;
         if (nextNotes && nextNotes.length > 0) {
-          console.log(`got ${nextNotes.length} new notes`);
           return {
             ...appState,
             postEvalState: null,

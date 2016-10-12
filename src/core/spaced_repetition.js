@@ -10,6 +10,7 @@ const intervalToSecondsFactor = 1;
 // Calculate factor used to calculate spaced interval
 // 'previousFactor' From 1.3 (hardest) to 2.5 (easiest)
 // 'responseQuality' From 0 (worst) to 5 (best)
+// Based on algorithm here: https://www.supermemo.com/english/ol/sm2.htm
 function calcFactor(previousFactor, responseQuality) {
   // EF':=EF+(0.1-(5-q)*(0.08+(5-q)*0.02))
   // User shouldn't update factor if answer is low quality
@@ -20,19 +21,20 @@ function calcFactor(previousFactor, responseQuality) {
   return newFactor;
 }
 
-//  Interval used for spaced repetition
-//  `prevInterval` - Interval in days
-//  `count` - Number of times content has been viewed
-//  return new interval in days
+// Interval used for spaced repetition
+// `prevInterval` - Interval in days
+// `count` - Number of times content has been viewed
+// return new interval in days
+// Based on algorithm here: https://www.supermemo.com/english/ol/sm2.htm
 function calcIntervalCore(prevInterval, factor, count) {
   if (count === 0) {
     return 0;
   } else if (count === 1) {
     return 1;
   } else if (count === 2) {
-    return 2;
+    return 3;
   }
-  return Math.floor(prevInterval * factor);
+  return prevInterval * factor;
 }
 
 function isBadResponse(responseQuality) {

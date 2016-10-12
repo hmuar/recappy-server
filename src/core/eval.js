@@ -1,5 +1,5 @@
 export default {
-  minResponseQuality: 0.0,
+  minResponseQuality: 1.0,
   maxResponseQuality: 5.0,
 };
 

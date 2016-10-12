@@ -62,7 +62,6 @@ test('register message with existing user, existing session', t => {
     t.ok(rMsg.session.state);
     t.notDeepLooseEqual(rMsg.session.globalIndex, null);
     t.ok(rMsg.evalCtx);
-    t.ok(rMsg.recordCtx);
     t.ok(rMsg.preEvalState);
     t.ok(rMsg.postEvalState);
     t.end();
