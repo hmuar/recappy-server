@@ -113,6 +113,7 @@ function advanceState(appState) {
               noteQueue: nextNotes,
               queueIndex: 0,
               globalIndex: nextGlobalIndex,
+              baseQueueLength: nextNotes.length,
               state: getEntryStateForNoteType(nextNotes[0].type),
             },
           };

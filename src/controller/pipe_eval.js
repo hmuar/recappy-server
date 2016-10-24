@@ -5,8 +5,7 @@ import { EvalStatus } from '~/core/eval';
 
 // Evaluate user input in the context of user's current session state.
 // Add a `evalCtx` object to message data.
-
-function invalidEval(correctAnswer = null) {
+export function invalidEval(correctAnswer = null) {
   return {
     answerQuality: null,
     correctAnswer,
@@ -14,7 +13,7 @@ function invalidEval(correctAnswer = null) {
   };
 }
 
-function successEval(answerQuality, correctAnswer = null) {
+export function successEval(answerQuality, correctAnswer = null) {
   return {
     answerQuality,
     correctAnswer,
@@ -22,7 +21,7 @@ function successEval(answerQuality, correctAnswer = null) {
   };
 }
 
-function insertEval(state, evalCtx) {
+export function insertEval(state, evalCtx) {
   return {
     ...state,
     evalCtx,

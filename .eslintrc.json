@@ -6,6 +6,7 @@
       "no-unused-vars": 1,
       "new-cap": 0,
       "no-console": "off",
+      "no-mixed-operators": "off",
       "import/no-extraneous-dependencies": ["error", { "devDependencies": true }],
       "import/no-unresolved": ["error", { "ignore": ["^[~]"] }]
     },

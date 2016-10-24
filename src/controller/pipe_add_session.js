@@ -17,7 +17,8 @@ function addNewSession(appState) {
                         subjectID,
                         startNoteIndex,
                         noteQueue,
-                        startGlobalIndex);
+                        startGlobalIndex,
+                        noteQueue.length);
   }).then(session => (
     {
       ...appState,

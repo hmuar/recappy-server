@@ -2,7 +2,8 @@ import { NoteRecord, Category, Note } from '~/db/collection';
 import { log } from '~/logger';
 import _ from 'lodash';
 
-export const TARGET_NUM_NOTES_IN_SESSION = 10;
+export const TARGET_NUM_NOTES_IN_SESSION = 20;
+export const MAX_NOTES_IN_QUEUE = TARGET_NUM_NOTES_IN_SESSION * 5;
 
 // Grab old notes user has already seen that are now
 // due according to note's due date.
@@ -66,9 +67,9 @@ export function getNewMaterial(subjectID, numNotes, globalIndex = 0) {
         return [];
       }
       // XXX: during dev, skip info notes
-      // return Note.find({ directParent: nextConcept._id }).sort('order');
-      return Note.find({ directParent: nextConcept._id,
-                          type: { $ne: 'info' } }).sort('order');
+      return Note.find({ directParent: nextConcept._id }).sort('order');
+      // return Note.find({ directParent: nextConcept._id,
+      //                     type: { $ne: 'info' } }).sort('order');
     });
 }
 
