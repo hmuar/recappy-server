@@ -85,9 +85,10 @@ export default class Controller {
         .then(state => pipeAdjustQueue(state))
         // advance session state
         .then(state => pipeAdvanceState(state))
+        .then(state => logState(state))
         // record new session state
         .then(state => pipeSaveSession(state))
-        .then(state => logState(state))
+        // .then(state => logState(state))
         .then(state => {
           // don't include this in return chain because this final udpate
           // can happen asynchronously

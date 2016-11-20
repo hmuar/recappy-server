@@ -58,6 +58,10 @@ export function logState(appState) {
     evalCtx,
     state: `${preEvalState} --> ${postEvalState} --> ${state}`,
     globalIndex,
+    queue: session.noteQueue.map((note) => ({
+      group: note.group,
+      type: note.type,
+    })),
   };
   winston.log('info', tState);
   return appState;

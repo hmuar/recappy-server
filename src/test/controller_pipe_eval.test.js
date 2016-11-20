@@ -46,6 +46,18 @@ function getSession(queueIndex = 0, state) {
          displayRaw: 'How many protons and neutrons does carbon have?',
          globalIndex: 1,
          directParent: db.createObjectID('7980227254feb46736ca47fd'),
+         paths: [
+           {
+             display: 'polar bonds?',
+             catName: 'polar-covalent-bond',
+             catId: '2980227254feb46732ca491e',
+           },
+           {
+             display: 'electron?',
+             catName: 'electron-shell',
+             catId: '7980227254feb46736ca47fd',
+           },
+         ],
          __v: 0,
          parent: [] },
       {
@@ -474,6 +486,46 @@ test('eval with INPUT state and another invalid input', t => {
   t.equal(mEvalState.session.state, SessionState.INPUT);
   t.equal(evalCtx.answerQuality, null);
   t.equal(evalCtx.correctAnswer, 'valence');
+  t.equal(evalCtx.status, EvalStatus.INVALID);
+  t.end();
+});
+
+test('eval with SHOW_PATHS state with valid input', t => {
+  const appState = getAppState(getSession(1, SessionState.SHOW_PATHS), {
+    type: Input.Type.CUSTOM,
+    payload: '0',
+  });
+  const mEvalState = pipeEval(appState);
+  const evalCtx = mEvalState.evalCtx;
+  t.equal(mEvalState.session.state, SessionState.SHOW_PATHS);
+  t.equal(evalCtx.answerQuality, Answer.max);
+  t.ok(evalCtx.correctAnswer);
+  t.equal(evalCtx.status, EvalStatus.SUCCESS);
+  t.end();
+});
+
+test('eval with SHOW_PATHS state with valid input for note no paths', t => {
+  const appState = getAppState(getSession(0, SessionState.SHOW_PATHS), {
+    type: Input.Type.CUSTOM,
+    payload: '0',
+  });
+  const mEvalState = pipeEval(appState);
+  const evalCtx = mEvalState.evalCtx;
+  t.equal(mEvalState.session.state, SessionState.SHOW_PATHS);
+  t.equal(evalCtx.answerQuality, null);
+  t.equal(evalCtx.status, EvalStatus.INVALID);
+  t.end();
+});
+
+test('eval with SHOW_PATHS state with invalid input', t => {
+  const appState = getAppState(getSession(1, SessionState.SHOW_PATHS), {
+    type: Input.Type.CUSTOM,
+    payload: '3',
+  });
+  const mEvalState = pipeEval(appState);
+  const evalCtx = mEvalState.evalCtx;
+  t.equal(mEvalState.session.state, SessionState.SHOW_PATHS);
+  t.equal(evalCtx.answerQuality, null);
   t.equal(evalCtx.status, EvalStatus.INVALID);
   t.end();
 });

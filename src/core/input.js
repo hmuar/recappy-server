@@ -13,4 +13,8 @@ export function getChoiceInput(num) {
   return `choice-${num}`;
 }
 
+export function getPathInput(index) {
+  return `path-${index}`;
+}
+
 export default Input;

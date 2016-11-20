@@ -76,13 +76,36 @@ test('get concepts in order', t => DBAssist.getConceptsInOrder(
     t.ok(concepts);
   }));
 
-test('get notes in order', t => DBAssist.getNotesInOrder(
-                  db.createObjectID('f64c57184a4ef7f0357f9cd6'),
-                  db.createObjectID('0850e4270c2aadd7ccdc1ca1'),
-                  db.createObjectID('5e28c07bb4d307d667fe83e8'),
-                  db.createObjectID('7980227254feb46736ca47fd'))
+// test('get notes in order', t => DBAssist.getNotesInOrder(
+//                   db.createObjectID('f64c57184a4ef7f0357f9cd6'),
+//                   db.createObjectID('0850e4270c2aadd7ccdc1ca1'),
+//                   db.createObjectID('5e28c07bb4d307d667fe83e8'),
+//                   db.createObjectID('7980227254feb46736ca47fd'))
+//   .then((notes) => {
+//     t.ok(notes);
+//   }));
+
+test('get child notes for subject', t => DBAssist.getAllChildNotes(
+          db.createObjectID('f64c57184a4ef7f0357f9cd6'))
+  .then((notes) => {
+    console.log(`found ${notes.length} notes`);
+    t.ok(notes);
+    t.ok(notes.length > 0);
+  }));
+
+test('get child notes for topic', t => DBAssist.getAllChildNotes(
+          db.createObjectID('5e28c07bb4d307d667fe83e8'))
   .then((notes) => {
     t.ok(notes);
+    t.equal(notes.length, 32);
   }));
+
+test('get child notes for concept', t => DBAssist.getAllChildNotes(
+          db.createObjectID('2980227254feb46732ca491e'))
+  .then((notes) => {
+    t.ok(notes);
+    t.equal(notes.length, 10);
+  }));
+
 
 after('after account testing', () => db.close());

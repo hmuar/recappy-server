@@ -74,6 +74,18 @@ function getSession(queueIndex = 0, state, queueLength = 3) {
           phrase: {
             pre: [],
           },
+          paths: [
+            {
+              display: 'polar bonds?',
+              catName: 'polar-covalent-bond',
+              catId: '2980227254feb46732ca491e',
+            },
+            {
+              display: 'electron?',
+              catName: 'electron-shell',
+              catId: '7980227254feb46736ca47fd',
+            },
+          ],
           label: '' },
       ];
 
@@ -140,6 +152,24 @@ test('adjust queue - max note queue length, low answer quality', t => {
   t.equal(startQueueLength, MAX_NOTES_IN_QUEUE);
   t.equal(endAdjustQueueLength, MAX_NOTES_IN_QUEUE);
   t.end();
+});
+
+test('adjust queue - show paths first choice', t => {
+  const appState = getAppState(
+    getSession(2, SessionState.SHOW_PATHS, MAX_NOTES_IN_QUEUE),
+    successEval(Answer.max, {
+      display: 'polar bonds?',
+      catName: 'polar-covalent-bond',
+      catId: '2980227254feb46732ca491e',
+    })
+  );
+  const startQueueLength = appState.session.noteQueue.length;
+  return pipeAdjustQueue(appState)
+  .then((adjustState) => {
+    const endAdjustQueueLength = adjustState.session.noteQueue.length;
+    t.equal(startQueueLength, MAX_NOTES_IN_QUEUE);
+    t.equal(endAdjustQueueLength, MAX_NOTES_IN_QUEUE + 10);
+  });
 });
 
 after('after controller pipe adjust queue testing', () => db.close());

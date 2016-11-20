@@ -9,6 +9,7 @@ export const SessionState = {
   INPUT: 'input',
   MULT_CHOICE: 'mult-choice',
   INFO: 'info',
+  SHOW_PATHS: 'show-paths',
   WAIT_NEXT_IN_QUEUE: 'wait-next-in-queue',
   START_QUEUE: 'start-queue',
   DONE_QUEUE: 'done-queue',
@@ -37,6 +38,14 @@ export function getCurrentNote(session) {
     if (queueIndex < noteQueue.length) {
       return noteQueue[queueIndex];
     }
+  }
+  return null;
+}
+
+export function getPaths(session) {
+  const curNote = getCurrentNote(session);
+  if (curNote && curNote.paths) {
+    return curNote.paths;
   }
   return null;
 }

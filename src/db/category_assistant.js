@@ -1,4 +1,4 @@
-import { Category } from '~/db/collection';
+import { Category, Note, ObjectID } from '~/db/collection';
 
 // function getParentIdList(parentCategories) {
 //   return parentCategories.map(function(obj) {
@@ -54,16 +54,32 @@ function getConceptsInOrder(subjectID, unitID, topicID) {
   return Category.find({ ctype: 'concept', $and: parentQuery }).sort('order');
 }
 
-function getNotesInOrder(subjectID, unitID, topicID, conceptID) {
-  const parentQuery = getParentQueryWithId([subjectID,
-                                    unitID,
-                                    topicID,
-                                    conceptID]);
-  if (parentQuery.length === 0) {
-    return [];
-  }
+// function getNotesInOrder(subjectID, unitID, topicID, conceptID) {
+//   const parentQuery = getParentQueryWithId([subjectID,
+//                                     unitID,
+//                                     topicID,
+//                                     conceptID]);
+//   if (parentQuery.length === 0) {
+//     return [];
+//   }
+//
+//   return Category.find({ ctype: 'note', $and: parentQuery }).sort('order');
+// }
 
-  return Category.find({ ctype: 'note', $and: parentQuery }).sort('order');
+function getAllChildNotes(catID) {
+  const formatCatID = typeof catID === 'string' ? ObjectID(catID) : catID;
+  return getCategoryById(formatCatID)
+  .then((cat) => {
+    let noteParents = [cat._id];
+    if (cat.parent) {
+      noteParents = [
+        ...cat.parent,
+        ...noteParents,
+      ];
+    }
+    const childNotesQuery = { ctype: 'note', parent: { $all: noteParents } };
+    return Note.find(childNotesQuery).sort('globalIndex');
+  });
 }
 
 const CategoryAssistant = {
@@ -75,7 +91,8 @@ const CategoryAssistant = {
   getUnitsInOrder,
   getTopicsInOrder,
   getConceptsInOrder,
-  getNotesInOrder,
+  // getNotesInOrder,
+  getAllChildNotes,
 };
 
 export default CategoryAssistant;

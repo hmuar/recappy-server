@@ -1,9 +1,9 @@
 import { isFailResponse } from '~/core/eval';
-import { getCurrentNote } from '~/core/session_state';
+import { SessionState, getCurrentNote } from '~/core/session_state';
 import { MAX_NOTES_IN_QUEUE } from '~/core/scheduler';
+import CategoryAssistant from '~/db/category_assistant';
 
 function getRandomInt(min, max) {
-  console.log(`+++++++++++++++++ Finding random int in (${min}, ${max})`);
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
@@ -16,9 +16,33 @@ export default function pipe(appState) {
     return appState;
   }
 
+  const session = appState.session;
+
+  if (session.state === SessionState.SHOW_PATHS) {
+    if (!isFailResponse(appState.evalCtx.answerQuality)) {
+      const path = appState.evalCtx.correctAnswer;
+      return CategoryAssistant.getAllChildNotes(path.catId).then((notes) => {
+        const queue = session.noteQueue;
+        const adjustedNoteQueue = [
+          ...queue.slice(0, session.queueIndex + 1),
+          ...notes,
+          ...queue.slice(session.queueIndex + 1, queue.length)];
+        const adjustedSession = {
+          ...session,
+          noteQueue: adjustedNoteQueue,
+          baseQueueLength: session.baseQueueLength + notes.length,
+        };
+        return {
+          ...appState,
+          session: adjustedSession,
+        };
+      });
+    }
+    return appState;
+  }
+
   const answerQuality = appState.evalCtx.answerQuality;
   if (isFailResponse(answerQuality)) {
-    const session = appState.session;
     const noteQueue = session.noteQueue;
     // if note queue is already max queue length, do nothing;
     if (noteQueue.length >= MAX_NOTES_IN_QUEUE) {
@@ -29,8 +53,6 @@ export default function pipe(appState) {
                       session.baseQueueLength : session.queueIndex;
     const adjustNoteIndex =
       getRandomInt(minIndex, noteQueue.length);
-
-    console.log(`------------ Using random index ${adjustNoteIndex}`);
 
     adjustedNoteQueue.splice(adjustNoteIndex, 0, getCurrentNote(session));
     const adjustedSession = {

@@ -105,8 +105,8 @@ function contentInjector(msgType) {
         mtype = Input.Type.REJECT;
       } else {
         mtype = Input.Type.CUSTOM;
-        if (~content.indexOf('choice-')) {
-          // if 'choice-' is in content, it was a payload representing
+        if (~content.indexOf('choice-') || ~content.indexOf('path-')) {
+          // if 'choice-' or 'path-' is in content, it was a payload representing
           // a predefined choice made by user, so strip out choice num
           dataVal = stripChoiceNum(content);
         } else {

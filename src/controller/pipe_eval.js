@@ -1,4 +1,4 @@
-import { SessionState } from '~/core/session_state';
+import { SessionState, getCurrentNote } from '~/core/session_state';
 import Input from '~/core/input';
 import Answer from '~/core/answer';
 import { EvalStatus } from '~/core/eval';
@@ -76,7 +76,6 @@ function RecallResponseContext(appState) {
   }
 }
 
-
 function fuzzyAnswerEval(input, answer) {
   // lowercase response
   let inputClean = input.toLowerCase().trim();
@@ -112,7 +111,7 @@ function InputContext(appState) {
     return appState;
   }
   const session = appState.session;
-  const note = session.noteQueue[session.queueIndex];
+  const note = getCurrentNote(session);
   if (input.type === Input.Type.CUSTOM) {
     const correctAnswer = evalNoteWithRawInput(input.payload, note);
     return insertEval(appState,
@@ -127,7 +126,7 @@ function MultChoiceContext(appState) {
     return appState;
   }
   const session = appState.session;
-  const note = session.noteQueue[session.queueIndex];
+  const note = getCurrentNote(session);
   const choiceAnswerKey = `choice${note.answer}`;
   const ansFormatted = `(${note.answer}) ${note[choiceAnswerKey]}`;
   // use isNaN to accept both numerical and number as text inputs
@@ -145,6 +144,26 @@ function MultChoiceContext(appState) {
 
 function WaitContext(appState) {
   return appState;
+}
+
+function ShowPathsContext(appState) {
+  const input = appState.input;
+  if (!input) {
+    return appState;
+  }
+  if (input.type === Input.Type.CUSTOM && !isNaN(input.payload)) {
+    const note = getCurrentNote(appState.session);
+    const dataAsNum = parseInt(input.payload, 10);
+    const validPayload = dataAsNum != null &&
+                         note.paths &&
+                         dataAsNum < note.paths.length;
+    if (validPayload) {
+      return insertEval(appState,
+        successEval(Answer.max, note.paths[dataAsNum]));
+    }
+    return insertEval(appState, invalidEval());
+  }
+  return insertEval(appState, invalidEval());
 }
 
 function DoneContext(appState) {
@@ -176,6 +195,8 @@ function getEvalContext(state) {
       return MultChoiceContext;
     case SessionState.WAIT_NEXT_IN_QUEUE:
       return WaitContext;
+    case SessionState.SHOW_PATHS:
+      return ShowPathsContext;
     case SessionState.DONE_QUEUE:
       return DoneContext;
     default:

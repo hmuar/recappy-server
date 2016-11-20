@@ -6,7 +6,8 @@ import Input from '~/core/input';
 import { SessionState } from '~/core/session_state';
 import DBAssist from '~/db/category_assistant';
 import { EvalStatus } from '~/core/eval';
-import { TARGET_NUM_NOTES_IN_SESSION } from '~/core/scheduler';
+// import { TARGET_NUM_NOTES_IN_SESSION } from '~/core/scheduler';
+import { invalidEval, successEval } from '~/controller/pipe_eval';
 import TestDatabase from './test_database';
 
 const before = test;
@@ -25,10 +26,23 @@ function getSession(queueIndex, state) {
         type: 'info',
       },
       { _id: db.createObjectID('987e8177faf2c2f03c974482'),
-         type: 'recall',
+        type: 'recall',
+        paths: [
+          {
+            display: 'polar bonds?',
+            catName: 'polar-covalent-bond',
+            catId: '2980227254feb46732ca491e',
+          },
+          {
+            display: 'electron?',
+            catName: 'electron-shell',
+            catId: '7980227254feb46736ca47fd',
+          },
+        ],
       },
       { _id: db.createObjectID('987e8177faf2c2f03c974482'),
         type: 'input',
+        paths: ['fake path input'],
       },
       { _id: db.createObjectID('ff7cbfb397fb2794827739ad'),
         type: 'choice',
@@ -38,19 +52,19 @@ function getSession(queueIndex, state) {
   };
 }
 
-function validEval(answerQuality) {
-  return {
-    answerQuality,
-    status: EvalStatus.SUCCESS,
-  };
-}
+// function successEval(answerQuality) {
+//   return {
+//     answerQuality,
+//     status: EvalStatus.SUCCESS,
+//   };
+// }
 
-function invalidEval() {
-  return {
-    answerQuality: null,
-    status: EvalStatus.INVALID,
-  };
-}
+// function invalidEval() {
+//   return {
+//     answerQuality: null,
+//     status: EvalStatus.INVALID,
+//   };
+// }
 
 function getAppState(session, evalCtx) {
   return {
@@ -82,7 +96,7 @@ before('before controller advance state testing', () => (
 
 test('test transition from state INIT', t => {
   const appState = getAppState(getSession(0, SessionState.INIT),
-                               validEval(Answer.ok));
+                               successEval(Answer.ok));
   const nextAppState = pipeStateTransition(appState);
   t.equal(nextAppState.session.state, SessionState.INFO);
   t.equal(nextAppState.session.queueIndex, 0);
@@ -91,7 +105,7 @@ test('test transition from state INIT', t => {
 
 test('test transition from state INFO success', t => {
   const appState = getAppState(getSession(0, SessionState.INFO),
-                               validEval(Answer.ok));
+                               successEval(Answer.ok));
   const nextAppState = pipeStateTransition(appState);
   t.equal(nextAppState.session.state, SessionState.RECALL);
   t.equal(nextAppState.session.queueIndex, 1);
@@ -109,7 +123,7 @@ test('test transition from state INFO invalid', t => {
 
 test('test transition from state RECALL success', t => {
   const appState = getAppState(getSession(1, SessionState.RECALL),
-                               validEval(Answer.ok));
+                               successEval(Answer.ok));
   const nextAppState = pipeStateTransition(appState);
   t.equal(nextAppState.session.state, SessionState.RECALL_RESPONSE);
   t.equal(nextAppState.session.queueIndex, 1);
@@ -127,7 +141,7 @@ test('test transition from state RECALL invalid', t => {
 
 test('test transition from state RECALL_RESPONSE success', t => {
   const appState = getAppState(getSession(1, SessionState.RECALL_RESPONSE),
-                               validEval(Answer.yes));
+                               successEval(Answer.yes));
   const nextAppState = pipeStateTransition(appState);
   t.equal(nextAppState.session.state, SessionState.INPUT);
   t.equal(nextAppState.session.queueIndex, 2);
@@ -136,10 +150,10 @@ test('test transition from state RECALL_RESPONSE success', t => {
 
 test('test transition from state RECALL_RESPONSE fail', t => {
   const appState = getAppState(getSession(1, SessionState.RECALL_RESPONSE),
-                               validEval(Answer.no));
+                               successEval(Answer.no));
   const nextAppState = pipeStateTransition(appState);
-  t.equal(nextAppState.session.state, SessionState.INPUT);
-  t.equal(nextAppState.session.queueIndex, 2);
+  t.equal(nextAppState.session.state, SessionState.SHOW_PATHS);
+  t.equal(nextAppState.session.queueIndex, 1);
   t.end();
 });
 
@@ -154,7 +168,7 @@ test('test transition from state RECALL_RESPONSE invalid', t => {
 
 test('test transition from state INPUT success', t => {
   const appState = getAppState(getSession(2, SessionState.INPUT),
-                               validEval(Answer.ok));
+                               successEval(Answer.ok));
   const nextAppState = pipeStateTransition(appState);
   t.equal(nextAppState.session.state, SessionState.MULT_CHOICE);
   t.equal(nextAppState.session.queueIndex, 3);
@@ -163,10 +177,10 @@ test('test transition from state INPUT success', t => {
 
 test('test transition from state INPUT fail', t => {
   const appState = getAppState(getSession(2, SessionState.INPUT),
-                               validEval(Answer.no));
+                               successEval(Answer.no));
   const nextAppState = pipeStateTransition(appState);
-  t.equal(nextAppState.session.state, SessionState.MULT_CHOICE);
-  t.equal(nextAppState.session.queueIndex, 3);
+  t.equal(nextAppState.session.state, SessionState.SHOW_PATHS);
+  t.equal(nextAppState.session.queueIndex, 2);
   t.end();
 });
 
@@ -181,7 +195,7 @@ test('test transition from state INPUT invalid', t => {
 
 test('test transition from MULT_CHOICE success', t => {
   const appState = getAppState(getSession(3, SessionState.MULT_CHOICE),
-                               validEval(Answer.ok));
+                               successEval(Answer.ok));
   const nextAppState = pipeStateTransition(appState);
   t.notEqual(nextAppState.session.state, SessionState.MULT_CHOICE);
   t.equal(nextAppState.session.queueIndex, 4);
@@ -190,7 +204,7 @@ test('test transition from MULT_CHOICE success', t => {
 
 test('test transition from MULT_CHOICE fail', t => {
   const appState = getAppState(getSession(3, SessionState.MULT_CHOICE),
-                               validEval(Answer.no));
+                               successEval(Answer.no));
   const nextAppState = pipeStateTransition(appState);
   t.notEqual(nextAppState.session.state, SessionState.MULT_CHOICE);
   t.equal(nextAppState.session.queueIndex, 4);
@@ -206,9 +220,24 @@ test('test transition from MULT_CHOICE invalid', t => {
   t.end();
 });
 
+test('test transition from SHOW_PATHS success', t => {
+  const appState = getAppState(getSession(1, SessionState.SHOW_PATHS),
+                                successEval(Answer.max, {
+                                  display: 'polar bonds?',
+                                  catName: 'polar-covalent-bond',
+                                  catId: '2980227254feb46732ca491e',
+                                })
+                              );
+  console.log(appState.session.noteQueue);
+  const nextAppState = pipeStateTransition(appState);
+  t.equal(nextAppState.session.state, SessionState.INPUT);
+  t.equal(nextAppState.session.queueIndex, 2);
+  t.end();
+});
+
 test('test transition from last note in queue', t => {
   const appState = getAppState(getSession(3, SessionState.MULT_CHOICE),
-                               validEval(Answer.ok));
+                               successEval(Answer.ok));
   const nextAppState = pipeStateTransition(appState);
   t.equal(nextAppState.session.state, SessionState.DONE_QUEUE);
   t.equal(nextAppState.session.queueIndex, 4);
@@ -217,12 +246,12 @@ test('test transition from last note in queue', t => {
 
 test('test transition from done queue', t => {
   const appState = getAppState(getSession(4, SessionState.DONE_QUEUE),
-                               validEval(Answer.ok));
+                               successEval(Answer.ok));
   return pipeStateTransition(appState)
   .then(ns => {
     t.ok(ns.session.state);
     t.notEqual(ns.session.state, SessionState.DONE_QUEUE);
-    t.equal(ns.session.noteQueue.length, TARGET_NUM_NOTES_IN_SESSION);
+    t.equal(ns.session.noteQueue.length, 24);
     t.equal(ns.session.queueIndex, 0);
     t.equal(ns.session.globalIndex, 1);
   });

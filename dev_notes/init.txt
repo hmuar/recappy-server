@@ -16,3 +16,6 @@ rm -rf docs; docco src/!(test)/**/**/**/**/**.js; docco src/*.js
 *** NOTE: Not using Loggly right now***********
 - Loggly setup
 - Log.io setup https://github.com/NarrativeScience/Log.io
+
+-- Messenger Webhook setup --
+curl -X POST "https://graph.facebook.com/v2.8/me/subscribed_apps?access_token="

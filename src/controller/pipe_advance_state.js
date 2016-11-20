@@ -1,8 +1,9 @@
 import { SessionState,
-         getEntryStateForNoteType } from '~/core/session_state';
+         getEntryStateForNoteType,
+         getPaths } from '~/core/session_state';
 import Input from '~/core/input';
 import { getNextNotes, TARGET_NUM_NOTES_IN_SESSION } from '~/core/scheduler';
-import { EvalStatus } from '~/core/eval';
+import { EvalStatus, isFailResponse } from '~/core/eval';
 
 // Given current info in app state, determine next study state for user.
 // Only need to look at current session state to determine next state.
@@ -46,12 +47,24 @@ function setPostEvalState(appState) {
         postEvalState = SessionState.RECALL_RESPONSE;
       }
       break;
+    case SessionState.SHOW_PATHS:
+      if (validEval) {
+        postEvalState = SessionState.WAIT_NEXT_IN_QUEUE;
+      }
+      break;
     case SessionState.INFO:
     case SessionState.INPUT:
     case SessionState.RECALL_RESPONSE:
     case SessionState.MULT_CHOICE:
       if (validEval) {
-        postEvalState = SessionState.WAIT_NEXT_IN_QUEUE;
+        // if min quality response, check for possible note paths
+        if (isFailResponse(appState.evalCtx.answerQuality)) {
+          const paths = getPaths(appState.session);
+          postEvalState = paths ? SessionState.SHOW_PATHS :
+            SessionState.WAIT_NEXT_IN_QUEUE;
+        } else {
+          postEvalState = SessionState.WAIT_NEXT_IN_QUEUE;
+        }
       }
       break;
     default:
@@ -152,6 +165,7 @@ function advanceState(appState) {
         },
       };
     }
+
     if (appState.postEvalState) {
       return {
         ...appState,

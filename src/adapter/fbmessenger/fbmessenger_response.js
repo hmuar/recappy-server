@@ -1,4 +1,4 @@
-import Input, { getChoiceInput } from '~/core/input';
+import Input, { getChoiceInput, getPathInput } from '~/core/input';
 import { SessionState } from '~/core/session_state';
 import generateQuestion from '~/speech';
 import Answer from '~/core/answer';
@@ -88,12 +88,23 @@ function sendResponseInContext(state) {
       });
     }
 
+    case SessionState.SHOW_PATHS: {
+      const quickReplyData = note.paths.map((path, index) => (
+        {
+          title: path.display,
+          action: getPathInput(index),
+        }
+      ));
+      return sendQuickReply(fbUserID, 'Where to from here?', quickReplyData);
+    }
+
     case SessionState.DONE_QUEUE:
       return sendText(fbUserID,
         'No more to learn for today, all done! Check back in tomorrow :)');
 
     default:
-      break;
+      logErr(`Unrecognized state ${session.state}, could not properly respond`);
+      return Promise.resolve(0);
   }
   return state;
 }
