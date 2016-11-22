@@ -12,6 +12,7 @@ const recordableStates = [
   SessionState.INPUT,
   SessionState.MULT_CHOICE,
   SessionState.INFO,
+  SessionState.SHOW_PATHS,
 ];
 
 function calcNoteHealth(responseHistory) {
@@ -115,6 +116,23 @@ function pipeHealth(recordCtx) {
   };
 }
 
+function pipePathHistory(recordCtx, record, evalCtx) {
+  if (!recordCtx || !record || !evalCtx) {
+    return recordCtx;
+  }
+
+  if (evalCtx.correctAnswer) {
+    const catId = evalCtx.correctAnswer.catId;
+    const pathHistory = record.pathHistory || [];
+    return {
+      ...recordCtx,
+      pathHistory: [...pathHistory, catId],
+    };
+  }
+
+  return recordCtx;
+}
+
 function createNewRecord(userID, note, recordCtx) {
   const recData = {
     userID,
@@ -160,13 +178,14 @@ export default function pipe(appState) {
                              noteID: note._id })
   .then(record => {
     let recordCtx = {};
-    recordCtx = pipeSpaceRepVals(recordCtx,
-                                 record,
-                                 evalCtx);
-
-    recordCtx = pipeDates(recordCtx, record);
-    recordCtx = pipeResponseHistory(recordCtx, record, evalCtx);
-    recordCtx = pipeHealth(recordCtx, record, evalCtx);
+    if (session.state === SessionState.SHOW_PATHS) {
+      recordCtx = pipePathHistory(recordCtx, record, evalCtx);
+    } else {
+      recordCtx = pipeSpaceRepVals(recordCtx, record, evalCtx);
+      recordCtx = pipeDates(recordCtx, record);
+      recordCtx = pipeResponseHistory(recordCtx, record, evalCtx);
+      recordCtx = pipeHealth(recordCtx, record, evalCtx);
+    }
 
     if (record) {
       return record.update(recordCtx).then(() => (

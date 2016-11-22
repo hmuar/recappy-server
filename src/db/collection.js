@@ -89,6 +89,7 @@ const noteRecordSchema = new mongoose.Schema({
   lastDone: Date,
   due: Date,
   responseHistory: [Number],
+  pathHistory: [mongoose.Schema.Types.ObjectId],
   health: Number,
   factorHistory: [Number],
   intervalHistory: [Number],

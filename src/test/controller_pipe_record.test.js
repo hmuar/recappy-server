@@ -10,7 +10,7 @@ const db = new TestDatabase();
 const before = test;
 const after = test;
 
-function getSession() {
+function getSession(state = SessionState.RECALL_RESPONSE) {
   return {
     queueIndex: 1,
     noteQueue:
@@ -90,7 +90,7 @@ function getSession() {
        },
        label: '' },
        ],
-    state: SessionState.RECALL_RESPONSE,
+    state,
     globalIndex: 0,
   };
 }
@@ -176,5 +176,41 @@ test('create new note record', t => {
     t.ok({}.hasOwnProperty.call(recordCtx, 'lastDoneHistory'));
   });
 });
+
+test('record paths', t => {
+  const userID = db.getStaticIDs().userFB;
+  const session = getSession(SessionState.SHOW_PATHS);
+  session.queueIndex = 2;
+
+  const appState = {
+    timestamp: 1,
+    senderID: '2028279607252615',
+    userID,
+    input: {
+      type: Input.Type.CUSTOM,
+      data: 'path-0',
+    },
+    subjectName: 'crash-course-biology',
+    subjectID: db.createObjectID('f64c57184a4ef7f0357f9cd6'),
+    session,
+    evalCtx: {
+      answerQuality: Answer.ok,
+      correctAnswer:
+        { display: 'electron?',
+          catName: 'electron-shell',
+          catId: 'fd008c92a59bfa825de3ad8b',
+        },
+    },
+  };
+
+  return pipeRecord(appState)
+  .then(state => {
+    t.ok({}.hasOwnProperty.call(state, 'recordCtx'));
+    const recordCtx = state.recordCtx;
+    t.ok(hasOwnProperty.call(recordCtx, 'pathHistory'));
+    t.deepEqual(recordCtx.pathHistory, ['fd008c92a59bfa825de3ad8b']);
+  });
+});
+
 
 after('after controller pipe record testing', () => db.close());

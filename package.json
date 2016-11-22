@@ -17,6 +17,7 @@
     "test-eval": "clear && blue-tape -r babel-register src/test/controller_pipe_eval.test.js",
     "test-db-assist": "clear && blue-tape -r babel-register src/test/db_assistant.test.js",
     "test-adjust-queue": "clear && blue-tape -r babel-register src/test/controller_pipe_adjust_queue.test.js",
+    "test-record": "clear && blue-tape -r babel-register src/test/controller_pipe_record.test.js",
     "docs": "watch 'rm -rf docs && docco src/**/**.js && rm -rf docs/*.test.html' src",
     "start": "nodemon register.js",
     "start-clean": "npm run clean-logs && npm run start",
