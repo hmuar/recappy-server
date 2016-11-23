@@ -23,7 +23,7 @@ export default function pipe(appState) {
         index,
       }
     ));
-    const recPaths = record.pathHistory ? record.pathHistory : [];
+    const recPaths = (record && record.pathHistory) ? record.pathHistory : [];
     return {
       paths: _.differenceWith(pathsWithIndex, recPaths, (np, rp) => (
         np.catId === rp.toHexString()

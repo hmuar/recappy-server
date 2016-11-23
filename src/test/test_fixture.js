@@ -289,7 +289,7 @@ const defaultNoteRecord2 = {
 
 const defaultNoteRecord3 = {
   userID: testUserFBMessenger._id,
-  noteID: noteC._id,
+  noteID: ObjectID('9980227254feb46732ca491a'),
   noteType: noteTemplateB.type,
   lastDone: lastDoneDate,
   due: dueDate,

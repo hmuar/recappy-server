@@ -57,7 +57,7 @@ function getSession(queueIndex, state) {
         ],
       },
       {
-        _id: noteCID,
+        _id: db.createObjectID('9980227254feb46732ca491a'),
         type: 'recall',
         paths: [
           {
