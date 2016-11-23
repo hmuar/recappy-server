@@ -136,6 +136,18 @@ const noteA = {
   displayRaw: 'Carbon has 6 protons and 6 neutrons in its nucleus. This makes it a relatively small, flexible atom so it is very useful. This helps make carbon fundamental to life. Without carbon all human, plant, and animal life would not be possible. We are all carbon-based lifeforms.',
   globalIndex: 0,
   directParent: noteParent[noteParent.length - 1],
+  paths: [
+    {
+      display: 'polar bonds?',
+      catName: 'polar-covalent-bond',
+      catId: '2980227254feb46732ca491e',
+    },
+    {
+      display: 'electron?',
+      catName: 'electron-shell',
+      catId: '7980227254feb46736ca47fd',
+    },
+  ],
 };
 
 const noteB = {
@@ -155,6 +167,18 @@ const noteB = {
   hidden: '6',
   globalIndex: 1,
   directParent: noteParent[noteParent.length - 1],
+  paths: [
+    {
+      display: 'polar bonds?',
+      catName: 'polar-covalent-bond',
+      catId: '2980227254feb46732ca491e',
+    },
+    {
+      display: 'electron?',
+      catName: 'electron-shell',
+      catId: '7980227254feb46736ca47fd',
+    },
+  ],
 };
 
 // Different concept
@@ -248,6 +272,7 @@ const defaultNoteRecord = {
   interval: SRCore.defaultInterval,
   count: 1,
   subjectParent: noteTemplateA.parent[0],
+  pathHistory: [ObjectID('2980227254feb46732ca491e')],
 };
 
 const defaultNoteRecord2 = {
@@ -260,6 +285,20 @@ const defaultNoteRecord2 = {
   interval: SRCore.defaultInterval,
   count: 1,
   subjectParent: noteTemplateB.parent[0],
+};
+
+const defaultNoteRecord3 = {
+  userID: testUserFBMessenger._id,
+  noteID: noteC._id,
+  noteType: noteTemplateB.type,
+  lastDone: lastDoneDate,
+  due: dueDate,
+  factor: SRCore.defaultFactor,
+  interval: SRCore.defaultInterval,
+  count: 1,
+  subjectParent: noteTemplateB.parent[0],
+  pathHistory: [ObjectID('2980227254feb46732ca491e'),
+                ObjectID('7980227254feb46736ca47fd')],
 };
 
 function addUsers() {
@@ -331,8 +370,9 @@ function addNoteRecords(defNoteIds) {
 
   const defRec = new NoteRecord(defaultNoteRecord);
   const defRec2 = new NoteRecord(defaultNoteRecord2);
+  const defRec3 = new NoteRecord(defaultNoteRecord3);
 
-  let pChain = defRec.save().then(() => defRec2.save());
+  let pChain = defRec.save().then(() => defRec2.save()).then(() => defRec3.save());
 
   const noteTemplateAIds = defNoteIds[0];
 

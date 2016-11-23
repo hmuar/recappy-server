@@ -43,6 +43,7 @@ export function logState(appState) {
           senderID,
           session,
           evalCtx,
+          paths,
           preEvalState,
           postEvalState } = appState;
   const { queueIndex, state, globalIndex } = session;
@@ -56,6 +57,7 @@ export function logState(appState) {
     note: `${queueIndex}: (${queueIndex + 1}/${maxQueueIndex + 1}) ${noteType}`,
     input,
     evalCtx,
+    paths,
     state: `${preEvalState} --> ${postEvalState} --> ${state}`,
     globalIndex,
     queue: session.noteQueue.map((note) => ({

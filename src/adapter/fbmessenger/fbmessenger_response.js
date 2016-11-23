@@ -89,10 +89,13 @@ function sendResponseInContext(state) {
     }
 
     case SessionState.SHOW_PATHS: {
-      const quickReplyData = note.paths.map((path, index) => (
+      if (!state.paths) {
+        return Promise.resolve(0);
+      }
+      const quickReplyData = state.paths.map((path) => (
         {
           title: path.display,
-          action: getPathInput(index),
+          action: getPathInput(path.index),
         }
       ));
       return sendQuickReply(fbUserID, 'Where to from here?', quickReplyData);
@@ -106,7 +109,6 @@ function sendResponseInContext(state) {
       logErr(`Unrecognized state ${session.state}, could not properly respond`);
       return Promise.resolve(0);
   }
-  return state;
 }
 
 export default function sendResponse(state) {

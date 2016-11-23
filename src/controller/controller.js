@@ -7,6 +7,7 @@ import pipeAdvanceState from './pipe_advance_state';
 import pipeSaveSession from './pipe_save_session';
 import pipeStudentModel from './pipe_student_model';
 import pipeAdjustQueue from './pipe_adjust_queue';
+import pipeAddPaths from './pipe_add_paths';
 
 // `msg` = {
 //   timestamp  : ""
@@ -85,6 +86,7 @@ export default class Controller {
         .then(state => pipeAdjustQueue(state))
         // advance session state
         .then(state => pipeAdvanceState(state))
+        .then(state => pipeAddPaths(state))
         .then(state => logState(state))
         // record new session state
         .then(state => pipeSaveSession(state))
