@@ -8,12 +8,13 @@ import DBAssist from '~/db/category_assistant';
 import { getSessionForUserAndSubject } from '~/db/session_assistant';
 import { EvalStatus } from '~/core/eval';
 import TestDatabase from './test_database';
+import TestConst from './test_const';
 
 const before = test;
 const after = test;
 const db = new TestDatabase();
 
-const SUBJECT_NAME = 'crash-course-biology';
+const SUBJECT_NAME = TestConst.SUBJECT_NAME;
 let subject = null; // eslint-disable-line
 let testUser = null; // eslint-disable-line
 
@@ -47,7 +48,7 @@ function getAppState(session, evalCtx) {
       type: Input.Type.ACCEPT,
       payload: null,
     },
-    subjectName: 'crash-course-biology',
+    subjectName: SUBJECT_NAME,
     subjectID: subject._id,
     session,
     evalCtx,

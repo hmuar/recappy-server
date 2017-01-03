@@ -142,7 +142,7 @@ function parse(requestBody) {
   const msg = entry.messaging[0];
 
   // TODO: Need to dynamically get this from request
-  const HARDCODED_SUBJ_NAME = 'crash-course-biology';
+  const HARDCODED_SUBJ_NAME = 'biology';
 
   const initMsgData = {
     timestamp: msg.timestamp,

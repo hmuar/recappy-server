@@ -1,10 +1,13 @@
 import test from 'blue-tape';
 import DBAssist from '~/db/category_assistant';
 import TestDatabase from './test_database';
+import TestConst from './test_const';
 
 const before = test;
 const after = test;
 const db = new TestDatabase();
+
+const SUBJECT_NAME = TestConst.SUBJECT_NAME;
 
 before('before db assistant testing',
   () => db.setup().then(() => db.clean()).then(() => db.loadAllFixtures()));
@@ -22,7 +25,7 @@ before('before db assistant testing',
 //   t.end();
 // });
 
-test('get category by name', t => DBAssist.getCategoryByName('subject', 'crash-course-biology')
+test('get category by name', t => DBAssist.getCategoryByName('subject', SUBJECT_NAME)
 .then((cat) => {
   t.ok(cat);
   t.equal(cat._id.toString(), 'f64c57184a4ef7f0357f9cd6');

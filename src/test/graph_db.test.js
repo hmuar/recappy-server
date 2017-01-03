@@ -1,12 +1,13 @@
 // import test from 'blue-tape';
 // import GraphDB from '~/db/graph';
 // import TestDatabase from './test_database';
+// import TestConst from './test_const';
 //
 // const before = test;
 // const after = test;
 // const db = new TestDatabase();
 //
-// const SUBJECT_NAME = 'crash-course-biology';
+// const SUBJECT_NAME = TestConst.SUBJECT_NAME;
 //
 // before('before scheduler testing', () => (
 //   db.setup().then(() => db.clean())

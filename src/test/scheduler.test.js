@@ -4,12 +4,13 @@ import { getOldMaterial,
          getNextNotes } from '~/core/scheduler';
 import DBAssist from '~/db/category_assistant';
 import TestDatabase from './test_database';
+import TestConst from './test_const';
 
 const before = test;
 const after = test;
 const db = new TestDatabase();
 
-const SUBJECT_NAME = 'crash-course-biology';
+const SUBJECT_NAME = TestConst.SUBJECT_NAME;
 let subject = null;
 let testUser = null;
 

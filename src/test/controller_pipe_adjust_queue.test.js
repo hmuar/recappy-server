@@ -8,10 +8,13 @@ import { EvalStatus } from '~/core/eval';
 import { insertEval, successEval } from '~/controller/pipe_eval';
 import { MAX_NOTES_IN_QUEUE } from '~/core/scheduler';
 import TestDatabase from './test_database';
+import TestConst from './test_const';
 
 const before = test;
 const after = test;
 const db = new TestDatabase();
+
+const SUBJECT_NAME = TestConst.SUBJECT_NAME;
 
 function getSession(queueIndex = 0, state, queueLength = 3) {
   const noteQueue =
@@ -109,7 +112,7 @@ function getAppState(session, evalCtx) {
     timestamp: 1,
     senderID: '2028279607252615',
     userID: '7716893a8c8aff3221812149',
-    subjectName: 'crash-course-biology',
+    subjectName: SUBJECT_NAME,
     subjectID: db.createObjectID('f64c57184a4ef7f0357f9cd6'),
     session,
   }, evalCtx);

@@ -9,12 +9,13 @@ import { EvalStatus } from '~/core/eval';
 // import { TARGET_NUM_NOTES_IN_SESSION } from '~/core/scheduler';
 import { invalidEval, successEval } from '~/controller/pipe_eval';
 import TestDatabase from './test_database';
+import TestConst from './test_const';
 
 const before = test;
 const after = test;
 const db = new TestDatabase();
 
-const SUBJECT_NAME = 'crash-course-biology';
+const SUBJECT_NAME = TestConst.SUBJECT_NAME;
 let subject = null;
 let testUser = null;
 
@@ -75,7 +76,7 @@ function getAppState(session, evalCtx) {
       type: Input.Type.ACCEPT,
       payload: null,
     },
-    subjectName: 'crash-course-biology',
+    subjectName: SUBJECT_NAME,
     subjectID: subject._id,
     session,
     evalCtx,

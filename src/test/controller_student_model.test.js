@@ -6,10 +6,13 @@ import Input from '~/core/input';
 import pipeStudentModel from '~/controller/pipe_student_model';
 import { StudentModel } from '~/db/collection';
 import TestDatabase from './test_database';
+import TestConst from './test_const';
 
 const before = test;
 const after = test;
 const db = new TestDatabase();
+
+const SUBJECT_NAME = TestConst.SUBJECT_NAME;
 
 function getSession(queueIndex, state) {
   return {
@@ -105,7 +108,7 @@ function getAppState(userID, queueIndex, state) {
       type: Input.Type.CUSTOM,
       data: '3',
     },
-    subjectName: 'crash-course-biology',
+    subjectName: SUBJECT_NAME,
     subjectID: db.createObjectID('f64c57184a4ef7f0357f9cd6'),
     session: getSession(queueIndex, state),
     evalCtx: {

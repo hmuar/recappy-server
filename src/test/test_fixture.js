@@ -9,6 +9,9 @@ import { ObjectID,
          NoteRecord,
          StudentModel } from '~/db/collection';
 import SRCore from '~/core/spaced_repetition';
+import TestConst from './test_const';
+
+const SUBJECT_NAME = TestConst.SUBJECT_NAME;
 
 // ******* User *******************************
 const testUserFBMessenger = {
@@ -40,7 +43,7 @@ const defaultSubject = {
   createdAt: new Date(),
   order: 1,
   ctype: 'subject',
-  ckey: 'crash-course-biology',
+  ckey: SUBJECT_NAME,
   weight: 1,
 };
 

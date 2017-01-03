@@ -1,12 +1,13 @@
 import test from 'blue-tape';
 import TestDatabase from '~/test/test_database';
 import pipeAddSession from '~/controller/pipe_add_session';
+import TestConst from './test_const';
 
 const before = test;
 const after = test;
 const db = new TestDatabase();
 
-const SUBJECT_NAME = 'crash-course-biology';
+const SUBJECT_NAME = TestConst.SUBJECT_NAME;
 
 function getAppState(userID, senderID) {
   return {

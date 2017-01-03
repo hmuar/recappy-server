@@ -3,10 +3,13 @@ import AdapterFB from '~/adapter/fbmessenger/fbmessenger';
 import Controller from '~/controller/controller';
 import Input from '~/core/input';
 import TestDatabase from './test_database';
+import TestConst from './test_const';
 
 const before = test;
 const after = test;
 const db = new TestDatabase();
+
+const SUBJECT_NAME = TestConst.SUBJECT_NAME;
 
 const controller = new Controller(AdapterFB);
 controller.sendResponse = (state) => {
@@ -24,7 +27,7 @@ before('before controller testing',
 test('controller pipe user', t => {
   const mData = {
     senderID: '1028279607252642',
-    subjectName: 'crash-course-biology',
+    subjectName: SUBJECT_NAME,
   };
   controller.pipeUser(mData).then((mDataWithUser) => {
     t.ok(mDataWithUser);
@@ -46,7 +49,7 @@ test('register message with existing user, existing session', t => {
     timestamp: 1,
     senderID: '1028279607252642',
     userID: null,
-    subjectName: 'crash-course-biology',
+    subjectName: SUBJECT_NAME,
     subjectID: db.createObjectID('f64c57184a4ef7f0357f9cd6'),
     input: {
       type: Input.Type.ACCEPT,
@@ -79,7 +82,7 @@ test('register message for existing user, no existing session', t => {
     timestamp: 1,
     senderID: '2028279607252615',
     userID: null,
-    subjectName: 'crash-course-biology',
+    subjectName: SUBJECT_NAME,
     input: {
       type: Input.Type.CUSTOM,
       payload: 'halllooo',
@@ -105,7 +108,7 @@ test('register message for no existing user, no existing session', t => {
     timestamp: 1,
     senderID: '9028279607252619',
     userID: null,
-    subjectName: 'crash-course-biology',
+    subjectName: SUBJECT_NAME,
     input: {
       type: Input.Type.CUSTOM,
       payload: 'halllooo',

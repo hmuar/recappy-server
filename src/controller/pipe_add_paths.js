@@ -5,7 +5,7 @@ import _ from 'lodash';
 export default function pipe(appState) {
   // get current note
   const note = getCurrentNote(appState.session);
-  if (!note.paths) {
+  if (!note || !note.paths) {
     return Promise.resolve(appState);
   }
   return NoteRecord.findOne({ userID: appState.userID,

@@ -5,10 +5,13 @@ import pipeRecord from '~/controller/pipe_record';
 import Input from '~/core/input';
 import { SessionState } from '~/core/session_state';
 import TestDatabase from './test_database';
+import TestConst from './test_const';
 
 const db = new TestDatabase();
 const before = test;
 const after = test;
+
+const SUBJECT_NAME = TestConst.SUBJECT_NAME;
 
 function getSession(state = SessionState.RECALL_RESPONSE) {
   return {
@@ -109,7 +112,7 @@ test('update existing note record', t => {
       type: Input.Type.CUSTOM,
       data: 'valence',
     },
-    subjectName: 'crash-course-biology',
+    subjectName: SUBJECT_NAME,
     subjectID: db.createObjectID('f64c57184a4ef7f0357f9cd6'),
     session: getSession(),
     evalCtx: {
@@ -150,7 +153,7 @@ test('create new note record', t => {
       type: Input.Type.CUSTOM,
       data: 3,
     },
-    subjectName: 'crash-course-biology',
+    subjectName: SUBJECT_NAME,
     subjectID: db.createObjectID('f64c57184a4ef7f0357f9cd6'),
     session,
     evalCtx: {
@@ -190,7 +193,7 @@ test('record paths', t => {
       type: Input.Type.CUSTOM,
       data: 'path-0',
     },
-    subjectName: 'crash-course-biology',
+    subjectName: SUBJECT_NAME,
     subjectID: db.createObjectID('f64c57184a4ef7f0357f9cd6'),
     session,
     evalCtx: {
