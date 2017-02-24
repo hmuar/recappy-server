@@ -4,6 +4,7 @@ import _ from 'lodash';
 
 export const TARGET_NUM_NOTES_IN_SESSION = 20;
 export const MAX_NOTES_IN_QUEUE = TARGET_NUM_NOTES_IN_SESSION * 5;
+export const MAX_GLOBAL_INDEX = 20;
 
 // Grab old notes user has already seen that are now
 // due according to note's due date.
@@ -53,7 +54,7 @@ export function getOldMaterial(userID,
 // on given lastGlobalIndex. Note lastGlobalIndex is actually
 // globalIndex of the next concept that should be introduced to user.
 // Get all notes associated with this concept.
-export function getNewMaterial(subjectID, numNotes, globalIndex = 0) {
+export function getNewMaterial(subjectID, numNotes, globalIndex = 0, prevNotes = []) {
   if (!subjectID || numNotes <= 0) {
     return Promise.resolve([]);
   }
@@ -64,12 +65,26 @@ export function getNewMaterial(subjectID, numNotes, globalIndex = 0) {
     .then(nextConcept => {
       if (!nextConcept) {
         log('Could not find next concept, returning 0 new notes');
-        return [];
+        return prevNotes;
       }
       // XXX: during dev, skip info notes
-      return Note.find({ directParent: nextConcept._id }).sort('order');
-      // return Note.find({ directParent: nextConcept._id,
-      //                     type: { $ne: 'info' } }).sort('order');
+      return Note.find({ directParent: nextConcept._id }).sort('order')
+      .then((notes) => {
+        const mergedNotes = [...prevNotes, ...notes];
+        // terminate and return results
+        if (mergedNotes.length >= numNotes || globalIndex >= MAX_GLOBAL_INDEX) {
+          return Promise.resolve(mergedNotes);
+        }
+        // recursively get more new material
+        console.log(`recursv call getNewMaterial gi: ${globalIndex + 1}`);
+        console.log(`${mergedNotes.length}`);
+        return getNewMaterial(
+          subjectID,
+          numNotes,
+          globalIndex + 1,
+          mergedNotes
+        );
+      });
     });
 }
 

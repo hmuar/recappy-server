@@ -19,6 +19,7 @@
     "test-adjust-queue": "clear && blue-tape -r babel-register src/test/controller_pipe_adjust_queue.test.js",
     "test-record": "clear && blue-tape -r babel-register src/test/controller_pipe_record.test.js",
     "test-add-paths": "clear && blue-tape -r babel-register src/test/controller_pipe_add_paths.test.js",
+    "test-scheduler": "clear && blue-tape -r babel-register src/test/scheduler.test.js | tap-summary",
     "docs": "watch 'rm -rf docs && docco src/**/**.js && rm -rf docs/*.test.html' src",
     "start": "nodemon register.js",
     "start-clean": "npm run clean-logs && npm run start",
