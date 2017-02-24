@@ -44,7 +44,7 @@ export function getCurrentNote(session) {
 
 export function getPaths(session) {
   const curNote = getCurrentNote(session);
-  if (curNote && curNote.paths) {
+  if (curNote && curNote.paths && curNote.paths.length > 0) {
     return curNote.paths;
   }
   return null;

@@ -54,10 +54,14 @@ export default class Controller {
   }
 
   sendResponse(state) {
+    console.log('--- Controller send response ----');
+    // return state;
     return this.adapter.sendResponse(state);
   }
 
   sendFeedbackResponse(state) {
+    console.log('--- Controller sendFeedbackResponse ------');
+    // return state;
     return this.adapter.sendFeedbackResponse(state);
   }
 
@@ -95,6 +99,10 @@ export default class Controller {
           // don't include this in return chain because this final udpate
           // can happen asynchronously
           pipeStudentModel(state);
+          console.log('^^^^^^ State before sending response ^^^^^^^');
+          if (state.feedback) {
+            console.log(state.feedback);
+          }
           return this.sendResponse(state);
         });
       }

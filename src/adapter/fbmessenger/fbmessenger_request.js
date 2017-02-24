@@ -3,6 +3,8 @@ import Config from '~/config/config';
 import { log } from '~/logger';
 import MessageType from './fbmessage_type';
 
+const FB_REQUEST_URL = `https://graph.facebook.com/v2.6/me/messages?access_token=${Config.FBToken}`;
+
 function getReqBodyTemplate(senderID) {
   return {
     recipient: {
@@ -110,7 +112,7 @@ function postBodyCreator(msgType) {
 function sendPostRequest(body) {
   const options = {
     json: true,
-    url: `https://graph.facebook.com/v2.6/me/messages?access_token=${Config.FBToken}`,
+    url: FB_REQUEST_URL,
     body,
   };
   return request.post(options);

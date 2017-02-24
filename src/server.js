@@ -2,10 +2,11 @@ import Hapi from 'hapi';
 // add additional resources to this list as they are created
 // for now, it is just fbmessenger resource
 import FBMessenger from './resource/fbmessenger';
+import Webclient from './resource/webclient';
 import NextQueue from './resource/nextqueue';
 import Database from './db/db';
 
-const resources = [FBMessenger, NextQueue];
+const resources = [FBMessenger, Webclient, NextQueue];
 
 export default class Server {
   constructor() {
