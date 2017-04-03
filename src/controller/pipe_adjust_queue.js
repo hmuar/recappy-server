@@ -18,15 +18,17 @@ export default function pipe(appState) {
 
   const session = appState.session;
 
+  // adjust session with additional notes from path
   if (session.state === SessionState.SHOW_PATHS) {
     if (!isFailResponse(appState.evalCtx.answerQuality)) {
       const path = appState.evalCtx.correctAnswer;
-      return CategoryAssistant.getAllChildNotes(path.catId).then((notes) => {
+      return CategoryAssistant.getAllChildNotes(path.catId).then(notes => {
         const queue = session.noteQueue;
         const adjustedNoteQueue = [
           ...queue.slice(0, session.queueIndex + 1),
           ...notes,
-          ...queue.slice(session.queueIndex + 1, queue.length)];
+          ...queue.slice(session.queueIndex + 1, queue.length),
+        ];
         const adjustedSession = {
           ...session,
           noteQueue: adjustedNoteQueue,
@@ -49,10 +51,10 @@ export default function pipe(appState) {
       return appState;
     }
     const adjustedNoteQueue = [...noteQueue];
-    const minIndex = session.queueIndex < session.baseQueueLength ?
-                      session.baseQueueLength : session.queueIndex;
-    const adjustNoteIndex =
-      getRandomInt(minIndex, noteQueue.length);
+    const minIndex = session.queueIndex < session.baseQueueLength
+      ? session.baseQueueLength
+      : session.queueIndex;
+    const adjustNoteIndex = getRandomInt(minIndex, noteQueue.length);
 
     adjustedNoteQueue.splice(adjustNoteIndex, 0, getCurrentNote(session));
     const adjustedSession = {

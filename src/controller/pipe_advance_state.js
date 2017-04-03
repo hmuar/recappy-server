@@ -1,6 +1,4 @@
-import { SessionState,
-         getEntryStateForNoteType,
-         getPaths } from '~/core/session_state';
+import { SessionState, getEntryStateForNoteType, getPaths } from '~/core/session_state';
 import Input from '~/core/input';
 import { getNextNotes, TARGET_NUM_NOTES_IN_SESSION } from '~/core/scheduler';
 import { EvalStatus, isFailResponse } from '~/core/eval';
@@ -27,8 +25,7 @@ function isValidEval(appState) {
 }
 
 function setPostEvalState(appState) {
-  if (!appState.session || !appState.session.state ||
-      !appState.evalCtx) {
+  if (!appState.session || !appState.session.state || !appState.evalCtx) {
     return appState;
   }
 
@@ -60,8 +57,7 @@ function setPostEvalState(appState) {
         // if min quality response, check for possible note paths
         if (isFailResponse(appState.evalCtx.answerQuality)) {
           const paths = getPaths(appState.session);
-          postEvalState = paths ? SessionState.SHOW_PATHS :
-            SessionState.WAIT_NEXT_IN_QUEUE;
+          postEvalState = paths ? SessionState.SHOW_PATHS : SessionState.WAIT_NEXT_IN_QUEUE;
         } else {
           postEvalState = SessionState.WAIT_NEXT_IN_QUEUE;
         }
@@ -89,10 +85,7 @@ function advanceState(appState) {
       // update note queue
       // update queueIndex
       // update globalIndex
-      // export function getNextNotes(userID, subjectID, numNotes, lastGlobalIndex) {
       const { userID, subjectID } = appState;
-      // XXX: Temp hardcode global index to 0
-      // const nextGlobalIndex = 0;
       const nextGlobalIndex = appState.session.globalIndex + 1;
 
       // XXX Dev loophole to allow date control
@@ -108,15 +101,14 @@ function advanceState(appState) {
         }
       }
 
-      return getNextNotes(userID,
-                   subjectID,
-                   nextGlobalIndex,
-                   TARGET_NUM_NOTES_IN_SESSION,
-                   cutoffDate)
-      .then(nextNotesArray => {
-        // const [oldNotes, newNotes] = nextNotesArray;
-        // const nextNotes = oldNotes.concat(newNotes);
-        const nextNotes = nextNotesArray;
+      return getNextNotes(
+        userID,
+        subjectID,
+        nextGlobalIndex,
+        TARGET_NUM_NOTES_IN_SESSION,
+        cutoffDate,
+      ).then(notes => {
+        const nextNotes = notes.notes;
         if (nextNotes && nextNotes.length > 0) {
           return {
             ...appState,
@@ -125,7 +117,7 @@ function advanceState(appState) {
               ...appState.session,
               noteQueue: nextNotes,
               queueIndex: 0,
-              globalIndex: nextGlobalIndex,
+              globalIndex: notes.maxGlobalIndex,
               baseQueueLength: nextNotes.length,
               state: getEntryStateForNoteType(nextNotes[0].type),
             },
@@ -136,8 +128,10 @@ function advanceState(appState) {
       });
     }
 
-    if (appState.postEvalState === SessionState.WAIT_NEXT_IN_QUEUE ||
-        appState.postEvalState === SessionState.START_QUEUE) {
+    if (
+      appState.postEvalState === SessionState.WAIT_NEXT_IN_QUEUE ||
+      appState.postEvalState === SessionState.START_QUEUE
+    ) {
       const { queueIndex, noteQueue } = appState.session;
       let nextSessionState = appState.postEvalState;
       let nextQueueIndex = queueIndex;

@@ -18,7 +18,6 @@ import pipeAddPaths from './pipe_add_paths';
 // }
 
 export default class Controller {
-
   constructor(adapter) {
     this.adapter = adapter;
   }
@@ -26,8 +25,7 @@ export default class Controller {
   // check if key property added to msg and
   // corresponding value is not undefined and not null
   pipeSuccess(appState, key) {
-    return {}.hasOwnProperty.call(appState, key) &&
-           appState[key] != null;
+    return {}.hasOwnProperty.call(appState, key) && appState[key] != null;
   }
 
   // convert adapter specific sender id into app user id
@@ -44,13 +42,13 @@ export default class Controller {
 
   debugDBAssist(msg) {
     DBAssist.getCategoryByName('subject', msg.subjectName)
-    .then((subject) => {
-      log(subject);
-    })
-    .catch((err) => {
-      logErr('error finding category by name');
-      logErr(err);
-    });
+      .then(subject => {
+        log(subject);
+      })
+      .catch(err => {
+        logErr('error finding category by name');
+        logErr(err);
+      });
   }
 
   sendResponse(state) {
@@ -68,49 +66,47 @@ export default class Controller {
   // main entry method called by external adapters
   registerMsg(msg) {
     return DBAssist.getCategoryByName('subject', msg.subjectName)
-    .then(subject => {
-      if (!subject) {
-        throw new Error(`Could not find subject ${msg.subjectName}`);
-      } else {
-        const appState = {
-          ...msg,
-          subjectID: subject._id,
-        };
-        // convert adapter specific sender id into app user
-        return this.pipeUser(appState)
-        // at this point should have app user information
-        .then(state => pipeAddSession(state))
-        // at this point should have session information
-        // need to evaluate msg in context of current state
-        .then(state => pipeEval(state))
-        .then(state => this.sendFeedbackResponse(state))
-        // persist results of msg evaluation
-        .then(state => pipeRecord(state))
-        // adjust queue based on evaluation
-        .then(state => pipeAdjustQueue(state))
-        // advance session state
-        .then(state => pipeAdvanceState(state))
-        .then(state => pipeAddPaths(state))
-        .then(state => logState(state))
-        // record new session state
-        .then(state => pipeSaveSession(state))
-        // .then(state => logState(state))
-        .then(state => {
-          // don't include this in return chain because this final udpate
-          // can happen asynchronously
-          pipeStudentModel(state);
-          console.log('^^^^^^ State before sending response ^^^^^^^');
-          if (state.feedback) {
-            console.log(state.feedback);
-          }
-          return this.sendResponse(state);
-        });
-      }
-    })
-    .catch((err) => {
-      logErr('error registering message in controller');
-      logErr(err);
-    });
+      .then(subject => {
+        if (!subject) {
+          throw new Error(`Could not find subject ${msg.subjectName}`);
+        } else {
+          const appState = {
+            ...msg,
+            subjectID: subject._id,
+          };
+          // convert adapter specific sender id into app user
+          return (
+            this.pipeUser(appState)
+              // at this point should have app user information
+              .then(state => pipeAddSession(state))
+              // at this point should have session information
+              // need to evaluate msg in context of current state
+              .then(state => pipeEval(state))
+              .then(state => this.sendFeedbackResponse(state))
+              // persist results of msg evaluation
+              .then(state => pipeRecord(state))
+              // adjust queue based on evaluation
+              .then(state => pipeAdjustQueue(state))
+              // advance session state
+              .then(state => pipeAdvanceState(state))
+              .then(state => pipeAddPaths(state))
+              .then(state => logState(state))
+              // record new session state
+              .then(state => pipeSaveSession(state))
+              // .then(state => logState(state))
+              .then(state => {
+                // don't include this in return chain because this final udpate
+                // can happen asynchronously
+                pipeStudentModel(state);
+                console.log(state);
+                return this.sendResponse(state);
+              })
+          );
+        }
+      })
+      .catch(err => {
+        logErr('error registering message in controller');
+        logErr(err);
+      });
   }
-
 }
