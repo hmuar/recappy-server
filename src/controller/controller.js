@@ -98,7 +98,6 @@ export default class Controller {
                 // don't include this in return chain because this final udpate
                 // can happen asynchronously
                 pipeStudentModel(state);
-                console.log(state);
                 return this.sendResponse(state);
               })
           );

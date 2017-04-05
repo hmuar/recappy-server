@@ -4,9 +4,10 @@ import Hapi from 'hapi';
 import FBMessenger from './resource/fbmessenger';
 import Webclient from './resource/webclient';
 import NextQueue from './resource/nextqueue';
+import Admin from './resource/admin';
 import Database from './db/db';
 
-const resources = [FBMessenger, Webclient, NextQueue];
+const resources = [FBMessenger, Webclient, NextQueue, Admin];
 
 export default class Server {
   constructor() {
@@ -18,16 +19,14 @@ export default class Server {
       port,
     });
     // map routes to resources
-    resources.map((resource) => (
-      resource.routes('/api/v1')
-        .map(routeData => this.server.route(routeData))
-    ));
+    resources.map(resource =>
+      resource.routes('/api/v1').map(routeData => this.server.route(routeData)));
   }
 
   // returns Promise
   start(pluginArray) {
     const plugins = pluginArray || [];
-    return this.server.register(plugins).then((err) => {
+    return this.server.register(plugins).then(err => {
       if (err) {
         this.server.log('error', 'Error registering plugins.');
         this.server.log('error', err);
@@ -35,10 +34,9 @@ export default class Server {
       }
       this.server.log('info', 'Done registering server plugins');
       const db = new Database();
-      return db.setup()
-      .then(() => {
+      return db.setup().then(() => {
         this.server.log('info', 'Connected to database');
-        return this.server.start((startErr) => {
+        return this.server.start(startErr => {
           if (startErr) {
             this.server.log('error', 'Error starting server');
             this.server.log('error', startErr);

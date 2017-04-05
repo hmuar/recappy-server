@@ -27,6 +27,17 @@ function getCategoryById(catId) {
   return Category.findById(catId);
 }
 
+function getNoteById(catId) {
+  return Note.findById(catId);
+}
+
+function getNotesByIds(ids) {
+  return Note.find({ _id: { $in: ids } }).exec((err, docs) =>
+    docs.sort(
+      (a, b) => ids.findIndex(id => a._id.equals(id)) - ids.findIndex(id => b._id.equals(id)),
+    ));
+}
+
 function getUnitsInOrder(subjectID) {
   const parentQuery = getParentQueryWithId([subjectID]);
   if (parentQuery.length === 0) {
@@ -36,8 +47,7 @@ function getUnitsInOrder(subjectID) {
 }
 
 function getTopicsInOrder(subjectID, unitID) {
-  const parentQuery = getParentQueryWithId([subjectID,
-                                    unitID]);
+  const parentQuery = getParentQueryWithId([subjectID, unitID]);
   if (parentQuery.length === 0) {
     return [];
   }
@@ -45,9 +55,7 @@ function getTopicsInOrder(subjectID, unitID) {
 }
 
 function getConceptsInOrder(subjectID, unitID, topicID) {
-  const parentQuery = getParentQueryWithId([subjectID,
-                                    unitID,
-                                    topicID]);
+  const parentQuery = getParentQueryWithId([subjectID, unitID, topicID]);
   if (parentQuery.length === 0) {
     return [];
   }
@@ -68,14 +76,10 @@ function getConceptsInOrder(subjectID, unitID, topicID) {
 
 function getAllChildNotes(catID) {
   const formatCatID = typeof catID === 'string' ? ObjectID(catID) : catID;
-  return getCategoryById(formatCatID)
-  .then((cat) => {
+  return getCategoryById(formatCatID).then(cat => {
     let noteParents = [cat._id];
     if (cat.parent) {
-      noteParents = [
-        ...cat.parent,
-        ...noteParents,
-      ];
+      noteParents = [...cat.parent, ...noteParents];
     }
     const childNotesQuery = { ctype: 'note', parent: { $all: noteParents } };
     return Note.find(childNotesQuery).sort('globalIndex');
@@ -93,6 +97,8 @@ const CategoryAssistant = {
   getConceptsInOrder,
   // getNotesInOrder,
   getAllChildNotes,
+  getNoteById,
+  getNotesByIds,
 };
 
 export default CategoryAssistant;
