@@ -3,17 +3,17 @@ const winston = require('winston');
 
 winston.level = 'info';
 
-winston.add(
-  winston.transports.File, {
-    filename: 'logs/server.log',
-    level: 'info',
-    eol: '\n', // for Windows, or `eol: ‘n’,` for *NIX OSs
-    json: false,
-    prettyPrint: true,
-    timestamp: true,
-    colorize: false,
-  }
-);
+winston.add(winston.transports.File, {
+  name: 'file',
+  filename: 'logs/server.log',
+  level: 'info',
+  eol: '\n', // for Windows, or `eol: ‘n’,` for *NIX OSs
+  json: false,
+  prettyPrint: true,
+  // prettyPrint: object => JSON.stringify(object),
+  timestamp: true,
+  colorize: false,
+});
 
 // Loggly support
 // winston.add(winston.transports.Loggly, {
@@ -38,15 +38,17 @@ export function logErr(msg) {
 }
 
 export function logState(appState) {
-  const { input,
-          userID,
-          senderID,
-          session,
-          evalCtx,
-          paths,
-          preEvalState,
-          postEvalState } = appState;
-  const { queueIndex, state, globalIndex } = session;
+  const {
+    input,
+    userID,
+    senderID,
+    session,
+    evalCtx,
+    paths,
+    preEvalState,
+    postEvalState,
+  } = appState;
+  const { queueIndex, state, globalIndex, } = session;
   let noteType = 'None';
   const maxQueueIndex = session.noteQueue.length - 1;
   if (queueIndex <= maxQueueIndex) {
@@ -60,8 +62,8 @@ export function logState(appState) {
     paths,
     state: `${preEvalState} --> ${postEvalState} --> ${state}`,
     globalIndex,
-    queue: session.noteQueue.map((note) => ({
-      group: note.group,
+    queue: session.noteQueue.map(note => ({
+      display: note.displayRaw.slice(0, 20),
       type: note.type,
     })),
   };

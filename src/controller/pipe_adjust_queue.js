@@ -1,7 +1,8 @@
-import { isFailResponse } from '~/core/eval';
+import { isFailResponse, EvalStatus } from '~/core/eval';
 import { SessionState, getCurrentNote } from '~/core/session_state';
 import { MAX_NOTES_IN_QUEUE } from '~/core/scheduler';
 import CategoryAssistant from '~/db/category_assistant';
+import { log } from '~/logger';
 
 function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min);
@@ -16,6 +17,11 @@ export default function pipe(appState) {
     return appState;
   }
 
+  if (appState.evalCtx.status === EvalStatus.INVALID) {
+    log('Invalid evaluation, skipping adjust queue.');
+    return appState;
+  }
+
   const session = appState.session;
 
   // adjust session with additional notes from path
@@ -27,7 +33,7 @@ export default function pipe(appState) {
         const adjustedNoteQueue = [
           ...queue.slice(0, session.queueIndex + 1),
           ...notes,
-          ...queue.slice(session.queueIndex + 1, queue.length),
+          ...queue.slice(session.queueIndex + 1, queue.length)
         ];
         const adjustedSession = {
           ...session,

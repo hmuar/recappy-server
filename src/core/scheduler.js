@@ -20,10 +20,10 @@ export function getOldMaterial(userID, subjectID, numNotes, dueDate) {
   return NoteRecord.find({
     userID,
     subjectParent: subjectID,
-    due: { $lte: dateCutoff },
-    noteType: { $ne: 'info' },
+    due: { $lte: dateCutoff, },
+    noteType: { $ne: 'info', },
   })
-    .select({ _id: 0, noteID: 1, due: 1 })
+    .select({ _id: 0, noteID: 1, due: 1, })
     .limit(numNotes)
     .then(dueNotes =>
       dueNotes.map(item => {
@@ -32,7 +32,7 @@ export function getOldMaterial(userID, subjectID, numNotes, dueDate) {
         // map each note to its noteID
         return item.noteID;
       }))
-    .then(noteIDs => Note.find({ _id: { $in: noteIDs } }))
+    .then(noteIDs => Note.find({ _id: { $in: noteIDs, }, }))
     .then(notes =>
       notes.map(note => {
         const noteIDString = note._id.toString();
@@ -79,19 +79,17 @@ export function getNewMaterial(subjectID, numNotes, globalIndex = 0, prevNotes =
       });
     }
     // XXX: during dev, skip info notes
-    return Note.find({ directParent: nextConcept._id }).sort('order').then(notes => {
+    return Note.find({ directParent: nextConcept._id, }).sort('order').then(notes => {
       const mergedNotes = [...prevNotes, ...notes];
       // terminate and return results
       if (mergedNotes.length >= numNotes || globalIndex >= MAX_GLOBAL_INDEX) {
-        log(`Got enough notes, returning ${mergedNotes.length} notes`);
+        // log(`Got enough notes, returning ${mergedNotes.length} notes`);
         return Promise.resolve({
           notes: mergedNotes,
           maxGlobalIndex: globalIndex,
         });
       }
 
-      log(`Recursive call in getNewMaterial, currently with ${mergedNotes.length} notes`);
-      log(`Looking for a target of ${numNotes}`);
       // recursively get more new material
       return getNewMaterial(subjectID, numNotes, globalIndex + 1, mergedNotes);
     });
@@ -110,7 +108,7 @@ export function getNextNotes(
   subjectID,
   globalIndex = 0,
   num = TARGET_NUM_NOTES_IN_SESSION,
-  dueDate = null,
+  dueDate = null
 ) {
   const numNotes = num == null ? TARGET_NUM_NOTES_IN_SESSION : num;
   if (numNotes <= 0) {
@@ -127,7 +125,7 @@ export function getNextNotes(
         ...oldNotes.map(note => {
           note.queueStatus = 'old'; // eslint-disable-line no-param-reassign
           return note;
-        }),
+        })
       ];
       // result = [...result, ...oldNotes];
       const newNotesNum = numNotes - oldNotes.length;
@@ -142,7 +140,7 @@ export function getNextNotes(
         ...newNotes.notes.map(note => {
           note.queueStatus = 'new'; // eslint-disable-line no-param-reassign
           return note;
-        }),
+        })
       ];
       // remove duplicate notes that were in both old and new lists
       const uniqResult = _.uniqBy(result, elem => elem._id.toString());

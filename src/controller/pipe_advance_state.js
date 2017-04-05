@@ -85,7 +85,7 @@ function advanceState(appState) {
       // update note queue
       // update queueIndex
       // update globalIndex
-      const { userID, subjectID } = appState;
+      const { userID, subjectID, } = appState;
       const nextGlobalIndex = appState.session.globalIndex + 1;
 
       // XXX Dev loophole to allow date control
@@ -106,7 +106,7 @@ function advanceState(appState) {
         subjectID,
         nextGlobalIndex,
         TARGET_NUM_NOTES_IN_SESSION,
-        cutoffDate,
+        cutoffDate
       ).then(notes => {
         const nextNotes = notes.notes;
         if (nextNotes && nextNotes.length > 0) {
@@ -132,7 +132,7 @@ function advanceState(appState) {
       appState.postEvalState === SessionState.WAIT_NEXT_IN_QUEUE ||
       appState.postEvalState === SessionState.START_QUEUE
     ) {
-      const { queueIndex, noteQueue } = appState.session;
+      const { queueIndex, noteQueue, } = appState.session;
       let nextSessionState = appState.postEvalState;
       let nextQueueIndex = queueIndex;
 

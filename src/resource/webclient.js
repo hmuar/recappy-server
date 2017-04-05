@@ -32,13 +32,13 @@ function routes(apiVersionPath) {
       const postBody = getPostBody(request);
       const controller = new Controller(AdapterWebclient);
       const msg = AdapterWebclient.parse(postBody);
-      console.log(msg);
       if (msg.input.type != null) {
-        controller.registerMsg(msg)
-        .then((state) => {
-          reply(state);
-        })
-        .catch((err) => logErr(err));
+        controller
+          .registerMsg(msg)
+          .then(state => {
+            reply(state);
+          })
+          .catch(err => logErr(err));
       } else {
         log('Unrecognized message');
         reply('Unrecognized message');

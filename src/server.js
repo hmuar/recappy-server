@@ -32,19 +32,18 @@ export default class Server {
         this.server.log('error', err);
         throw err; // something bad happened loading the plugin
       }
-      this.server.log('info', 'Done registering server plugins');
+      // this.server.log('info', 'Done registering server plugins');
       const db = new Database();
-      return db.setup().then(() => {
-        this.server.log('info', 'Connected to database');
-        return this.server.start(startErr => {
-          if (startErr) {
-            this.server.log('error', 'Error starting server');
-            this.server.log('error', startErr);
-            throw startErr;
-          }
-          this.server.log('info', `Server running at: ${this.server.info.uri}`);
-        });
-      });
+      return db.setup().then(() =>
+        // this.server.log('info', 'Connected to database');
+         this.server.start(startErr => {
+           if (startErr) {
+             this.server.log('error', 'Error starting server');
+             this.server.log('error', startErr);
+             throw startErr;
+           }
+           this.server.log('info', `Server running at: ${this.server.info.uri}`);
+         }));
     });
   }
 

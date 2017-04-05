@@ -52,13 +52,11 @@ export default class Controller {
   }
 
   sendResponse(state) {
-    console.log('--- Controller send response ----');
     // return state;
     return this.adapter.sendResponse(state);
   }
 
   sendFeedbackResponse(state) {
-    console.log('--- Controller sendFeedbackResponse ------');
     // return state;
     return this.adapter.sendFeedbackResponse(state);
   }
@@ -90,10 +88,10 @@ export default class Controller {
               // advance session state
               .then(state => pipeAdvanceState(state))
               .then(state => pipeAddPaths(state))
-              .then(state => logState(state))
+              // .then(state => logState(state))
               // record new session state
               .then(state => pipeSaveSession(state))
-              // .then(state => logState(state))
+              .then(state => logState(state))
               .then(state => {
                 // don't include this in return chain because this final udpate
                 // can happen asynchronously

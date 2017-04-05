@@ -17,19 +17,18 @@ function senderToUser(msgData) {
   if (!fbUserID) {
     throw new Error('Could not find senderID, could not convert to user');
   } else {
-    return Account.getUserByFacebookMsgID(fbUserID)
-      .then((user) => {
-        if (!user) {
-          return {
-            ...msgData,
-            userID: null,
-          };
-        }
+    return Account.getUserByFacebookMsgID(fbUserID).then(user => {
+      if (!user) {
         return {
           ...msgData,
-          userID: user._id,
+          userID: null,
         };
-      });
+      }
+      return {
+        ...msgData,
+        userID: user._id,
+      };
+    });
   }
 }
 
@@ -39,8 +38,7 @@ function createUser(mData) {
   if (!fbUserID) {
     return Promise.error(null);
   }
-  return Account.createUserWithFacebookMsgID(fbUserID)
-  .then((user) => ({
+  return Account.createUserWithFacebookMsgID(fbUserID).then(user => ({
     ...mData,
     userID: user._id,
   }));
@@ -64,12 +62,12 @@ function getMsgType(msg) {
 function contentExtractor(msgType) {
   // return prop nested inside parent
   function getNestedProp(parent, prop) {
-    return (obj) => obj[parent][prop];
+    return obj => obj[parent][prop];
   }
   const extMap = {};
   extMap[MessageType.TEXT] = getNestedProp('message', 'text');
   extMap[MessageType.POSTBACK] = getNestedProp('postback', 'payload');
-  extMap[MessageType.QUICK_REPLY] = (obj) => obj.message.quick_reply.payload;
+  extMap[MessageType.QUICK_REPLY] = obj => obj.message.quick_reply.payload;
   extMap[MessageType.UNKNOWN] = () => null;
   return extMap[msgType];
 }
@@ -84,17 +82,14 @@ function stripChoiceNum(choice) {
 // given obj object based on given `msgType`
 function contentInjector(msgType) {
   if (msgType === MessageType.TEXT) {
-    return (msg, content) => (
-      {
-        ...msg,
-        input: {
-          type: Input.Type.CUSTOM,
-          payload: content,
-        },
-      }
-    );
-  } else if (msgType === MessageType.POSTBACK ||
-             msgType === MessageType.QUICK_REPLY) {
+    return (msg, content) => ({
+      ...msg,
+      input: {
+        type: Input.Type.CUSTOM,
+        payload: content,
+      },
+    });
+  } else if (msgType === MessageType.POSTBACK || msgType === MessageType.QUICK_REPLY) {
     return (msg, content) => {
       let mtype = null;
       let dataVal = null;
@@ -124,15 +119,13 @@ function contentInjector(msgType) {
     };
   }
 
-  return (msg) => (
-    {
-      ...msg,
-      input: {
-        type: Input.Type.UNKNOWN,
-        payload: null,
-      },
-    }
-  );
+  return msg => ({
+    ...msg,
+    input: {
+      type: Input.Type.UNKNOWN,
+      payload: null,
+    },
+  });
 }
 
 // Parse incoming POST body and return a msg object
@@ -150,7 +143,6 @@ function parse(requestBody) {
     subjectName: HARDCODED_SUBJ_NAME,
     input: null,
   };
-  console.log(msg);
 
   const msgType = getMsgType(msg);
   const content = contentExtractor(msgType)(msg);
@@ -159,9 +151,7 @@ function parse(requestBody) {
 }
 
 function evalSuccess(state) {
-  return (state &&
-          state.evalCtx &&
-          state.evalCtx.status === EvalStatus.SUCCESS);
+  return state && state.evalCtx && state.evalCtx.status === EvalStatus.SUCCESS;
 }
 
 // function advancedState(state) {

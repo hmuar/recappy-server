@@ -33,7 +33,6 @@ export default class AdminController {
   }
 
   formResponse(state, response) {
-    console.log('--- Controller send response ----');
     return {
       ...state,
       response,
@@ -41,7 +40,6 @@ export default class AdminController {
   }
 
   setNoteQueueWithIds(msg) {
-    console.log('setNoteQueueWithIds');
     const idList = msg.manualQueueIds;
     const subjectName = msg.subjectName;
 
@@ -67,9 +65,6 @@ export default class AdminController {
   }
 
   registerMsg(msg) {
-    console.log(msg);
-    console.log(msg.manualQueueIds);
-    console.log('__________');
     if (msg.manualQueueIds) {
       return this.setNoteQueueWithIds(msg);
     }

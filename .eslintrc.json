@@ -8,7 +8,14 @@
       "no-console": "off",
       "no-mixed-operators": "off",
       "import/no-extraneous-dependencies": ["error", { "devDependencies": true }],
-      "import/no-unresolved": ["error", { "ignore": ["^[~]"] }]
+      "import/no-unresolved": ["error", { "ignore": ["^[~]"] }],
+      "comma-dangle": ["error", {
+        "arrays": "never",
+        "objects": "always",
+        "imports": "never",
+        "exports": "never",
+        "functions": "only-multiline"
+      }]
     },
     "parserOptions":{
       "ecmaFeatures": {

@@ -3,8 +3,7 @@ import { SessionState } from '~/core/session_state';
 import generateQuestion from '~/speech';
 import Answer from '~/core/answer';
 import { logErr } from '~/logger';
-import { sendMessages,
-         sendImage } from './webclient_request';
+import { sendMessages, sendImage } from './webclient_request';
 
 export function sendPossibleImage(senderID, note) {
   if ('imgUrl' in note) {
@@ -16,11 +15,8 @@ export function sendPossibleImage(senderID, note) {
 }
 
 function extractFeedbackResp(feedback) {
-  console.log('extract feedback resp');
-  console.log(feedback);
   if (feedback && feedback.message) {
-    return feedback.message
-      .filter((msg) => msg.text);
+    return feedback.message.filter(msg => msg.text);
   }
   return [];
 }
@@ -30,15 +26,13 @@ function sendResponseInContext(state) {
   const session = state.session;
   const note = session.noteQueue[session.queueIndex];
   const preResponses = extractFeedbackResp(state.feedback);
-  console.log('*** preResponses ****************');
-  console.log(preResponses);
   switch (session.state) {
     case SessionState.INIT: {
       const response = sendMessages(fbUserID, [
         {
           text: "Let's get started!",
           replies: [],
-        },
+        }
       ]);
       return Promise.resolve([response]);
     }
@@ -55,7 +49,7 @@ function sendResponseInContext(state) {
         {
           text: note.display,
           replies: quickReplyData,
-        },
+        }
       ]);
       return Promise.resolve([response]);
     }
@@ -73,7 +67,7 @@ function sendResponseInContext(state) {
         {
           text: questionText,
           replies: quickReplyData,
-        },
+        }
       ]);
       return Promise.resolve([response]);
     }
@@ -90,20 +84,17 @@ function sendResponseInContext(state) {
       });
       // return sendPossibleImage(fbUserID, note)
       const quickReplyText = 'Is that what you were thinking?';
-      const response = sendMessages(
-        fbUserID,
-        [
-          ...preResponses,
-          {
-            text: note.hidden,
-            replies: [],
-          },
-          {
-            text: quickReplyText,
-            replies: quickReplyData,
-          },
-        ]
-      );
+      const response = sendMessages(fbUserID, [
+        ...preResponses,
+        {
+          text: note.hidden,
+          replies: [],
+        },
+        {
+          text: quickReplyText,
+          replies: quickReplyData,
+        }
+      ]);
       return Promise.resolve([response]);
     }
 
@@ -115,7 +106,7 @@ function sendResponseInContext(state) {
         {
           text: questionText,
           replies: [],
-        },
+        }
       ]);
       return Promise.resolve([response]);
     }
@@ -129,26 +120,21 @@ function sendResponseInContext(state) {
       choicesText += `(3) ${note.choice3}\n`;
       choicesText += `(4) ${note.choice4}\n`;
       choicesText += `(5) ${note.choice5}`;
-      const quickReplyData = [1, 2, 3, 4, 5].map((num) => (
+      const quickReplyData = [1, 2, 3, 4, 5].map(num => ({
+        title: `${num}`,
+        action: getChoiceInput(num),
+      }));
+      const response = sendMessages(fbUserID, [
+        ...preResponses,
         {
-          title: `${num}`,
-          action: getChoiceInput(num),
+          text: questionText,
+          replies: [],
+        },
+        {
+          text: choicesText,
+          replies: quickReplyData,
         }
-      ));
-      const response = sendMessages(
-        fbUserID,
-        [
-          ...preResponses,
-          {
-            text: questionText,
-            replies: [],
-          },
-          {
-            text: choicesText,
-            replies: quickReplyData,
-          },
-        ]
-      );
+      ]);
       return Promise.resolve([response]);
     }
 
@@ -156,36 +142,28 @@ function sendResponseInContext(state) {
       if (!state.paths || state.paths.length === 0) {
         return Promise.resolve(0);
       }
-      const quickReplyData = state.paths.map((path) => (
+      const quickReplyData = state.paths.map(path => ({
+        title: path.display,
+        action: getPathInput(path.index),
+      }));
+      const response = sendMessages(fbUserID, [
+        ...preResponses,
         {
-          title: path.display,
-          action: getPathInput(path.index),
+          text: 'Where to from here?',
+          replies: quickReplyData,
         }
-      ));
-      const response = sendMessages(
-        fbUserID,
-        [
-          ...preResponses,
-          {
-            text: 'Where to from here?',
-            replies: quickReplyData,
-          },
-        ]
-      );
+      ]);
       return Promise.resolve([response]);
     }
 
     case SessionState.DONE_QUEUE: {
-      const response = sendMessages(
-        fbUserID,
-        [
-          ...preResponses,
-          {
-            text: 'No more to learn for today, all done! Check back in tomorrow :)',
-            replies: [],
-          },
-        ]
-      );
+      const response = sendMessages(fbUserID, [
+        ...preResponses,
+        {
+          text: 'No more to learn for today, all done! Check back in tomorrow :)',
+          replies: [],
+        }
+      ]);
       return Promise.resolve([response]);
     }
 
@@ -196,16 +174,18 @@ function sendResponseInContext(state) {
 }
 
 export default function sendResponse(state) {
-  return sendResponseInContext(state)
-  // .then(() => state)
-  .catch((err) => {
-    if (state.session) {
-      logErr(`Error sending response from ${state.session.state} state`);
-    } else {
-      logErr('Error sending response');
-    }
-    logErr(err);
-  });
+  return (
+    sendResponseInContext(state)
+      // .then(() => state)
+      .catch(err => {
+        if (state.session) {
+          logErr(`Error sending response from ${state.session.state} state`);
+        } else {
+          logErr('Error sending response');
+        }
+        logErr(err);
+      })
+  );
 }
 
 function posFeedback() {
@@ -225,7 +205,7 @@ function sendFeedbackText(toID, isPositive, correctMsg = null) {
     {
       text: msg,
       replies: [],
-    },
+    }
   ]);
 }
 
@@ -238,14 +218,12 @@ export function sendFeedbackResp(state) {
     case SessionState.RECALL_RESPONSE:
     case SessionState.INPUT:
     case SessionState.MULT_CHOICE:
-      console.log('sendFeedbackResp......................');
-      console.log(sendFeedbackText(fbUserID, isCorrect, state.evalCtx.correctAnswer));
       return Promise.resolve({
         ...state,
         feedback: sendFeedbackText(fbUserID, isCorrect, state.evalCtx.correctAnswer),
       });
-      // return sendFeedbackText(fbUserID, isCorrect, state.evalCtx.correctAnswer)
-      //       .then(() => state);
+    // return sendFeedbackText(fbUserID, isCorrect, state.evalCtx.correctAnswer)
+    //       .then(() => state);
     default:
       break;
   }

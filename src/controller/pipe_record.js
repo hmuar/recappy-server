@@ -12,7 +12,7 @@ const recordableStates = [
   SessionState.INPUT,
   SessionState.MULT_CHOICE,
   SessionState.INFO,
-  SessionState.SHOW_PATHS,
+  SessionState.SHOW_PATHS
 ];
 
 function calcNoteHealth(responseHistory) {
@@ -42,15 +42,13 @@ function calcNoteHealth(responseHistory) {
   }
 
   // var avg = sum / (lastResponses.length + 1);
-  const avg = sum / (lastResponses.length);
+  const avg = sum / lastResponses.length;
   return avg;
 }
 
 // calculate new factor
 // calculate new interval
-function pipeSpaceRepVals(recordCtx,
-                          record,
-                          evalCtx) {
+function pipeSpaceRepVals(recordCtx, record, evalCtx) {
   const rec = record || {
     factor: SpacedRep.defaultFactor,
     interval: SpacedRep.defaultInterval,
@@ -61,10 +59,7 @@ function pipeSpaceRepVals(recordCtx,
   const newFactor = SpacedRep.calcFactor(rec.factor, responseQuality);
   const newCount = rec.count + 1;
 
-  const newInterval = SpacedRep.calcInterval(rec.interval,
-                                           newFactor,
-                                           newCount,
-                                           responseQuality);
+  const newInterval = SpacedRep.calcInterval(rec.interval, newFactor, newCount, responseQuality);
   const factorHistory = rec.factorHistory || [];
   const intervalHistory = rec.intervalHistory || [];
 
@@ -174,9 +169,10 @@ export default function pipe(appState) {
     return appState;
   }
 
-  return NoteRecord.findOne({ userID: appState.userID,
-                             noteID: note._id })
-  .then(record => {
+  return NoteRecord.findOne({
+    userID: appState.userID,
+    noteID: note._id,
+  }).then(record => {
     let recordCtx = {};
     if (session.state === SessionState.SHOW_PATHS) {
       recordCtx = pipePathHistory(recordCtx, record, evalCtx);
@@ -188,21 +184,15 @@ export default function pipe(appState) {
     }
 
     if (record) {
-      return record.update(recordCtx).then(() => (
-        {
-          ...appState,
-          recordCtx,
-        }
-      ));
+      return record.update(recordCtx).then(() => ({
+        ...appState,
+        recordCtx,
+      }));
     }
     // need to create new record
-    return createNewRecord(appState.userID,
-                           note,
-                           recordCtx).then(() => (
-                             {
-                               ...appState,
-                               recordCtx,
-                             }
-                           ));
+    return createNewRecord(appState.userID, note, recordCtx).then(() => ({
+      ...appState,
+      recordCtx,
+    }));
   });
 }

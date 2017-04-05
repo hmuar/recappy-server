@@ -17,7 +17,7 @@ function addNewSession(appState) {
         startNoteIndex,
         noteQueue,
         notesInfo.maxGlobalIndex,
-        noteQueue.length,
+        noteQueue.length
       );
     })
     .then(session => ({
