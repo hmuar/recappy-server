@@ -108,4 +108,4 @@ test('get child notes for concept', t =>
     t.equal(notes.length, 10);
   }));
 
-after('after account testing', () => db.close());
+after('db assistant testing', () => db.close());

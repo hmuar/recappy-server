@@ -22,11 +22,13 @@ let testUser = null;
 function getSession(queueIndex, state) {
   return {
     queueIndex,
-    noteQueue:
-      [{ _id: db.createObjectID('9e16c772556579bd6fc6c222'),
+    noteQueue: [
+      {
+        _id: db.createObjectID('9e16c772556579bd6fc6c222'),
         type: 'info',
       },
-      { _id: db.createObjectID('987e8177faf2c2f03c974482'),
+      {
+        _id: db.createObjectID('987e8177faf2c2f03c974482'),
         type: 'recall',
         paths: [
           {
@@ -38,16 +40,19 @@ function getSession(queueIndex, state) {
             display: 'electron?',
             catName: 'electron-shell',
             catId: '7980227254feb46736ca47fd',
-          },
+          }
         ],
       },
-      { _id: db.createObjectID('987e8177faf2c2f03c974482'),
+      {
+        _id: db.createObjectID('987e8177faf2c2f03c974482'),
         type: 'input',
         paths: ['fake path input'],
       },
-      { _id: db.createObjectID('ff7cbfb397fb2794827739ad'),
+      {
+        _id: db.createObjectID('ff7cbfb397fb2794827739ad'),
         type: 'choice',
-      }],
+      }
+    ],
     state,
     globalIndex: 0,
   };
@@ -83,21 +88,22 @@ function getAppState(session, evalCtx) {
   };
 }
 
-before('before controller advance state testing', () => (
-  db.setup().then(() => db.clean()).then(() => db.loadAllFixtures()))
-  .then(() => DBAssist.getCategoryByName('subject', SUBJECT_NAME))
-  .then(subj => {
-    subject = subj;
-    return db.getTestUser();
-  })
-  .then(user => {
-    testUser = user;
-  }
-));
+before('before controller advance state testing', () =>
+  db
+    .setup()
+    .then(() => db.clean())
+    .then(() => db.loadAllFixtures())
+    .then(() => DBAssist.getCategoryByName('subject', SUBJECT_NAME))
+    .then(subj => {
+      subject = subj;
+      return db.getTestUser();
+    })
+    .then(user => {
+      testUser = user;
+    }));
 
 test('test transition from state INIT', t => {
-  const appState = getAppState(getSession(0, SessionState.INIT),
-                               successEval(Answer.ok));
+  const appState = getAppState(getSession(0, SessionState.INIT), successEval(Answer.ok));
   const nextAppState = pipeStateTransition(appState);
   t.equal(nextAppState.session.state, SessionState.INFO);
   t.equal(nextAppState.session.queueIndex, 0);
@@ -105,8 +111,7 @@ test('test transition from state INIT', t => {
 });
 
 test('test transition from state INFO success', t => {
-  const appState = getAppState(getSession(0, SessionState.INFO),
-                               successEval(Answer.ok));
+  const appState = getAppState(getSession(0, SessionState.INFO), successEval(Answer.ok));
   const nextAppState = pipeStateTransition(appState);
   t.equal(nextAppState.session.state, SessionState.RECALL);
   t.equal(nextAppState.session.queueIndex, 1);
@@ -114,8 +119,7 @@ test('test transition from state INFO success', t => {
 });
 
 test('test transition from state INFO invalid', t => {
-  const appState = getAppState(getSession(0, SessionState.INFO),
-                               invalidEval());
+  const appState = getAppState(getSession(0, SessionState.INFO), invalidEval());
   const nextAppState = pipeStateTransition(appState);
   t.equal(nextAppState.session.state, SessionState.INFO);
   t.equal(nextAppState.session.queueIndex, 0);
@@ -123,8 +127,7 @@ test('test transition from state INFO invalid', t => {
 });
 
 test('test transition from state RECALL success', t => {
-  const appState = getAppState(getSession(1, SessionState.RECALL),
-                               successEval(Answer.ok));
+  const appState = getAppState(getSession(1, SessionState.RECALL), successEval(Answer.ok));
   const nextAppState = pipeStateTransition(appState);
   t.equal(nextAppState.session.state, SessionState.RECALL_RESPONSE);
   t.equal(nextAppState.session.queueIndex, 1);
@@ -132,8 +135,7 @@ test('test transition from state RECALL success', t => {
 });
 
 test('test transition from state RECALL invalid', t => {
-  const appState = getAppState(getSession(1, SessionState.RECALL),
-                               invalidEval());
+  const appState = getAppState(getSession(1, SessionState.RECALL), invalidEval());
   const nextAppState = pipeStateTransition(appState);
   t.equal(nextAppState.session.state, SessionState.RECALL);
   t.equal(nextAppState.session.queueIndex, 1);
@@ -141,8 +143,10 @@ test('test transition from state RECALL invalid', t => {
 });
 
 test('test transition from state RECALL_RESPONSE success', t => {
-  const appState = getAppState(getSession(1, SessionState.RECALL_RESPONSE),
-                               successEval(Answer.yes));
+  const appState = getAppState(
+    getSession(1, SessionState.RECALL_RESPONSE),
+    successEval(Answer.yes)
+  );
   const nextAppState = pipeStateTransition(appState);
   t.equal(nextAppState.session.state, SessionState.INPUT);
   t.equal(nextAppState.session.queueIndex, 2);
@@ -150,8 +154,7 @@ test('test transition from state RECALL_RESPONSE success', t => {
 });
 
 test('test transition from state RECALL_RESPONSE fail', t => {
-  const appState = getAppState(getSession(1, SessionState.RECALL_RESPONSE),
-                               successEval(Answer.no));
+  const appState = getAppState(getSession(1, SessionState.RECALL_RESPONSE), successEval(Answer.no));
   const nextAppState = pipeStateTransition(appState);
   t.equal(nextAppState.session.state, SessionState.SHOW_PATHS);
   t.equal(nextAppState.session.queueIndex, 1);
@@ -159,8 +162,7 @@ test('test transition from state RECALL_RESPONSE fail', t => {
 });
 
 test('test transition from state RECALL_RESPONSE invalid', t => {
-  const appState = getAppState(getSession(1, SessionState.RECALL_RESPONSE),
-                               invalidEval());
+  const appState = getAppState(getSession(1, SessionState.RECALL_RESPONSE), invalidEval());
   const nextAppState = pipeStateTransition(appState);
   t.equal(nextAppState.session.state, SessionState.RECALL_RESPONSE);
   t.equal(nextAppState.session.queueIndex, 1);
@@ -168,8 +170,7 @@ test('test transition from state RECALL_RESPONSE invalid', t => {
 });
 
 test('test transition from state INPUT success', t => {
-  const appState = getAppState(getSession(2, SessionState.INPUT),
-                               successEval(Answer.ok));
+  const appState = getAppState(getSession(2, SessionState.INPUT), successEval(Answer.ok));
   const nextAppState = pipeStateTransition(appState);
   t.equal(nextAppState.session.state, SessionState.MULT_CHOICE);
   t.equal(nextAppState.session.queueIndex, 3);
@@ -177,8 +178,7 @@ test('test transition from state INPUT success', t => {
 });
 
 test('test transition from state INPUT fail', t => {
-  const appState = getAppState(getSession(2, SessionState.INPUT),
-                               successEval(Answer.no));
+  const appState = getAppState(getSession(2, SessionState.INPUT), successEval(Answer.no));
   const nextAppState = pipeStateTransition(appState);
   t.equal(nextAppState.session.state, SessionState.SHOW_PATHS);
   t.equal(nextAppState.session.queueIndex, 2);
@@ -186,8 +186,7 @@ test('test transition from state INPUT fail', t => {
 });
 
 test('test transition from state INPUT invalid', t => {
-  const appState = getAppState(getSession(2, SessionState.INPUT),
-                               invalidEval());
+  const appState = getAppState(getSession(2, SessionState.INPUT), invalidEval());
   const nextAppState = pipeStateTransition(appState);
   t.equal(nextAppState.session.state, SessionState.INPUT);
   t.equal(nextAppState.session.queueIndex, 2);
@@ -195,8 +194,7 @@ test('test transition from state INPUT invalid', t => {
 });
 
 test('test transition from MULT_CHOICE success', t => {
-  const appState = getAppState(getSession(3, SessionState.MULT_CHOICE),
-                               successEval(Answer.ok));
+  const appState = getAppState(getSession(3, SessionState.MULT_CHOICE), successEval(Answer.ok));
   const nextAppState = pipeStateTransition(appState);
   t.notEqual(nextAppState.session.state, SessionState.MULT_CHOICE);
   t.equal(nextAppState.session.queueIndex, 4);
@@ -204,8 +202,7 @@ test('test transition from MULT_CHOICE success', t => {
 });
 
 test('test transition from MULT_CHOICE fail', t => {
-  const appState = getAppState(getSession(3, SessionState.MULT_CHOICE),
-                               successEval(Answer.no));
+  const appState = getAppState(getSession(3, SessionState.MULT_CHOICE), successEval(Answer.no));
   const nextAppState = pipeStateTransition(appState);
   t.notEqual(nextAppState.session.state, SessionState.MULT_CHOICE);
   t.equal(nextAppState.session.queueIndex, 4);
@@ -213,8 +210,7 @@ test('test transition from MULT_CHOICE fail', t => {
 });
 
 test('test transition from MULT_CHOICE invalid', t => {
-  const appState = getAppState(getSession(3, SessionState.MULT_CHOICE),
-                               invalidEval());
+  const appState = getAppState(getSession(3, SessionState.MULT_CHOICE), invalidEval());
   const nextAppState = pipeStateTransition(appState);
   t.equal(nextAppState.session.state, SessionState.MULT_CHOICE);
   t.equal(nextAppState.session.queueIndex, 3);
@@ -222,14 +218,14 @@ test('test transition from MULT_CHOICE invalid', t => {
 });
 
 test('test transition from SHOW_PATHS success', t => {
-  const appState = getAppState(getSession(1, SessionState.SHOW_PATHS),
-                                successEval(Answer.max, {
-                                  display: 'polar bonds?',
-                                  catName: 'polar-covalent-bond',
-                                  catId: '2980227254feb46732ca491e',
-                                })
-                              );
-  console.log(appState.session.noteQueue);
+  const appState = getAppState(
+    getSession(1, SessionState.SHOW_PATHS),
+    successEval(Answer.max, {
+      display: 'polar bonds?',
+      catName: 'polar-covalent-bond',
+      catId: '2980227254feb46732ca491e',
+    })
+  );
   const nextAppState = pipeStateTransition(appState);
   t.equal(nextAppState.session.state, SessionState.INPUT);
   t.equal(nextAppState.session.queueIndex, 2);
@@ -237,8 +233,7 @@ test('test transition from SHOW_PATHS success', t => {
 });
 
 test('test transition from last note in queue', t => {
-  const appState = getAppState(getSession(3, SessionState.MULT_CHOICE),
-                               successEval(Answer.ok));
+  const appState = getAppState(getSession(3, SessionState.MULT_CHOICE), successEval(Answer.ok));
   const nextAppState = pipeStateTransition(appState);
   t.equal(nextAppState.session.state, SessionState.DONE_QUEUE);
   t.equal(nextAppState.session.queueIndex, 4);
@@ -246,10 +241,8 @@ test('test transition from last note in queue', t => {
 });
 
 test('test transition from done queue', t => {
-  const appState = getAppState(getSession(4, SessionState.DONE_QUEUE),
-                               successEval(Answer.ok));
-  return pipeStateTransition(appState)
-  .then(ns => {
+  const appState = getAppState(getSession(4, SessionState.DONE_QUEUE), successEval(Answer.ok));
+  return pipeStateTransition(appState).then(ns => {
     t.ok(ns.session.state);
     t.notEqual(ns.session.state, SessionState.DONE_QUEUE);
     t.equal(ns.session.noteQueue.length, 24);

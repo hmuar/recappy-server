@@ -7,8 +7,8 @@ const before = test;
 const after = test;
 const db = new TestDatabase();
 
-before('before fb message adapter testing',
-  () => db.setup().then(() => db.clean()).then(() => db.loadAllFixtures()));
+before('before fb message adapter testing', () =>
+  db.setup().then(() => db.clean()).then(() => db.loadAllFixtures()));
 
 test('convert sender to user', t => {
   const messageData = {
@@ -51,9 +51,9 @@ test('parse text request into message data', t => {
               seq: 216,
               text: 'user response text',
             },
-          },
+          }
         ],
-      },
+      }
     ],
   };
   const mData = AdapterFB.parse(request);
@@ -66,7 +66,6 @@ test('parse text request into message data', t => {
   t.equal(mData.input.payload, 'user response text');
   t.end();
 });
-
 
 test('parse accept payload request into message data', t => {
   const request = {
@@ -87,9 +86,9 @@ test('parse accept payload request into message data', t => {
             postback: {
               payload: 'accept',
             },
-          },
+          }
         ],
-      },
+      }
     ],
   };
   const mData = AdapterFB.parse(request);
@@ -122,9 +121,9 @@ test('parse reject payload request into message data', t => {
             postback: {
               payload: 'reject',
             },
-          },
+          }
         ],
-      },
+      }
     ],
   };
   const mData = AdapterFB.parse(request);
@@ -157,9 +156,9 @@ test('parse choice payload request into message data', t => {
             postback: {
               payload: 'choice-5',
             },
-          },
+          }
         ],
-      },
+      }
     ],
   };
   const mData = AdapterFB.parse(request);
@@ -186,4 +185,4 @@ test('parse choice payload request into message data', t => {
 //   request.post.restore();
 // });
 
-after('after account testing', () => db.close());
+after('after fb message adapter testing', () => db.close());

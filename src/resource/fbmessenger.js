@@ -33,8 +33,7 @@ function routes(apiVersionPath) {
       const controller = new Controller(AdapterFB);
       const msg = AdapterFB.parse(postBody);
       if (msg.input.type != null) {
-        controller.registerMsg(msg)
-        .catch((err) => logErr(err));
+        controller.registerMsg(msg).catch(err => logErr(err));
       } else {
         log('Unrecognized message');
       }

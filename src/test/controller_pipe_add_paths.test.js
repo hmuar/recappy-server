@@ -23,8 +23,7 @@ const noteCID = db.getStaticIDs().note3;
 function getSession(queueIndex, state) {
   return {
     queueIndex,
-    noteQueue:
-    [
+    noteQueue: [
       {
         _id: noteAID,
         type: 'info',
@@ -38,7 +37,7 @@ function getSession(queueIndex, state) {
             display: 'electron?',
             catName: 'electron-shell',
             catId: '7980227254feb46736ca47fd',
-          },
+          }
         ],
       },
       {
@@ -54,7 +53,7 @@ function getSession(queueIndex, state) {
             display: 'electron?',
             catName: 'electron-shell',
             catId: '7980227254feb46736ca47fd',
-          },
+          }
         ],
       },
       {
@@ -70,9 +69,9 @@ function getSession(queueIndex, state) {
             display: 'electron?',
             catName: 'electron-shell',
             catId: '7980227254feb46736ca47fd',
-          },
+          }
         ],
-      },
+      }
     ],
     state,
     globalIndex: 0,
@@ -95,22 +94,23 @@ function getAppState(session, evalCtx) {
   };
 }
 
-before('before controller advance state testing', () => (
-  db.setup().then(() => db.clean()).then(() => db.loadAllFixtures()))
-  .then(() => DBAssist.getCategoryByName('subject', SUBJECT_NAME))
-  .then(subj => {
-    subject = subj;
-    return db.getTestUser();
-  })
-  .then(user => {
-    testUser = user;
-  }
-));
+before('before controller advance state testing', () =>
+  db
+    .setup()
+    .then(() => db.clean())
+    .then(() => db.loadAllFixtures())
+    .then(() => DBAssist.getCategoryByName('subject', SUBJECT_NAME))
+    .then(subj => {
+      subject = subj;
+      return db.getTestUser();
+    })
+    .then(user => {
+      testUser = user;
+    }));
 
 test('test add paths some existing path in record', t => {
   const appState = getAppState(getSession(0, SessionState.SHOW_PATHS));
-  return pipeAddPaths(appState)
-  .then(nextAppState => {
+  return pipeAddPaths(appState).then(nextAppState => {
     t.ok(nextAppState.paths);
     t.deepEqual(nextAppState.paths, [
       {
@@ -118,15 +118,14 @@ test('test add paths some existing path in record', t => {
         catName: 'electron-shell',
         catId: '7980227254feb46736ca47fd',
         index: 1,
-      },
+      }
     ]);
   });
 });
 
 test('test add paths no existing paths in record', t => {
   const appState = getAppState(getSession(1, SessionState.SHOW_PATHS));
-  return pipeAddPaths(appState)
-  .then(nextAppState => {
+  return pipeAddPaths(appState).then(nextAppState => {
     t.ok(nextAppState.paths);
     t.deepEqual(nextAppState.paths, [
       {
@@ -140,15 +139,14 @@ test('test add paths no existing paths in record', t => {
         catName: 'electron-shell',
         catId: '7980227254feb46736ca47fd',
         index: 1,
-      },
+      }
     ]);
   });
 });
 
 test('test add paths all existing paths in record', t => {
   const appState = getAppState(getSession(2, SessionState.SHOW_PATHS));
-  return pipeAddPaths(appState)
-  .then(nextAppState => {
+  return pipeAddPaths(appState).then(nextAppState => {
     t.ok(nextAppState.paths);
     t.deepEqual(nextAppState.paths, []);
   });
@@ -156,8 +154,7 @@ test('test add paths all existing paths in record', t => {
 
 test('test add paths wrong state', t => {
   const appState = getAppState(getSession(0, SessionState.RECALL_RESPONSE));
-  return pipeAddPaths(appState)
-  .then(nextAppState => {
+  return pipeAddPaths(appState).then(nextAppState => {
     t.ok(nextAppState.paths);
     t.deepEqual(nextAppState.paths, []);
   });

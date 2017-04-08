@@ -103,6 +103,7 @@ function sendResponseInContext(state) {
 }
 
 export default function sendResponse(state) {
+  console.error('sendResponse --------------------------------------------');
   return sendResponseInContext(state).then(() => state).catch(err => {
     if (state.session) {
       logErr(`Error sending response from ${state.session.state} state`);

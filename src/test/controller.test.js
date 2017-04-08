@@ -11,29 +11,27 @@ const db = new TestDatabase();
 
 const SUBJECT_NAME = TestConst.SUBJECT_NAME;
 
+// Stubbed methods
 const controller = new Controller(AdapterFB);
-controller.sendResponse = (state) => {
-  console.log('Stubbed out controller.sendResponse');
-  return state;
-};
-controller.sendFeedbackResponse = (state) => {
-  console.log('Stubbed out controller.sendFeedbackResponse');
-  return state;
-};
+controller.sendResponse = state =>
+  // console.log('Stubbed out controller.sendResponse');
+  state;
+controller.sendFeedbackResponse = state =>
+  // console.log('Stubbed out controller.sendFeedbackResponse');
+  state;
 
-before('before controller testing',
-  () => db.setup().then(() => db.clean()).then(() => db.loadAllFixtures()));
+before('before controller testing', () =>
+  db.setup().then(() => db.clean()).then(() => db.loadAllFixtures()));
 
 test('controller pipe user', t => {
   const mData = {
     senderID: '1028279607252642',
     subjectName: SUBJECT_NAME,
   };
-  controller.pipeUser(mData).then((mDataWithUser) => {
+  return controller.pipeUser(mData).then(mDataWithUser => {
     t.ok(mDataWithUser);
     t.ok(mDataWithUser.userID);
     t.equal(mDataWithUser.userID.toString(), '5716893a8c8aff3221812148');
-    t.end();
   });
 });
 
@@ -57,27 +55,28 @@ test('register message with existing user, existing session', t => {
     },
   };
 
-  controller.registerMsg(msg).then((rMsg) => {
-    t.ok(rMsg.userID);
-    t.ok(rMsg.session);
-    t.notDeepLooseEqual(rMsg.session.queueIndex, null);
-    t.ok(rMsg.session.noteQueue);
-    t.ok(rMsg.session.state);
-    t.notDeepLooseEqual(rMsg.session.globalIndex, null);
-    t.ok(rMsg.evalCtx);
-    t.ok(rMsg.preEvalState);
-    t.ok(rMsg.postEvalState);
-    t.end();
-  }).catch((error) => {
-    console.error(error);
-    t.fail('could not register message');
-    t.end();
-  });
+  return controller
+    .registerMsg(msg)
+    .then(rMsg => {
+      t.ok(rMsg.userID);
+      t.ok(rMsg.session);
+      t.notDeepLooseEqual(rMsg.session.queueIndex, null);
+      t.ok(rMsg.session.noteQueue);
+      t.ok(rMsg.session.state);
+      t.notDeepLooseEqual(rMsg.session.globalIndex, null);
+      t.ok(rMsg.evalCtx);
+      t.ok(rMsg.preEvalState);
+      t.ok(rMsg.postEvalState);
+    })
+    .catch(error => {
+      console.error(error);
+      t.fail('could not register message');
+    });
 });
 
 // senderID has existing user, but no existing session in test database
 // so this tests process of session creation
-test('register message for existing user, no existing session', t => {
+test('register message for existing user, NO existing session', t => {
   const msg = {
     timestamp: 1,
     senderID: '2028279607252615',
@@ -89,42 +88,43 @@ test('register message for existing user, no existing session', t => {
     },
   };
 
-  controller.registerMsg(msg).then((rMsg) => {
-    t.ok(rMsg.userID);
-    t.ok(rMsg.session);
-    t.ok(rMsg.session.noteQueue.length > 0);
-    t.end();
-  }).catch((error) => {
-    console.error(error);
-    t.fail('could not register message');
-    t.end();
-  });
+  return controller
+    .registerMsg(msg)
+    .then(rMsg => {
+      t.ok(rMsg.userID);
+      t.ok(rMsg.session);
+      t.ok(rMsg.session.noteQueue.length > 0);
+    })
+    .catch(error => {
+      console.error(error);
+      t.fail('could not register message');
+    });
 });
 
 // senderID has no existing user, but no existing session in test database
 // so this tests process of session creation
-test('register message for no existing user, no existing session', t => {
-  const msg = {
-    timestamp: 1,
-    senderID: '9028279607252619',
-    userID: null,
-    subjectName: SUBJECT_NAME,
-    input: {
-      type: Input.Type.CUSTOM,
-      payload: 'halllooo',
-    },
-  };
-
-  controller.registerMsg(msg).then((rMsg) => {
-    t.ok(rMsg.userID);
-    t.ok(rMsg.session);
-    t.ok(rMsg.session.noteQueue.length > 0);
-    t.end();
-  }).catch((error) => {
-    console.error(error);
-    t.fail('could not register message');
-    t.end();
-  });
-});
+// test('register message for no existing user, no existing session', t => {
+//   const msg = {
+//     timestamp: 1,
+//     senderID: '9028279607252619',
+//     userID: null,
+//     subjectName: SUBJECT_NAME,
+//     input: {
+//       type: Input.Type.CUSTOM,
+//       payload: 'halllooo',
+//     },
+//   };
+//
+//   controller.registerMsg(msg).then((rMsg) => {
+//     t.ok(rMsg.userID);
+//     t.ok(rMsg.session);
+//     t.ok(rMsg.session.noteQueue.length > 0);
+//     t.end();
+//   }).catch((error) => {
+//     console.error(error);
+//     t.fail('could not register message');
+//     t.end();
+//   });
+// });
 
 after('after controller testing', () => db.close());
