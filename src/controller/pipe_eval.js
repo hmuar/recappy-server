@@ -28,6 +28,12 @@ export function insertEval(state, evalCtx) {
   };
 }
 
+// properly format compound answers, e.g. those that contain
+// multiple acceptable answers
+function formatAnswer(answer) {
+  return answer.replace(/\|\|/g, 'or');
+}
+
 // Ignore input and advance state
 function InitContext(appState) {
   if (!appState.input) {
@@ -44,8 +50,10 @@ function InfoContext(appState) {
     return appState;
   }
 
-  return insertEval(appState, input.type === Input.Type.ACCEPT ?
-    successEval(Answer.ok) : invalidEval());
+  return insertEval(
+    appState,
+    input.type === Input.Type.ACCEPT ? successEval(Answer.ok) : invalidEval()
+  );
 }
 
 // Look for ACCEPT or REJECT input type and then advance state
@@ -56,8 +64,10 @@ function RecallContext(appState) {
     return appState;
   }
 
-  return insertEval(appState, input.type === Input.Type.ACCEPT ?
-    successEval(Answer.ok) : invalidEval());
+  return insertEval(
+    appState,
+    input.type === Input.Type.ACCEPT ? successEval(Answer.ok) : invalidEval()
+  );
 }
 
 function RecallResponseContext(appState) {
@@ -95,13 +105,12 @@ function fuzzyAnswerEval(input, answer) {
 }
 
 function evalNoteWithRawInput(input, note) {
-  const answers = note.answer.split(',').map((s) => s.trim());
+  const answers = note.answer.split('||').map(s => s.trim());
   for (let i = 0; i < answers.length; i++) {
     if (fuzzyAnswerEval(input, answers[i])) {
       return true;
     }
   }
-
   return false;
 }
 
@@ -114,8 +123,10 @@ function InputContext(appState) {
   const note = getCurrentNote(session);
   if (input.type === Input.Type.CUSTOM) {
     const correctAnswer = evalNoteWithRawInput(input.payload, note);
-    return insertEval(appState,
-      successEval(correctAnswer ? Answer.max : Answer.min, note.answer));
+    return insertEval(
+      appState,
+      successEval(correctAnswer ? Answer.max : Answer.min, formatAnswer(note.answer))
+    );
   }
   return insertEval(appState, invalidEval(note.answer));
 }
@@ -135,8 +146,7 @@ function MultChoiceContext(appState) {
     // Note should be type "choice"
     const correctAnswer = dataAsNum === note.answer;
     // XXX: Hardcoded convention for how mult_choice notes store answer
-    return insertEval(appState,
-      successEval(correctAnswer ? Answer.max : Answer.min, ansFormatted));
+    return insertEval(appState, successEval(correctAnswer ? Answer.max : Answer.min, ansFormatted));
   }
 
   return insertEval(appState, invalidEval(ansFormatted));
@@ -154,12 +164,9 @@ function ShowPathsContext(appState) {
   if (input.type === Input.Type.CUSTOM && !isNaN(input.payload)) {
     const note = getCurrentNote(appState.session);
     const dataAsNum = parseInt(input.payload, 10);
-    const validPayload = dataAsNum != null &&
-                         note.paths &&
-                         dataAsNum < note.paths.length;
+    const validPayload = dataAsNum != null && note.paths && dataAsNum < note.paths.length;
     if (validPayload) {
-      return insertEval(appState,
-        successEval(Answer.max, note.paths[dataAsNum]));
+      return insertEval(appState, successEval(Answer.max, note.paths[dataAsNum]));
     }
     return insertEval(appState, invalidEval());
   }

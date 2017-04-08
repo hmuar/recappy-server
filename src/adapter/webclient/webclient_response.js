@@ -199,7 +199,7 @@ function negFeedback() {
 function sendFeedbackText(toID, isPositive, correctMsg = null) {
   let msg = isPositive ? posFeedback() : negFeedback();
   if (!isPositive && correctMsg) {
-    msg = `${msg} It's actually - ${correctMsg}`;
+    msg = `${msg} It's actually ${correctMsg}`;
   }
   return sendMessages(toID, [
     {
