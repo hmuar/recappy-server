@@ -93,7 +93,7 @@ export default class Controller {
               .then(state => pipeSaveSession(state))
               .then(state => logState(state))
               .then(state => {
-                // don't include this in return chain because this final udpate
+                // don't include this in return chain because this final update
                 // can happen asynchronously
                 pipeStudentModel(state);
                 return this.sendResponse(state);

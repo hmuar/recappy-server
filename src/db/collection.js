@@ -21,10 +21,7 @@ const sessionSchema = new mongoose.Schema({
   subjects: {},
 });
 
-export const StudentSession = mongoose.model('StudentSession',
-                                     sessionSchema,
-                                     'studentsession');
-
+export const StudentSession = mongoose.model('StudentSession', sessionSchema, 'studentsession');
 
 // Category
 // --------
@@ -97,19 +94,17 @@ const noteRecordSchema = new mongoose.Schema({
   lastDoneHistory: [Date],
 });
 
-export const NoteRecord = mongoose.model('NoteRecord',
-                                 noteRecordSchema,
-                                 'noterecord');
+export const NoteRecord = mongoose.model('NoteRecord', noteRecordSchema, 'noterecord');
 
 const studentModelSchema = new mongoose.Schema({
   userID: mongoose.Schema.Types.ObjectId,
   catID: mongoose.Schema.Types.ObjectId,
-  weight: { type: Number, min: 0, max: 1 },
+  weight: { type: Number, min: 0, max: 1, },
   ctype: String,
+  ckey: String,
+  directParent: mongoose.Schema.Types.ObjectId,
 });
 
-export const StudentModel = mongoose.model('StudentModel',
-                                  studentModelSchema,
-                                  'studentmodel');
+export const StudentModel = mongoose.model('StudentModel', studentModelSchema, 'studentmodel');
 
 export const ObjectID = mongoose.Types.ObjectId;

@@ -1,13 +1,14 @@
 import Hapi from 'hapi';
 // add additional resources to this list as they are created
 // for now, it is just fbmessenger resource
-import FBMessenger from './resource/fbmessenger';
-import Webclient from './resource/webclient';
-import NextQueue from './resource/nextqueue';
-import Admin from './resource/admin';
-import Database from './db/db';
+import FBMessenger from '~/resource/fbmessenger';
+import Webclient from '~/resource/webclient';
+import NextQueue from '~/resource/nextqueue';
+import Admin from '~/resource/admin';
+import Sandbox from '~/resource/sandbox';
+import Database from '~/db/db';
 
-const resources = [FBMessenger, Webclient, NextQueue, Admin];
+const resources = [FBMessenger, Webclient, NextQueue, Admin, Sandbox];
 
 export default class Server {
   constructor() {
@@ -36,14 +37,14 @@ export default class Server {
       const db = new Database();
       return db.setup().then(() =>
         // this.server.log('info', 'Connected to database');
-         this.server.start(startErr => {
-           if (startErr) {
-             this.server.log('error', 'Error starting server');
-             this.server.log('error', startErr);
-             throw startErr;
-           }
-           this.server.log('info', `Server running at: ${this.server.info.uri}`);
-         }));
+        this.server.start(startErr => {
+          if (startErr) {
+            this.server.log('error', 'Error starting server');
+            this.server.log('error', startErr);
+            throw startErr;
+          }
+          this.server.log('info', `Server running at: ${this.server.info.uri}`);
+        }));
     });
   }
 

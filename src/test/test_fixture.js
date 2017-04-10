@@ -1,13 +1,15 @@
 /* eslint-disable max-len */
 
 import { SessionState } from '~/core/session_state';
-import { ObjectID,
-         User,
-         Note,
-         Category,
-         StudentSession,
-         NoteRecord,
-         StudentModel } from '~/db/collection';
+import {
+  ObjectID,
+  User,
+  Note,
+  Category,
+  StudentSession,
+  NoteRecord,
+  StudentModel
+} from '~/db/collection';
 import SRCore from '~/core/spaced_repetition';
 import TestConst from './test_const';
 
@@ -62,9 +64,7 @@ const defaultUnit = {
   order: 1,
   ctype: 'unit',
   ckey: 'episode-1-carbon',
-  parent: [
-    ObjectID('f64c57184a4ef7f0357f9cd6'),
-  ],
+  parent: [ObjectID('f64c57184a4ef7f0357f9cd6')],
   weight: 1,
 };
 
@@ -74,10 +74,7 @@ const defaultTopic = {
   order: 1,
   ctype: 'topic',
   ckey: 'basic',
-  parent: [
-    ObjectID('f64c57184a4ef7f0357f9cd6'),
-    ObjectID('0850e4270c2aadd7ccdc1ca1'),
-  ],
+  parent: [ObjectID('f64c57184a4ef7f0357f9cd6'), ObjectID('0850e4270c2aadd7ccdc1ca1')],
   weight: 1,
 };
 
@@ -90,7 +87,7 @@ const defaultConcept = {
   parent: [
     ObjectID('f64c57184a4ef7f0357f9cd6'),
     ObjectID('0850e4270c2aadd7ccdc1ca1'),
-    ObjectID('5e28c07bb4d307d667fe83e8'),
+    ObjectID('5e28c07bb4d307d667fe83e8')
   ],
   weight: 1,
   globalIndex: 0,
@@ -106,22 +103,26 @@ const defaultConcept2 = {
   parent: [
     ObjectID('f64c57184a4ef7f0357f9cd6'),
     ObjectID('0850e4270c2aadd7ccdc1ca1'),
-    ObjectID('5e28c07bb4d307d667fe83e8'),
+    ObjectID('5e28c07bb4d307d667fe83e8')
   ],
   weight: 1,
   globalIndex: 1,
   subjectParent: defaultSubject._id,
 };
 
-const noteParent = [ObjectID('f64c57184a4ef7f0357f9cd6'),
-    ObjectID('0850e4270c2aadd7ccdc1ca1'),
-    ObjectID('5e28c07bb4d307d667fe83e8'),
-    ObjectID('7980227254feb46736ca47fd')];
+const noteParent = [
+  ObjectID('f64c57184a4ef7f0357f9cd6'),
+  ObjectID('0850e4270c2aadd7ccdc1ca1'),
+  ObjectID('5e28c07bb4d307d667fe83e8'),
+  ObjectID('7980227254feb46736ca47fd')
+];
 
-const noteParentOtherConcept = [ObjectID('f64c57184a4ef7f0357f9cd6'),
-    ObjectID('0850e4270c2aadd7ccdc1ca1'),
-    ObjectID('5e28c07bb4d307d667fe83e8'),
-    ObjectID('2980227254feb46732ca491e')];
+const noteParentOtherConcept = [
+  ObjectID('f64c57184a4ef7f0357f9cd6'),
+  ObjectID('0850e4270c2aadd7ccdc1ca1'),
+  ObjectID('5e28c07bb4d307d667fe83e8'),
+  ObjectID('2980227254feb46732ca491e')
+];
 
 const noteA = {
   _id: ObjectID('9e16c772556579bd6fc6c222'),
@@ -149,7 +150,7 @@ const noteA = {
       display: 'electron?',
       catName: 'electron-shell',
       catId: '7980227254feb46736ca47fd',
-    },
+    }
   ],
 };
 
@@ -180,7 +181,7 @@ const noteB = {
       display: 'electron?',
       catName: 'electron-shell',
       catId: '7980227254feb46736ca47fd',
-    },
+    }
   ],
 };
 
@@ -300,21 +301,19 @@ const defaultNoteRecord3 = {
   interval: SRCore.defaultInterval,
   count: 1,
   subjectParent: noteTemplateB.parent[0],
-  pathHistory: [ObjectID('2980227254feb46732ca491e'),
-                ObjectID('7980227254feb46736ca47fd')],
+  pathHistory: [ObjectID('2980227254feb46732ca491e'), ObjectID('7980227254feb46736ca47fd')],
 };
 
 function addUsers() {
-  return (new User(testUserFBMessenger)).save()
-  .then(() => (new User(testUserFBMessenger2)).save())
-  .then(() => (new User(testUserFBMessenger3)).save())
-  .then(() => (new User(testUser)).save());
+  return new User(testUserFBMessenger)
+    .save()
+    .then(() => new User(testUserFBMessenger2).save())
+    .then(() => new User(testUserFBMessenger3).save())
+    .then(() => new User(testUser).save());
 }
 
 function cloneNote(noteData, num) {
-  return Array(num).fill().map(() => (
-    new Note(noteData)
-  ));
+  return Array(num).fill().map(() => new Note(noteData));
 }
 
 // return two lists of ids of cloned notes
@@ -322,14 +321,15 @@ function addNotes() {
   const defNoteIds = [];
   // return (new Category(defaultSubject)).save();
   const subj = new Category(defaultSubject);
-  return subj.save()
-    .then(() => (new Category(subjectA)).save())
-    .then(() => (new Category(defaultUnit)).save())
-    .then(() => (new Category(defaultTopic)).save())
-    .then(() => (new Category(defaultConcept)).save())
-    .then(() => (new Category(defaultConcept2)).save())
-    .then(() => (new Note(noteA)).save())
-    .then(() => (new Note(noteB)).save())
+  return subj
+    .save()
+    .then(() => new Category(subjectA).save())
+    .then(() => new Category(defaultUnit).save())
+    .then(() => new Category(defaultTopic).save())
+    .then(() => new Category(defaultConcept).save())
+    .then(() => new Category(defaultConcept2).save())
+    .then(() => new Note(noteA).save())
+    .then(() => new Note(noteB).save())
     .then(() => Note.create(cloneNote(noteC, 10)))
     .then(() => {
       const noteTempAList = cloneNote(noteTemplateA, 10);
@@ -383,9 +383,7 @@ function addNoteRecords(defNoteIds) {
   for (let i = 0; i < 10; i++) {
     // add 20 miliseconds to make sure when i=0, the date will be in future
     const newDueDate = new Date(dueDate.getTime() + (i - 5) * minToMillisecFactor + 20); //eslint-disable-line
-    const newNoteRecord = getDefNoteRecordData(noteTemplateA,
-                                               noteTemplateAIds[i],
-                                               newDueDate);
+    const newNoteRecord = getDefNoteRecordData(noteTemplateA, noteTemplateAIds[i], newDueDate);
     const snote = new NoteRecord(newNoteRecord);
     if (!pChain) {
       pChain = snote.save();
@@ -399,9 +397,7 @@ function addNoteRecords(defNoteIds) {
   // half will be due in the past, half in the future
   for (let i = 0; i < 10; i++) {
     const newDueDate = new Date(dueDate.getTime() + (i - 5) * minToMillisecFactor); //eslint-disable-line
-    const newNoteRecord = getDefNoteRecordData(noteTemplateB,
-                                               noteTemplateBIds[i],
-                                               newDueDate);
+    const newNoteRecord = getDefNoteRecordData(noteTemplateB, noteTemplateBIds[i], newDueDate);
     const snote = new NoteRecord(newNoteRecord);
     if (!pChain) {
       pChain = snote.save();
@@ -433,20 +429,12 @@ function addStudentModel() {
 }
 
 const Fixture = {
-
   addAll() {
-    return addUsers().then(() => (
-      addNotes()
-    ))
-    .then(defNoteIds => (
-      addNoteRecords(defNoteIds)
-    ))
-    .then(() => (
-      addSessions()
-    ))
-    .then(() => (
-      addStudentModel()
-    ));
+    return addUsers()
+      .then(() => addNotes())
+      .then(defNoteIds => addNoteRecords(defNoteIds))
+      .then(() => addSessions())
+      .then(() => addStudentModel());
   },
 
   addUsers,
@@ -465,7 +453,6 @@ const Fixture = {
       note3: noteC._id,
     };
   },
-
 };
 
 export default Fixture;

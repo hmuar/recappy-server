@@ -13,7 +13,5 @@ export default function pipe(appState) {
     log('No current note found when trying to pipe student model');
     return Promise.resolve(appState);
   }
-  return updateModelForUser(appState.userID,
-                            curNote,
-                            appState.evalCtx).then(() => appState);
+  return updateModelForUser(appState.userID, curNote, appState.evalCtx).then(() => appState);
 }

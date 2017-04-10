@@ -4,8 +4,8 @@ const minToMillisecFactor = 60000;
 const secToMillisecFactor = 1000;
 
 // customizable
-const intervalToMinutesFactor = 1440;
-const intervalToSecondsFactor = 1;
+const intervalToMinutesFactor = 1440; // 1440 min in one day
+const intervalToSecondsFactor = 86400; // 86400 secs in one day
 
 // Calculate factor used to calculate spaced interval
 // 'previousFactor' From 1.3 (hardest) to 2.5 (easiest)
@@ -21,20 +21,27 @@ function calcFactor(previousFactor, responseQuality) {
   return newFactor;
 }
 
+function intervalAttenuation(interval) {
+  return interval;
+}
+
 // Interval used for spaced repetition
 // `prevInterval` - Interval in days
 // `count` - Number of times content has been viewed
 // return new interval in days
 // Based on algorithm here: https://www.supermemo.com/english/ol/sm2.htm
 function calcIntervalCore(prevInterval, factor, count) {
+  let interval = 0;
   if (count === 0) {
-    return 0;
+    interval = 0;
   } else if (count === 1) {
-    return 1;
+    interval = 1;
   } else if (count === 2) {
-    return 3;
+    interval = 3;
+  } else {
+    interval = prevInterval * factor;
   }
-  return prevInterval * factor;
+  return intervalAttenuation(interval);
 }
 
 function calcInterval(prevInterval, factor, count, responseQuality) {
@@ -62,7 +69,7 @@ function calcDueDate(interval) {
   const dueDate = new Date();
   const intervalMin = intervalInMinutes(interval);
   // const intervalMin = intervalInSeconds(interval);
-  return new Date(dueDate.getTime() + (intervalMin * minToMillisecFactor));
+  return new Date(dueDate.getTime() + intervalMin * minToMillisecFactor);
   // return new Date(dueDate.getTime() + (intervalMin * secToMillisecFactor));
 }
 

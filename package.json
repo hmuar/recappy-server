@@ -7,7 +7,7 @@
     "lint": "esw -w src",
     "test-watch": "watch 'npm run test' src",
     "test": "blue-tape -r babel-register src/test/*.test.js | faucet",
-    "testone": "clear && blue-tape -r babel-register src/test/controller.test.js | faucet",
+    "testone": "clear && blue-tape -r babel-register src/test/controller_student_model.test.js | faucet",
     "docs": "watch 'rm -rf docs && docco src/**/**.js && rm -rf docs/*.test.html' src",
     "start": "nodemon register.js",
     "start-clean": "npm run clean-logs && npm run start",
