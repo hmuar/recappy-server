@@ -50,10 +50,14 @@ class Simulator {
 
   // complete
   runEval(user) {
-    console.log(`--------------- Running sim step [${this.stepIndex}]-----------------`);
     const { id, successProb, } = user;
 
     const success = Math.random() < successProb;
+    if (!success) {
+      console.log(
+        `--------------- Running sim step [${this.stepIndex}] success (${success})-----------------`
+      );
+    }
     const msg = this.generateMsg(id, success);
     const result = this.controller.registerMsg(msg);
     this.stepIndex += 1;

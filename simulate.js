@@ -14,7 +14,7 @@ function start() {
   const simulator = new Simulator();
   const userProfile = {
     id: HARDCODED_SIM_USER_ID,
-    successProb: 1.0,
+    successProb: 0.8,
   };
 
   return simulator.run(userProfile, numSteps);

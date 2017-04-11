@@ -18,7 +18,10 @@ export default function pipe(appState) {
     success = true;
   }
 
-  console.log(`Note type: ${currentNote.type}, state: ${appState.session.state}`);
+  if (!success) {
+    console.log(`Note type: ${currentNote.type}, state: ${appState.session.state}`);
+    console.log(currentNote.displayRaw.slice(0, 50));
+  }
 
   return insertEval(appState, success ? successEval(Answer.max) : successEval(Answer.min));
 }
