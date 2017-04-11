@@ -11,7 +11,7 @@ import { Category, Note, ObjectID } from '~/db/collection';
 // }
 
 function getCategoryByName(catLabel, catName) {
-  return Category.findOne({ ctype: catLabel, ckey: catName });
+  return Category.findOne({ ctype: catLabel, ckey: catName, });
 }
 
 // function getParentQuery(parentCategories) {
@@ -20,7 +20,7 @@ function getCategoryByName(catLabel, catName) {
 // }
 
 function getParentQueryWithId(parentCategoriesIds) {
-  return [{ parent: parentCategoriesIds }];
+  return [{ parent: parentCategoriesIds, }];
 }
 
 function getCategoryById(catId) {
@@ -32,9 +32,9 @@ function getNoteById(catId) {
 }
 
 function getNotesByIds(ids) {
-  return Note.find({ _id: { $in: ids } }).exec((err, docs) =>
+  return Note.find({ _id: { $in: ids, }, }).exec((err, docs) =>
     docs.sort(
-      (a, b) => ids.findIndex(id => a._id.equals(id)) - ids.findIndex(id => b._id.equals(id)),
+      (a, b) => ids.findIndex(id => a._id.equals(id)) - ids.findIndex(id => b._id.equals(id))
     ));
 }
 
@@ -43,7 +43,7 @@ function getUnitsInOrder(subjectID) {
   if (parentQuery.length === 0) {
     return [];
   }
-  return Category.find({ ctype: 'unit', $and: parentQuery }).sort('order');
+  return Category.find({ ctype: 'unit', $and: parentQuery, }).sort('order');
 }
 
 function getTopicsInOrder(subjectID, unitID) {
@@ -51,7 +51,7 @@ function getTopicsInOrder(subjectID, unitID) {
   if (parentQuery.length === 0) {
     return [];
   }
-  return Category.find({ ctype: 'topic', $and: parentQuery }).sort('order');
+  return Category.find({ ctype: 'topic', $and: parentQuery, }).sort('order');
 }
 
 function getConceptsInOrder(subjectID, unitID, topicID) {
@@ -59,7 +59,7 @@ function getConceptsInOrder(subjectID, unitID, topicID) {
   if (parentQuery.length === 0) {
     return [];
   }
-  return Category.find({ ctype: 'concept', $and: parentQuery }).sort('order');
+  return Category.find({ ctype: 'concept', $and: parentQuery, }).sort('order');
 }
 
 // function getNotesInOrder(subjectID, unitID, topicID, conceptID) {
@@ -81,7 +81,7 @@ function getAllChildNotes(catID) {
     if (cat.parent) {
       noteParents = [...cat.parent, ...noteParents];
     }
-    const childNotesQuery = { ctype: 'note', parent: { $all: noteParents } };
+    const childNotesQuery = { ctype: 'note', parent: { $all: noteParents, }, };
     return Note.find(childNotesQuery).sort('globalIndex');
   });
 }
