@@ -66,8 +66,9 @@ function setPostEvalState(appState) {
       if (validEval) {
         // if min quality response, check for possible note paths
         if (isFailResponse(appState.evalCtx.answerQuality)) {
-          const paths = getPaths(appState.session);
-          postEvalState = paths ? SessionState.SHOW_PATHS : SessionState.WAIT_NEXT_IN_QUEUE;
+          // const paths = getPaths(appState.session);
+          // postEvalState = paths ? SessionState.SHOW_PATHS : SessionState.WAIT_NEXT_IN_QUEUE;
+          postEvalState = SessionState.WAIT_NEXT_IN_QUEUE;
         } else {
           postEvalState = SessionState.WAIT_NEXT_IN_QUEUE;
         }
@@ -85,14 +86,16 @@ function setPostEvalState(appState) {
 
 // if postEvalState === WAIT_NEXT_IN_QUEUE, need to advance noteQueue, next state
 function advanceState(appState) {
+  console.time('--- advanceState');
   if (!appState) {
-    return appState;
+    return Promise.resolve(appState);
   }
 
   // if necessary, advance queueIndex
   // set proper next state based on next note
   if (appState.session && appState.postEvalState) {
     if (appState.postEvalState === SessionState.DONE_QUEUE) {
+      console.time('--------- Done Queue get next notes');
       // update note queue
       // update queueIndex
       // update globalIndex
@@ -104,9 +107,9 @@ function advanceState(appState) {
 
       // Advance days and use it as an offset from current date. Then use that
       // as cutoff date when getting next note queue from scheduler.
+      // const cutoffDate = new Date(appState.timestamp);
       const cutoffDate = new Date();
       cutoffDate.setDate(cutoffDate.getDate() + newDayOffset);
-      console.log(`using dayOffset ${newDayOffset} to calc new cutoffDate: ${cutoffDate}`);
 
       return getNextNotes(
         userID,
@@ -115,6 +118,7 @@ function advanceState(appState) {
         TARGET_NUM_NOTES_IN_SESSION,
         cutoffDate
       ).then(notes => {
+        console.timeEnd('--------- Done Queue get next notes');
         const nextNotes = notes.notes;
         if (nextNotes && nextNotes.length > 0) {
           return {
@@ -143,6 +147,7 @@ function advanceState(appState) {
       appState.postEvalState === SessionState.WAIT_NEXT_IN_QUEUE ||
       appState.postEvalState === SessionState.START_QUEUE
     ) {
+      console.time('---------- Standard state advance');
       const { queueIndex, noteQueue, } = appState.session;
       let nextSessionState = appState.postEvalState;
       let nextQueueIndex = queueIndex;
@@ -161,33 +166,38 @@ function advanceState(appState) {
         }
       }
 
-      return {
+      console.timeEnd('---------- Standard state advance');
+      return Promise.resolve({
         ...appState,
         session: {
           ...appState.session,
           queueIndex: nextQueueIndex,
           state: nextSessionState,
         },
-      };
+      });
     }
 
     if (appState.postEvalState) {
-      return {
+      return Promise.resolve({
         ...appState,
         session: {
           ...appState.session,
           state: appState.postEvalState,
         },
-      };
+      });
     }
   }
 
-  return appState;
+  return Promise.resolve(appState);
 }
 
 export default function pipe(appState) {
+  console.time('--- setPreEvalState');
   let nextAppState = setPreEvalState(appState);
+  console.timeEnd('--- setPreEvalState');
+  console.time('--- setPostEvalState');
   nextAppState = setPostEvalState(nextAppState);
+  console.timeEnd('--- setPostEvalState');
   nextAppState = advanceState(nextAppState);
   return nextAppState;
 }

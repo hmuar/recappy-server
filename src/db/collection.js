@@ -107,4 +107,13 @@ const studentModelSchema = new mongoose.Schema({
 
 export const StudentModel = mongoose.model('StudentModel', studentModelSchema, 'studentmodel');
 
+const simulationSchema = new mongoose.Schema({
+  userID: mongoose.Schema.Types.ObjectId,
+  createdAt: Date,
+  backlogCount: Number,
+  appState: {},
+});
+
+export const Simulation = mongoose.model('Simulation', simulationSchema, 'simulation');
+
 export const ObjectID = mongoose.Types.ObjectId;

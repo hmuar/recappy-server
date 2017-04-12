@@ -19,19 +19,20 @@ export function getSessionForUserAndSubject(userID, subjectID) {
       reject(new Error('No subjectID specified, cannot find session'));
     }
     resolve();
-  })
-  .then(() => {
+  }).then(() => {
     if (userID && subjectID) {
-      return StudentSession.findOne({ userID }).then((session) => {
+      console.time('find student session');
+      return StudentSession.findOne({ userID, }).then(session => {
+        console.timeEnd('find student session');
         if (session) {
           const subjects = session.subjects;
           const subjectIDString = subjectID.valueOf();
           if (subjects && subjectIDString in subjects) {
             return subjects[subjectIDString];
           }
-        // TODO: should return entire session here
-        //       so that we can use it to update subjects later,
-        //       instead of having to query for session again.
+          // TODO: should return entire session here
+          //       so that we can use it to update subjects later,
+          //       instead of having to query for session again.
           return null;
         }
         return null;
@@ -42,14 +43,16 @@ export function getSessionForUserAndSubject(userID, subjectID) {
 }
 
 // return Promise
-export function updateSessionForUser(userID,
-                              subjectID,
-                              queueIndex,
-                              noteQueue,
-                              state,
-                              conceptGlobalIndex,
-                              baseQueueLength) {
-  return StudentSession.findOne({ userID }).then((session) => {
+export function updateSessionForUser(
+  userID,
+  subjectID,
+  queueIndex,
+  noteQueue,
+  state,
+  conceptGlobalIndex,
+  baseQueueLength
+) {
+  return StudentSession.findOne({ userID, }).then(session => {
     const subjectIDString = subjectID.valueOf();
     const subjects = session.subjects;
 
@@ -62,19 +65,21 @@ export function updateSessionForUser(userID,
     };
 
     return StudentSession.findByIdAndUpdate(session._id, {
-      $set: { subjects },
+      $set: { subjects, },
     });
   });
 }
 
-export function createSession(userID,
-                       subjectID,
-                       queueIndex,
-                       noteQueue,
-                       conceptGlobalIndex,
-                       baseQueueLength) {
+export function createSession(
+  userID,
+  subjectID,
+  queueIndex,
+  noteQueue,
+  conceptGlobalIndex,
+  baseQueueLength
+) {
   const conceptIndex = conceptGlobalIndex || 0;
-  return StudentSession.findOne({ userID }).then((session) => {
+  return StudentSession.findOne({ userID, }).then(session => {
     const subjectIDString = subjectID.valueOf();
 
     let subjects = {};
@@ -92,9 +97,7 @@ export function createSession(userID,
         userID,
         subjects,
       };
-      return StudentSession.create(newSession).then(() => (
-        subjects[subjectIDString]
-      ));
+      return StudentSession.create(newSession).then(() => subjects[subjectIDString]);
     }
     // session already exists, so need to return subject if exists,
     // and if not add to subjects array
@@ -110,9 +113,7 @@ export function createSession(userID,
       baseQueueLength,
     };
     return StudentSession.findByIdAndUpdate(session._id, {
-      $set: { subjects },
-    }).then(() => (
-      subjects[subjectIDString]
-    ));
+      $set: { subjects, },
+    }).then(() => subjects[subjectIDString]);
   });
 }

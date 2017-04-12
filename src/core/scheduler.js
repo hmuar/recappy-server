@@ -1,9 +1,10 @@
+import { targetNumNotesInSession, maxNotesInQueue } from '~/core/hyperparam';
 import { NoteRecord, Category, Note } from '~/db/collection';
 import { log } from '~/logger';
 import _ from 'lodash';
 
-export const TARGET_NUM_NOTES_IN_SESSION = 8;
-export const MAX_NOTES_IN_QUEUE = TARGET_NUM_NOTES_IN_SESSION * 5;
+export const TARGET_NUM_NOTES_IN_SESSION = targetNumNotesInSession;
+export const MAX_NOTES_IN_QUEUE = maxNotesInQueue;
 export const MAX_GLOBAL_INDEX = 20;
 
 // Grab old notes user has already seen that are now

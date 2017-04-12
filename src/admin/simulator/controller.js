@@ -9,6 +9,7 @@ import pipeSaveSimSession from '~/admin/simulator/pipe_save_sim_session';
 import pipeStudentModel from '~/controller/pipe_student_model';
 import pipeAdjustQueue from '~/controller/pipe_adjust_queue';
 import pipeAddPaths from '~/controller/pipe_add_paths';
+import pipeRecordSimStats from '~/admin/simulator/pipe_record_sim_stats';
 
 // `msg` = {
 //   timestamp  : ""
@@ -31,48 +32,87 @@ export default class SimulatorController {
   }
 
   // msg should have additional simulator params
-  registerMsg(msg) {
-    return DBAssist.getCategoryByName('subject', msg.subjectName)
-      .then(subject => {
-        if (!subject) {
-          throw new Error(`Could not find subject ${msg.subjectName}`);
-        } else {
-          const appState = {
-            ...msg,
-            subjectID: subject._id,
-          };
-          // convert adapter specific sender id into app user
-          return (
-            this.pipeUser(appState)
-              // at this point should have app user information
-              .then(state => pipeAddSession(state))
-              .then(state => pipeAddSimulatorSession(state))
-              // at this point should have session information
-              // need to evaluate msg in context of current state
-              .then(state => pipeSimEval(state))
-              // .then(state => this.sendFeedbackResponse(state))
-              // persist results of msg evaluation
-              .then(state => pipeRecord(state))
-              // adjust queue based on evaluation
-              .then(state => pipeAdjustQueue(state))
-              // advance session state
-              .then(state => pipeAdvanceSimState(state))
-              .then(state => pipeAddPaths(state))
-              // record new session state
-              .then(state => pipeSaveSimSession(state))
-              // .then(state => logState(state))
-              .then(state => {
-                // don't include this in return chain because this final update
-                // can happen asynchronously
-                pipeStudentModel(state);
-                return this.sendResponse(state);
-              })
-          );
-        }
-      })
-      .catch(err => {
-        logErr('error registering message in controller');
-        logErr(err);
-      });
+  registerMsg(msg, initSession = null) {
+    // convert adapter specific sender id into app user
+    console.time('controller');
+    const appState = msg;
+    console.time('Pipe user');
+    return (
+      this.pipeUser(appState)
+        // at this point should have app user information
+        .then(state => {
+          console.timeEnd('Pipe user');
+          console.time('Pipe add session');
+          if (state.session != null) {
+            return state;
+          }
+          return pipeAddSession(state);
+        })
+        .then(state => {
+          console.timeEnd('Pipe add session');
+          console.time('Pipe add simulator session');
+          return pipeAddSimulatorSession(state);
+        })
+        // at this point should have session information
+        // need to evaluate msg in context of current state
+        .then(state => {
+          console.timeEnd('Pipe add simulator session');
+          console.time('Pipe sim eval');
+          return pipeSimEval(state);
+        })
+        // .then(state => this.sendFeedbackResponse(state))
+        // persist results of msg evaluation
+        .then(state => {
+          console.timeEnd('Pipe sim eval');
+          console.time('Pipe record');
+          pipeRecord(state);
+          return state;
+        })
+        // adjust queue based on evaluation
+        .then(state => {
+          console.timeEnd('Pipe record');
+          console.time('Pipe adjust queue');
+          return pipeAdjustQueue(state);
+        })
+        // advance session state
+        .then(state => {
+          console.timeEnd('Pipe adjust queue');
+          console.time('Pipe advance sim state');
+          return pipeAdvanceSimState(state);
+        })
+        // .then(state => {
+        //   console.timeEnd('Pipe advance sim state');
+        //   console.time('Pipe add paths');
+        //   return pipeAddPaths(state);
+        // })
+        // record new session state
+        .then(state => {
+          // console.timeEnd('Pipe add paths');
+          console.timeEnd('--- advanceState');
+          console.timeEnd('Pipe advance sim state');
+          console.time('Pipe save sim session');
+          pipeSaveSimSession(state);
+          return state;
+        })
+        .then(state => {
+          // console.timeEnd('---- update student session');
+          console.timeEnd('Pipe save sim session');
+          console.time('Pipe record sim stats');
+          pipeRecordSimStats(state);
+          return state;
+        })
+        // .then(state => logState(state))
+        .then(state => {
+          // don't include this in return chain because this final update
+          // can happen asynchronously
+          console.timeEnd('Pipe record sim stats');
+          pipeStudentModel(state);
+          return this.sendResponse(state);
+        })
+        .catch(err => {
+          logErr('error registering message in controller');
+          logErr(err);
+        })
+    );
   }
 }

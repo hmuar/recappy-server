@@ -10,7 +10,9 @@ export function updateSessionForUser(
   baseQueueLength,
   simulator
 ) {
+  console.time('---- find student session');
   return StudentSession.findOne({ userID, }).then(session => {
+    console.timeEnd('---- find student session');
     const subjectIDString = subjectID.valueOf();
     const subjects = session.subjects;
 
@@ -22,8 +24,12 @@ export function updateSessionForUser(
       baseQueueLength,
       simulator,
     };
+    // console.time('---- update student session');
 
-    return StudentSession.findByIdAndUpdate(session._id, {
+    // return StudentSession.findByIdAndUpdate(session._id, {
+    //   $set: { subjects, },
+    // });
+    return session.update({
       $set: { subjects, },
     });
   });

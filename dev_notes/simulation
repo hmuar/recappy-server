@@ -1,0 +1,4 @@
+Example sim cmd line command
+----------------------------
+
+npm run sim -- --notes=10

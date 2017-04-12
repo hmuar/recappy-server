@@ -1,5 +1,6 @@
 const minResponseQuality = 1.0;
 const maxResponseQuality = 5.0;
+const halfMaxResponseQuality = maxResponseQuality / 2.0;
 
 export default {
   minResponseQuality,
@@ -12,5 +13,5 @@ export const EvalStatus = {
 };
 
 export function isFailResponse(responseQuality) {
-  return responseQuality < maxResponseQuality / 2.0;
+  return responseQuality < halfMaxResponseQuality;
 }

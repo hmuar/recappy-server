@@ -24,7 +24,7 @@ function getParentQueryWithId(parentCategoriesIds) {
 }
 
 function getCategoryById(catId) {
-  return Category.findById(catId);
+  return Category.findOne({ _id: catId, });
 }
 
 function getNoteById(catId) {
