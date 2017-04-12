@@ -78,6 +78,7 @@ function advanceState(appState) {
   if (!appState) {
     return appState;
   }
+
   // if necessary, advance queueIndex
   // set proper next state based on next note
   if (appState.session && appState.postEvalState) {

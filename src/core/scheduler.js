@@ -2,7 +2,7 @@ import { NoteRecord, Category, Note } from '~/db/collection';
 import { log } from '~/logger';
 import _ from 'lodash';
 
-export const TARGET_NUM_NOTES_IN_SESSION = 20;
+export const TARGET_NUM_NOTES_IN_SESSION = 8;
 export const MAX_NOTES_IN_QUEUE = TARGET_NUM_NOTES_IN_SESSION * 5;
 export const MAX_GLOBAL_INDEX = 20;
 
@@ -129,10 +129,7 @@ export function getNextNotes(
       ];
       // result = [...result, ...oldNotes];
       const newNotesNum = numNotes - oldNotes.length;
-      if (newNotesNum > 0) {
-        return getNewMaterial(subjectID, newNotesNum, globalIndex);
-      }
-      return [];
+      return getNewMaterial(subjectID, newNotesNum, globalIndex);
     })
     .then(newNotes => {
       result = [

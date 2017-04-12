@@ -1,5 +1,4 @@
 import { SessionState, getEntryStateForNoteType, getPaths } from '~/core/session_state';
-import Input from '~/core/input';
 import { getNextNotes, TARGET_NUM_NOTES_IN_SESSION } from '~/core/scheduler';
 import { EvalStatus, isFailResponse } from '~/core/eval';
 
@@ -89,6 +88,7 @@ function advanceState(appState) {
   if (!appState) {
     return appState;
   }
+
   // if necessary, advance queueIndex
   // set proper next state based on next note
   if (appState.session && appState.postEvalState) {
@@ -99,18 +99,14 @@ function advanceState(appState) {
       const { userID, subjectID, } = appState;
       const nextGlobalIndex = appState.session.globalIndex + 1;
 
-      // XXX Dev loophole to allow date control
-      // Check if user input was a number. If so, treat it as an offset
-      // for number of days from current Date, and then use that date
+      const sessionSimulator = appState.session.simulator;
+      const newDayOffset = sessionSimulator.dayOffset + 1;
+
+      // Advance days and use it as an offset from current date. Then use that
       // as cutoff date when getting next note queue from scheduler.
       const cutoffDate = new Date();
-      const input = appState.input;
-      if (input.type === Input.Type.CUSTOM) {
-        const tryInt = parseInt(input.payload, 10);
-        if (!isNaN(tryInt)) {
-          cutoffDate.setDate(cutoffDate.getDate() + tryInt);
-        }
-      }
+      cutoffDate.setDate(cutoffDate.getDate() + newDayOffset);
+      console.log(`using dayOffset ${newDayOffset} to calc new cutoffDate: ${cutoffDate}`);
 
       return getNextNotes(
         userID,
@@ -128,6 +124,10 @@ function advanceState(appState) {
               ...appState.session,
               noteQueue: nextNotes,
               queueIndex: 0,
+              simulator: {
+                ...sessionSimulator,
+                dayOffset: newDayOffset,
+              },
               globalIndex: notes.maxGlobalIndex,
               baseQueueLength: nextNotes.length,
               state: getEntryStateForNoteTypeSim(nextNotes[0].type),

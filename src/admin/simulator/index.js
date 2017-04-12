@@ -27,7 +27,7 @@ class Simulator {
       timestamp: new Date().getTime(),
       senderID: userID,
       subjectName: 'biology',
-      simulator: {
+      simulatorInput: {
         success,
       },
     };
@@ -51,15 +51,13 @@ class Simulator {
   // complete
   runEval(user) {
     const { id, successProb, } = user;
-
     const success = Math.random() < successProb;
-    if (!success) {
-      console.log(
-        `--------------- Running sim step [${this.stepIndex}] success (${success})-----------------`
-      );
-    }
+    console.log(`--------------- Running sim step [${this.stepIndex}]-----------------`);
     const msg = this.generateMsg(id, success);
-    const result = this.controller.registerMsg(msg);
+    const result = this.controller.registerMsg(msg).then(state => {
+      console.log(state);
+      return state;
+    });
     this.stepIndex += 1;
     return result;
   }

@@ -14,11 +14,15 @@ function start() {
   const simulator = new Simulator();
   const userProfile = {
     id: HARDCODED_SIM_USER_ID,
-    successProb: 0.8,
+    successProb: 1.0,
   };
 
   return simulator.run(userProfile, numSteps);
 }
 
 const db = new Database();
-db.setup().then(() => start()).then(() => console.log('Done running simulation'));
+db
+  .setup()
+  .then(() => start())
+  .then(() => console.log('Done running simulation'))
+  .then(() => process.exit(0));

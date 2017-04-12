@@ -1,10 +1,11 @@
 import DBAssist from '~/db/category_assistant';
 import { log, logErr, logState } from '~/logger';
 import pipeAddSession from '~/controller/pipe_add_session';
+import pipeAddSimulatorSession from '~/admin/simulator/pipe_add_sim_session';
 import pipeRecord from '~/controller/pipe_record';
 import pipeSimEval from '~/admin/simulator/pipe_sim_eval';
 import pipeAdvanceSimState from '~/admin/simulator/pipe_advance_sim_state';
-import pipeSaveSession from '~/controller/pipe_save_session';
+import pipeSaveSimSession from '~/admin/simulator/pipe_save_sim_session';
 import pipeStudentModel from '~/controller/pipe_student_model';
 import pipeAdjustQueue from '~/controller/pipe_adjust_queue';
 import pipeAddPaths from '~/controller/pipe_add_paths';
@@ -45,6 +46,7 @@ export default class SimulatorController {
             this.pipeUser(appState)
               // at this point should have app user information
               .then(state => pipeAddSession(state))
+              .then(state => pipeAddSimulatorSession(state))
               // at this point should have session information
               // need to evaluate msg in context of current state
               .then(state => pipeSimEval(state))
@@ -57,7 +59,7 @@ export default class SimulatorController {
               .then(state => pipeAdvanceSimState(state))
               .then(state => pipeAddPaths(state))
               // record new session state
-              .then(state => pipeSaveSession(state))
+              .then(state => pipeSaveSimSession(state))
               // .then(state => logState(state))
               .then(state => {
                 // don't include this in return chain because this final update
