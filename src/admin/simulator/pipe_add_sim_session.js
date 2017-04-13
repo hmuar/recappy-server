@@ -6,6 +6,8 @@ export default function pipe(appState) {
         ...appState.session,
         simulator: {
           dayOffset: 0,
+          step: 0,
+          notesSeen: 0,
         },
       },
     };

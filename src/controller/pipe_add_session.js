@@ -16,7 +16,8 @@ function addNewSession(appState) {
         subjectID,
         startNoteIndex,
         noteQueue,
-        notesInfo.maxGlobalIndex,
+        notesInfo.globalIndex,
+        notesInfo.nextGlobalIndex,
         noteQueue.length
       );
     })

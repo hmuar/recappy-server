@@ -67,6 +67,9 @@ const noteSchema = new mongoose.Schema({
   globalIndex: Number,
   subjectParent: mongoose.Schema.Types.ObjectId,
   directParent: mongoose.Schema.Types.ObjectId,
+  // queueStatus is used by scheduler to tag notes in session
+  // as 'old' or 'new'
+  queueStatus: String,
 });
 
 export const Note = mongoose.model('Note', noteSchema, 'category');
@@ -111,6 +114,10 @@ const simulationSchema = new mongoose.Schema({
   userID: mongoose.Schema.Types.ObjectId,
   createdAt: Date,
   backlogCount: Number,
+  notesSeen: Number,
+  step: Number,
+  noteRecords: [],
+  noteGlobalIndexes: [Number],
   appState: {},
 });
 

@@ -16,26 +16,18 @@ function start() {
     successProb: SUCCESS_PROB,
   };
 
-  console.time('Entire simulation');
   if (args.notes) {
     const numSteps = args.notes;
     console.log(`[Running for ${numSteps} steps]`);
-    return simulator
-      .runSteps(userProfile, numSteps)
-      .then(() => console.timeEnd('Entire simulation'));
+    return simulator.runSteps(userProfile, numSteps);
   } else if (args.days) {
     const numDays = args.days;
     console.log(`[Running for ${numDays} days]`);
-    return simulator
-      .startDays(userProfile, numDays)
-      .then(() => console.timeEnd('Entire simulation'));
+    return simulator.startDays(userProfile, numDays);
   }
   console.log('No acceptable flags submitted, no simulaton run');
 }
 
 const db = new Database();
-db
-  .setup()
-  .then(() => start())
-  .then(() => console.log('Done running simulation'))
-  .then(() => process.exit(0));
+db.setup().then(() => start()).then(() => console.log('Done running simulation'));
+// .then(() => process.exit(0));

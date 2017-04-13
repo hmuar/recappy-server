@@ -21,9 +21,7 @@ export function getSessionForUserAndSubject(userID, subjectID) {
     resolve();
   }).then(() => {
     if (userID && subjectID) {
-      console.time('find student session');
       return StudentSession.findOne({ userID, }).then(session => {
-        console.timeEnd('find student session');
         if (session) {
           const subjects = session.subjects;
           const subjectIDString = subjectID.valueOf();
@@ -49,7 +47,8 @@ export function updateSessionForUser(
   queueIndex,
   noteQueue,
   state,
-  conceptGlobalIndex,
+  globalIndex,
+  nextGlobalIndex,
   baseQueueLength
 ) {
   return StudentSession.findOne({ userID, }).then(session => {
@@ -60,7 +59,8 @@ export function updateSessionForUser(
       queueIndex,
       noteQueue,
       state,
-      globalIndex: conceptGlobalIndex,
+      globalIndex,
+      nextGlobalIndex,
       baseQueueLength,
     };
 
@@ -75,10 +75,10 @@ export function createSession(
   subjectID,
   queueIndex,
   noteQueue,
-  conceptGlobalIndex,
+  globalIndex,
+  nextGlobalIndex,
   baseQueueLength
 ) {
-  const conceptIndex = conceptGlobalIndex || 0;
   return StudentSession.findOne({ userID, }).then(session => {
     const subjectIDString = subjectID.valueOf();
 
@@ -89,7 +89,8 @@ export function createSession(
           queueIndex: 0,
           noteQueue,
           state: getStartState(),
-          globalIndex: conceptIndex,
+          globalIndex,
+          nextGlobalIndex,
           baseQueueLength,
         },
       };
@@ -109,7 +110,8 @@ export function createSession(
       queueIndex: 0,
       noteQueue,
       state: getStartState(),
-      globalIndex: conceptIndex,
+      globalIndex,
+      nextGlobalIndex,
       baseQueueLength,
     };
     return StudentSession.findByIdAndUpdate(session._id, {

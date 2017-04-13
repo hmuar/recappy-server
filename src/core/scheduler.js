@@ -5,7 +5,7 @@ import _ from 'lodash';
 
 export const TARGET_NUM_NOTES_IN_SESSION = targetNumNotesInSession;
 export const MAX_NOTES_IN_QUEUE = maxNotesInQueue;
-export const MAX_GLOBAL_INDEX = 20;
+export const MAX_GLOBAL_INDEX = 5000;
 
 // Grab old notes user has already seen that are now
 // due according to note's due date.
@@ -38,6 +38,7 @@ export function getOldMaterial(userID, subjectID, numNotes, dueDate) {
       notes.map(note => {
         const noteIDString = note._id.toString();
         note.dueDate = dueMap[noteIDString]; // eslint-disable-line no-param-reassign
+        note.queueStatus = 'old'; // eslint-disable-line no-param-reassign
         return note;
       }))
     .then(notes =>
@@ -55,15 +56,18 @@ export function getOldMaterial(userID, subjectID, numNotes, dueDate) {
 // on given lastGlobalIndex. Note lastGlobalIndex is actually
 // globalIndex of the next concept that should be introduced to user.
 // Get all notes associated with this concept.
+// If result contains no new notes, nextGlobalIndex is set to remain at
+// current global index. Otherwise, it is incremented.
 // return {
 //   notes: [],
-//   maxGlobalIndex,
+//   nextGlobalIndex,
 // }
 export function getNewMaterial(subjectID, numNotes, globalIndex = 0, prevNotes = []) {
   if (!subjectID || numNotes <= 0) {
     return Promise.resolve({
       notes: [],
-      maxGlobalIndex: globalIndex,
+      globalIndex,
+      nextGlobalIndex: globalIndex,
     });
   }
 
@@ -76,18 +80,27 @@ export function getNewMaterial(subjectID, numNotes, globalIndex = 0, prevNotes =
       log(`Could not find next concept with index ${globalIndex}, returning 0 new notes`);
       return Promise.resolve({
         notes: prevNotes,
-        maxGlobalIndex: globalIndex,
+        globalIndex,
+        nextGlobalIndex: globalIndex,
       });
     }
     // XXX: during dev, skip info notes
     return Note.find({ directParent: nextConcept._id, }).sort('order').then(notes => {
-      const mergedNotes = [...prevNotes, ...notes];
+      const taggedNotes = notes.map(note => {
+        note.queueStatus = 'new'; // eslint-disable-line no-param-reassign
+        return note;
+      });
+      const mergedNotes = [...prevNotes, ...taggedNotes];
       // terminate and return results
-      if (mergedNotes.length >= numNotes || globalIndex >= MAX_GLOBAL_INDEX) {
+      // if (mergedNotes.length >= numNotes || globalIndex >= MAX_GLOBAL_INDEX) {
+      if (mergedNotes.length >= numNotes) {
         // log(`Got enough notes, returning ${mergedNotes.length} notes`);
         return Promise.resolve({
           notes: mergedNotes,
-          maxGlobalIndex: globalIndex,
+          // successfully added all new notes from concept associated
+          // with current global index, so increment globalIndex
+          globalIndex,
+          nextGlobalIndex: globalIndex + 1,
         });
       }
 
@@ -100,7 +113,8 @@ export function getNewMaterial(subjectID, numNotes, globalIndex = 0, prevNotes =
 // Get combination of old and new notes
 // return {
 //   notes:[oldNotes, newNotes],
-//   maxGlobalIndex,
+//   globalIndex,
+//   nextGlobalIndex,
 // }
 // TODO: Detect if two questions have same c-key and only ask one
 // TODO: factor in weighting of concepts
@@ -113,7 +127,7 @@ export function getNextNotes(
 ) {
   const numNotes = num == null ? TARGET_NUM_NOTES_IN_SESSION : num;
   if (numNotes <= 0) {
-    return Promise.resolve([]);
+    return Promise.resolve({ notes: [], globalIndex, nextGlobalIndex: globalIndex, });
   }
 
   const oldNotesNum = Math.ceil(numNotes);
@@ -121,30 +135,19 @@ export function getNextNotes(
 
   return getOldMaterial(userID, subjectID, oldNotesNum, dueDate)
     .then(oldNotes => {
-      result = [
-        ...result,
-        ...oldNotes.map(note => {
-          note.queueStatus = 'old'; // eslint-disable-line no-param-reassign
-          return note;
-        })
-      ];
+      result = [...result, ...oldNotes];
       // result = [...result, ...oldNotes];
       const newNotesNum = numNotes - oldNotes.length;
       return getNewMaterial(subjectID, newNotesNum, globalIndex);
     })
-    .then(newNotes => {
-      result = [
-        ...result,
-        ...newNotes.notes.map(note => {
-          note.queueStatus = 'new'; // eslint-disable-line no-param-reassign
-          return note;
-        })
-      ];
+    .then(newNotesInfo => {
+      result = [...result, ...newNotesInfo.notes];
       // remove duplicate notes that were in both old and new lists
       const uniqResult = _.uniqBy(result, elem => elem._id.toString());
       return {
         notes: uniqResult,
-        maxGlobalIndex: newNotes.maxGlobalIndex,
+        globalIndex,
+        nextGlobalIndex: newNotesInfo.nextGlobalIndex,
       };
     });
 }

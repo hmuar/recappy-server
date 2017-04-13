@@ -87,7 +87,7 @@ function advanceState(appState) {
       // update queueIndex
       // update globalIndex
       const { userID, subjectID, } = appState;
-      const nextGlobalIndex = appState.session.globalIndex + 1;
+      const nextGlobalIndex = appState.session.nextGlobalIndex;
 
       // XXX Dev loophole to allow date control
       // Check if user input was a number. If so, treat it as an offset
@@ -108,8 +108,8 @@ function advanceState(appState) {
         nextGlobalIndex,
         TARGET_NUM_NOTES_IN_SESSION,
         cutoffDate
-      ).then(notes => {
-        const nextNotes = notes.notes;
+      ).then(notesInfo => {
+        const nextNotes = notesInfo.notes;
         if (nextNotes && nextNotes.length > 0) {
           return {
             ...appState,
@@ -118,7 +118,8 @@ function advanceState(appState) {
               ...appState.session,
               noteQueue: nextNotes,
               queueIndex: 0,
-              globalIndex: notes.maxGlobalIndex,
+              globalIndex: notesInfo.globalIndex,
+              nextGlobalIndex: notesInfo.nextGlobalIndex,
               baseQueueLength: nextNotes.length,
               state: getEntryStateForNoteType(nextNotes[0].type),
             },

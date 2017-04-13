@@ -6,13 +6,12 @@ export function updateSessionForUser(
   queueIndex,
   noteQueue,
   state,
-  conceptGlobalIndex,
+  globalIndex,
+  nextGlobalIndex,
   baseQueueLength,
   simulator
 ) {
-  console.time('---- find student session');
   return StudentSession.findOne({ userID, }).then(session => {
-    console.timeEnd('---- find student session');
     const subjectIDString = subjectID.valueOf();
     const subjects = session.subjects;
 
@@ -20,11 +19,14 @@ export function updateSessionForUser(
       queueIndex,
       noteQueue,
       state,
-      globalIndex: conceptGlobalIndex,
+      globalIndex,
+      nextGlobalIndex,
       baseQueueLength,
-      simulator,
+      simulator: {
+        ...simulator,
+        step: simulator.step + 1,
+      },
     };
-    // console.time('---- update student session');
 
     // return StudentSession.findByIdAndUpdate(session._id, {
     //   $set: { subjects, },
@@ -43,6 +45,7 @@ export default function pipe(appState) {
     noteQueue,
     state,
     globalIndex,
+    nextGlobalIndex,
     baseQueueLength,
     simulator,
   } = appState.session;
@@ -53,6 +56,7 @@ export default function pipe(appState) {
     noteQueue,
     state,
     globalIndex,
+    nextGlobalIndex,
     baseQueueLength,
     simulator
   ).then(() => appState);
