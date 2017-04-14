@@ -1,12 +1,14 @@
-import Eval, { isFailResponse } from './eval';
+import { isFailResponse } from '~/core/eval';
+import {
+  intervalToMinutesFactor,
+  intervalToSecondsFactor,
+  maxIntervalDays
+} from '~/core/hyperparam';
 
 const minToMillisecFactor = 60000;
-const secToMillisecFactor = 1000;
+// const secToMillisecFactor = 1000;
 
-// customizable
-const intervalToMinutesFactor = 1440; // 1440 min in one day
-const intervalToSecondsFactor = 86400; // 86400 secs in one day
-
+const MAX_INTERVAL = maxIntervalDays;
 // Calculate factor used to calculate spaced interval
 // 'previousFactor' From 1.3 (hardest) to 2.5 (easiest)
 // 'responseQuality' From 0 (worst) to 5 (best)
@@ -41,7 +43,9 @@ function calcIntervalCore(prevInterval, factor, count) {
   } else {
     interval = prevInterval * factor;
   }
-  return intervalAttenuation(interval);
+
+  const boundedInterval = Math.min(interval, MAX_INTERVAL);
+  return intervalAttenuation(boundedInterval);
 }
 
 function calcInterval(prevInterval, factor, count, responseQuality) {
@@ -60,9 +64,9 @@ function intervalInMinutes(interval) {
   return interval * intervalToMinutesFactor;
 }
 
-function intervalInSeconds(interval) {
-  return interval * intervalToSecondsFactor;
-}
+// function intervalInSeconds(interval) {
+//   return interval * intervalToSecondsFactor;
+// }
 
 // TODO: write a test for this function
 function calcDueDate(interval) {

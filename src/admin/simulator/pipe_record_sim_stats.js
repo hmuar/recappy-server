@@ -14,7 +14,12 @@ function getAllDueMaterial(userID, subjectID, cutoffDate) {
 export function getBacklogCount(appState) {
   const { userID, subjectID, session, } = appState;
   const dayOffset = session.simulator.dayOffset;
-  const cutoffDate = new Date(appState.timestamp);
+  let cutoffDate;
+  if (appState.timestamp) {
+    cutoffDate = new Date(appState.timestamp);
+  } else {
+    cutoffDate = new Date();
+  }
   cutoffDate.setDate(cutoffDate.getDate() + dayOffset);
   return getAllDueMaterial(userID, subjectID, cutoffDate).then(notes => notes ? notes.length : 0);
 }

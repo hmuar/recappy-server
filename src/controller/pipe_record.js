@@ -78,6 +78,7 @@ function pipeDates(recordCtx, record) {
   const lastDoneDate = new Date();
   const dueHistory = record ? record.dueHistory || [] : [];
   const lastDoneHistory = record ? record.lastDoneHistory || [] : [];
+
   return {
     ...recordCtx,
     due,
