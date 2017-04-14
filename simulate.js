@@ -5,7 +5,7 @@ import Simulator from '~/admin/simulator';
 import { ObjectID } from '~/db/collection';
 
 const HARDCODED_SIM_USER_ID = ObjectID('58ec1b70509986fe34517f71');
-const SUCCESS_PROB = 0.9;
+const SUCCESS_BASE_PROB = 0.6;
 
 function start() {
   const args = require('yargs').argv;
@@ -13,7 +13,7 @@ function start() {
   const simulator = new Simulator();
   const userProfile = {
     id: HARDCODED_SIM_USER_ID,
-    successProb: SUCCESS_PROB,
+    successBaseProb: SUCCESS_BASE_PROB,
   };
 
   if (args.notes) {

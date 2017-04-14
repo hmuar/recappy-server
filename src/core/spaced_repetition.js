@@ -76,7 +76,7 @@ function calcDueDate(interval) {
 const SRCore = {
   defaultFactor: 2.5,
   defaultInterval: 1.0,
-  defaultCount: 1,
+  defaultCount: 0,
   calcFactor,
   calcInterval,
   intervalInMinutes,

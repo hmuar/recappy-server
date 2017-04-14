@@ -2,12 +2,41 @@ import { SessionState, getCurrentNote } from '~/core/session_state';
 import Answer from '~/core/answer';
 import { successEval, insertEval } from '~/controller/pipe_eval';
 
-export default function pipe(appState) {
-  if (!{}.hasOwnProperty.call(appState, 'simulatorInput')) {
-    return appState;
+function generateSuccess(probability) {
+  return Math.random() < probability;
+}
+
+function countInfluence(count) {
+  if (count < 3) {
+    return 0;
+  }
+  return (count - 2) * 0.15;
+}
+
+// use previous note records to modify base success prob
+function calcSuccess(appState, currentNote) {
+  const { successBaseProb, } = appState.simulatorInput;
+  let prob = successBaseProb;
+
+  const noteRecordsMap = appState.session.simulator.noteRecordsMap;
+  if (noteRecordsMap) {
+    const noteRec = noteRecordsMap[currentNote._id.toString()];
+    if (noteRec) {
+      const countInf = countInfluence(noteRec.count);
+      prob = Math.min(1.0, prob + countInf);
+      return generateSuccess(prob);
+    }
   }
 
-  let success = appState.simulatorInput.success;
+  return generateSuccess(prob);
+}
+
+export default function pipe(appState) {
+  // if (!{}.hasOwnProperty.call(appState, 'simulatorInput')) {
+  //   return appState;
+  // }
+  //
+  let success = false;
 
   const currentNote = getCurrentNote(appState.session);
   if (!currentNote) {
@@ -19,14 +48,9 @@ export default function pipe(appState) {
     }
   } else if (currentNote.type === 'info') {
     success = true;
+  } else {
+    success = calcSuccess(appState, currentNote);
   }
-
-  // if (!success) {
-  //   if(currentNote) {
-  //     console.log(`Note type: ${currentNote.type}, state: ${appState.session.state}`);
-  //     console.log(currentNote.displayRaw.slice(0, 50));
-  //   }
-  // }
 
   return insertEval(appState, success ? successEval(Answer.max) : successEval(Answer.min));
 }

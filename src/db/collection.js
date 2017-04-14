@@ -117,6 +117,7 @@ const simulationSchema = new mongoose.Schema({
   notesSeen: Number,
   step: Number,
   noteRecords: [],
+  noteRecordsMap: {},
   noteGlobalIndexes: [Number],
   appState: {},
 });

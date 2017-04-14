@@ -1,5 +1,4 @@
-import DBAssist from '~/db/category_assistant';
-import { log, logErr, logState } from '~/logger';
+import { logErr } from '~/logger';
 import pipeAddSession from '~/controller/pipe_add_session';
 import pipeAddSimulatorSession from '~/admin/simulator/pipe_add_sim_session';
 import pipeRecord from '~/controller/pipe_record';
@@ -8,16 +7,9 @@ import pipeAdvanceSimState from '~/admin/simulator/pipe_advance_sim_state';
 import pipeSaveSimSession from '~/admin/simulator/pipe_save_sim_session';
 import pipeStudentModel from '~/controller/pipe_student_model';
 import pipeAdjustQueue from '~/controller/pipe_adjust_queue';
-import pipeAddPaths from '~/controller/pipe_add_paths';
+// import pipeAddPaths from '~/controller/pipe_add_paths';
 import pipeRecordSimStats from '~/admin/simulator/pipe_record_sim_stats';
-import pipeSpacedRepSimStats from '~/admin/simulator/pipe_spaced_rep_sim_stats';
-
-// `msg` = {
-//   timestamp  : ""
-//   senderID   : "",
-//   text       : "",
-//   action     : ""
-// }
+import pipeSimNoteRecords from '~/admin/simulator/pipe_sim_note_records';
 
 export default class SimulatorController {
   // for simulator, senderID should just be same as userID
@@ -33,13 +25,14 @@ export default class SimulatorController {
   }
 
   // msg should have additional simulator params
-  registerMsg(msg, initSession = null) {
+  registerMsg(msg) {
     // convert adapter specific sender id into app user
     const appState = msg;
     return (
       this.pipeUser(appState)
         // at this point should have app user information
         .then(state => {
+          // if session was passed in from previous sim step, use it
           if (state.session != null) {
             return state;
           }
@@ -61,7 +54,7 @@ export default class SimulatorController {
         .then(state => pipeRecordSimStats(state))
         // persist results of msg evaluation
         .then(state => pipeRecord(state))
-        .then(state => pipeSpacedRepSimStats(state))
+        .then(state => pipeSimNoteRecords(state))
         .then(state => pipeSaveSimSession(state))
         // .then(state => logState(state))
         .then(state => {

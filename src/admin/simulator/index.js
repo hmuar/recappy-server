@@ -12,13 +12,13 @@ class Simulator {
   }
 
   // success: bool indicating correct response
-  generateMsg(userID, success, initSession = null) {
+  generateMsg(userID, successBaseProb, initSession = null) {
     return {
       timestamp: new Date().getTime(),
       senderID: userID,
       subjectID: HARDCODED_SUBJECT_ID,
       simulatorInput: {
-        success,
+        successBaseProb,
       },
       session: initSession,
     };
@@ -43,22 +43,7 @@ class Simulator {
     return chain;
   }
 
-  // debugBacklogCount() {
-  //   const HARDCODED_SIM_USER_ID = ObjectID('58ec1b70509986fe34517f71');
-  //   return getSessionForUserAndSubject(HARDCODED_SIM_USER_ID, HARDCODED_SUBJECT_ID)
-  //     .then(session => ({
-  //       session,
-  //     }))
-  //     .then(appState => {
-  //       console.log('!!!!!!!');
-  //       console.log(appState);
-  //       return getBacklogCount(appState).then(count => console.log(`Backlog count: ${count}`));
-  //     });
-  // }
-
   runDays(user, numDays) {
-    // return this.debugBacklogCount();
-
     if (this.daysCompleted < numDays) {
       return this.runEval(user).then(() => this.runDays(user, numDays));
     }
@@ -67,10 +52,10 @@ class Simulator {
 
   // complete
   runEval(user, initSession = null) {
-    const { id, successProb, } = user;
-    const success = Math.random() < successProb;
-    console.log(`--------------- Running sim step [${this.stepIndex}]-----------------`);
-    const msg = this.generateMsg(id, success, initSession);
+    const { id, successBaseProb, } = user;
+    // const success = Math.random() < successProb;
+    // console.log(`--------------- Running sim step [${this.stepIndex}]-----------------`);
+    const msg = this.generateMsg(id, successBaseProb, initSession);
     const finalState = this.controller.registerMsg(msg).then(state => {
       if (state.session.state === SessionState.DONE_QUEUE) {
         this.daysCompleted += 1;
