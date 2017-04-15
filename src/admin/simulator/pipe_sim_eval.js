@@ -10,7 +10,8 @@ function countInfluence(count) {
   if (count < 3) {
     return 0;
   }
-  return (count - 2) * 0.15;
+  return (count - 2) * 0.1;
+  // return 0;
 }
 
 // use previous note records to modify base success prob
@@ -19,11 +20,14 @@ function calcSuccess(appState, currentNote) {
   let prob = successBaseProb;
 
   const noteRecordsMap = appState.session.simulator.noteRecordsMap;
+  // console.log(noteRecordsMap);
+  // console.log(appState);
   if (noteRecordsMap) {
-    const noteRec = noteRecordsMap[currentNote._id.toString()];
-    if (noteRec) {
-      const countInf = countInfluence(noteRec.count);
+    const count = noteRecordsMap[currentNote._id.toString()];
+    if (count != null) {
+      const countInf = countInfluence(count);
       prob = Math.min(1.0, prob + countInf);
+      // console.log(`Count: ${count} ---> Prob: ${prob}`);
       return generateSuccess(prob);
     }
   }

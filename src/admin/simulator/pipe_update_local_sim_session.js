@@ -1,15 +1,19 @@
-import { StudentSession } from '~/db/collection';
-
 export function updateLocalSession(appState) {
   const {
-    simulator,
-  } = appState.session;
+    session,
+  } = appState;
+
+  const { simulator, } = session;
+  const step = simulator.step || 0;
 
   return {
     ...appState,
-    simulator: {
-      ...simulator,
-      step: simulator.step + 1,
+    session: {
+      ...session,
+      simulator: {
+        ...simulator,
+        step: step + 1,
+      },
     },
   };
 }

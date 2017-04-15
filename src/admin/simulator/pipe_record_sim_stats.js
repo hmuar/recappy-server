@@ -34,6 +34,7 @@ function createNewSimRecord(appState) {
 
   return getBacklogCount(appState)
     .then(backlogCount => {
+      const { simRecords, ...keepSession } = appState.session;
       const newRecord = {
         userID: appState.userID,
         createdAt: appState.timestamp,
@@ -41,22 +42,35 @@ function createNewSimRecord(appState) {
         notesSeen,
         step: simulator.step,
         noteGlobalIndexes: newNotes.map(note => note.globalIndex),
-        appState,
-      };
-      return Simulation.create(newRecord);
-    })
-    .then(record => ({
-      // pass notesSeen value from newRecord
-      ...appState,
-      simRecordID: record._id,
-      session: {
-        ...appState.session,
-        simulator: {
-          ...appState.session.simulator,
-          notesSeen,
+        appState: {
+          ...appState,
+          session: {
+            ...keepSession,
+          },
         },
-      },
-    }));
+      };
+      // return Simulation.create(newRecord);
+      return newRecord;
+    })
+    .then(record => {
+      const simRecs = session.simRecords ? session.simRecords : {};
+      return {
+        // pass notesSeen value from newRecord
+        ...appState,
+        // simRecordID: record._id,
+        session: {
+          ...appState.session,
+          simulator: {
+            ...appState.session.simulator,
+            notesSeen,
+          },
+          simRecords: {
+            ...simRecs,
+            [simulator.step]: record,
+          },
+        },
+      };
+    });
 }
 
 export default function pipe(appState) {

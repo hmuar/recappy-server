@@ -1,4 +1,5 @@
 import SimulatorController from '~/admin/simulator/controller';
+import { Simulation } from '~/db/collection';
 import { SessionState } from '~/core/session_state';
 import { ObjectID } from '~/db/collection';
 import pipeSaveSimSession from '~/admin/simulator/pipe_save_sim_session';
@@ -42,7 +43,21 @@ class Simulator {
   }
 
   runSim(user, count, simType) {
-    return this.runSimByType(user, count, simType).then(state => pipeSaveSimSession(state));
+    return (
+      this.runSimByType(user, count, simType)
+        // save all aggregated sim records to db
+        .then(state => {
+          const simRecordsMap = state.session.simRecords;
+          if (simRecordsMap) {
+            const simRecords = Object.values(state.session.simRecords);
+            if (simRecords && simRecords.length) {
+              return Simulation.create(simRecords).then(() => state);
+            }
+          }
+          return state;
+        })
+        .then(state => pipeSaveSimSession(state))
+    );
   }
 
   runSteps(user, numSteps) {
@@ -86,6 +101,7 @@ class Simulator {
       if (state.session.state === SessionState.DONE_QUEUE) {
         this.daysCompleted += 1;
         console.log(`----- [ Day ${this.daysCompleted} ] -------`);
+        // console.log(state);
       }
       return state;
     });

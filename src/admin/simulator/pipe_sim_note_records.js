@@ -16,38 +16,58 @@ function getAllNoteRecords(userID, subjectID) {
 }
 
 function updateSimRecord(appState) {
-  const { userID, subjectID, simRecordID, } = appState;
+  const { userID, subjectID, session, } = appState;
   return getAllNoteRecords(userID, subjectID).then(recs => {
     const recsByNoteID = {};
+    const counts = [];
+    const intervals = [];
     for (let i = 0; i < recs.length; i++) {
       const rec = recs[i];
       if (rec && rec.noteID) {
-        recsByNoteID[rec.noteID.toString()] = rec;
+        counts.push(rec.count);
+        intervals.push(rec.interval);
+        recsByNoteID[rec.noteID.toString()] = rec.count;
       }
     }
 
-    return Simulation.findByIdAndUpdate(simRecordID, {
-      // $set: { noteRecords: recsByNoteID, },
-      $set: {
-        noteRecords: recs,
-        noteRecordsMap: recsByNoteID,
-      },
-    }).then(() => recsByNoteID);
+    const simStep = session.simulator.step;
+    const simRec = session.simRecords[simStep];
+    simRec.noteRecords = {
+      counts,
+      intervals,
+    };
+    session.simulator.noteRecordsMap = recsByNoteID;
+
+    return appState;
+
+    // return Simulation.findByIdAndUpdate(simRecordID, {
+    //   // $set: { noteRecords: recsByNoteID, },
+    //   $set: {
+    //     noteRecords: recs,
+    //     noteRecordsMap: recsByNoteID,
+    //   },
+    // }).then(() => recsByNoteID);
   });
 }
 
 export default function pipe(appState) {
-  if (appState.simRecordID) {
-    return updateSimRecord(appState).then(noteRecordsMap => ({
-      ...appState,
-      session: {
-        ...appState.session,
-        simulator: {
-          ...appState.session.simulator,
-          noteRecordsMap,
-        },
-      },
-    }));
+  const { session, } = appState;
+  const simStep = session.simulator.step;
+
+  if (session.simRecords && session.simRecords[simStep]) {
+    return updateSimRecord(appState);
   }
+
   return appState;
+
+  // return updateSimRecord(appState).then(noteRecordsMap => ({
+  //   ...appState,
+  //   session: {
+  //     ...appState.session,
+  //     simulator: {
+  //       ...appState.session.simulator,
+  //       noteRecordsMap,
+  //     },
+  //   },
+  // }));
 }

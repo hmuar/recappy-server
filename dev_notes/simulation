@@ -1,4 +1,5 @@
 Example sim cmd line command
 ----------------------------
 
-npm run sim -- --notes=10
+npm run sim -- --days=5
+npm run sim -- --steps=10

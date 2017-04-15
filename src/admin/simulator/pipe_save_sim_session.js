@@ -22,18 +22,15 @@ export function updateSessionForUser(
       globalIndex,
       nextGlobalIndex,
       baseQueueLength,
-      simulator: {
-        ...simulator,
-        step: simulator.step + 1,
-      },
+      simulator,
     };
 
-    // return StudentSession.findByIdAndUpdate(session._id, {
+    return StudentSession.findByIdAndUpdate(session._id, {
+      $set: { subjects, },
+    }).then(updatedSession => updatedSession.subjects[subjectIDString]);
+    // return session.update({
     //   $set: { subjects, },
     // });
-    return session.update({
-      $set: { subjects, },
-    });
   });
 }
 
@@ -59,5 +56,8 @@ export default function pipe(appState) {
     nextGlobalIndex,
     baseQueueLength,
     simulator
-  ).then(() => appState);
+  ).then(session => ({
+    ...appState,
+    session,
+  }));
 }
