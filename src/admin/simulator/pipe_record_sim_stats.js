@@ -13,7 +13,9 @@ function getAllDueMaterial(userID, subjectID, cutoffDate) {
 
 export function getBacklogCount(appState) {
   const { userID, subjectID, session, } = appState;
-  const dayOffset = session.simulator.dayOffset;
+  // need to increment dayOffset here to anticipate the advance in state
+  // that will happen later in pipeAdvanceSimState
+  const dayOffset = session.simulator.dayOffset + 1;
   let cutoffDate;
   if (appState.timestamp) {
     cutoffDate = new Date(appState.timestamp);
@@ -27,21 +29,21 @@ export function getBacklogCount(appState) {
 function createNewSimRecord(appState) {
   // update seenNotes count
   const { session, } = appState;
-  const { baseQueueLength, noteQueue, simulator, } = session;
-  const newNotes = noteQueue.slice(0, baseQueueLength).filter(n => n.queueStatus === 'new');
-  const oldNotesSeen = simulator.notesSeen ? simulator.notesSeen : 0;
-  const notesSeen = oldNotesSeen + newNotes.length;
+  const { simulator, } = session;
+  // const newNotes = noteQueue.slice(0, baseQueueLength).filter(n => n.queueStatus === 'new');
+  // const oldNotesSeen = simulator.notesSeen ? simulator.notesSeen : 0;
+  // const notesSeen = oldNotesSeen + newNotes.length;
 
   return getBacklogCount(appState)
     .then(backlogCount => {
+      // we do not want to store simRecords as part of session in db,
+      // this is only an in-memory data ref
       const { simRecords, ...keepSession } = appState.session;
       const newRecord = {
         userID: appState.userID,
         createdAt: appState.timestamp,
         backlogCount,
-        notesSeen,
         step: simulator.step,
-        noteGlobalIndexes: newNotes.map(note => note.globalIndex),
         appState: {
           ...appState,
           session: {
@@ -62,7 +64,6 @@ function createNewSimRecord(appState) {
           ...appState.session,
           simulator: {
             ...appState.session.simulator,
-            notesSeen,
           },
           simRecords: {
             ...simRecs,
@@ -75,8 +76,8 @@ function createNewSimRecord(appState) {
 
 export default function pipe(appState) {
   if (
-    appState.preEvalState !== SessionState.DONE_QUEUE &&
-    appState.postEvalState !== SessionState.START_QUEUE
+    appState.session.state !== SessionState.DONE_QUEUE &&
+    appState.session.state !== SessionState.INIT
   ) {
     return appState;
   }

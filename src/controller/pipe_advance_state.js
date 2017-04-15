@@ -113,7 +113,7 @@ function advanceState(appState) {
         if (nextNotes && nextNotes.length > 0) {
           return {
             ...appState,
-            postEvalState: null,
+            // postEvalState: null,
             session: {
               ...appState.session,
               noteQueue: nextNotes,

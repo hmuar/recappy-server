@@ -4,13 +4,13 @@ import pipeAddSimParams from '~/admin/simulator/pipe_add_sim_params';
 import pipeRecord from '~/controller/pipe_record';
 import pipeSimEval from '~/admin/simulator/pipe_sim_eval';
 import pipeAdvanceSimState from '~/admin/simulator/pipe_advance_sim_state';
-import pipeSaveSimSession from '~/admin/simulator/pipe_save_sim_session';
+// import pipeSaveSimSession from '~/admin/simulator/pipe_save_sim_session';
 import pipeUpdateLocalSimSession from '~/admin/simulator/pipe_update_local_sim_session';
-import pipeStudentModel from '~/controller/pipe_student_model';
+// import pipeStudentModel from '~/controller/pipe_student_model';
 import pipeAdjustQueue from '~/controller/pipe_adjust_queue';
 // import pipeAddPaths from '~/controller/pipe_add_paths';
 import pipeRecordSimStats from '~/admin/simulator/pipe_record_sim_stats';
-import pipeSimNoteRecords from '~/admin/simulator/pipe_sim_note_records';
+import pipeRecordPostSimStats from '~/admin/simulator/pipe_record_post_sim_stats';
 
 export default class SimulatorController {
   // for simulator, senderID should just be same as userID
@@ -58,36 +58,31 @@ export default class SimulatorController {
           }
           return pipeAddSession(state);
         })
-        .then(state => this.pipeTimer(state, 'pipeAddSimulatorSession', 'pipeAddSession'))
+        // .then(state => this.pipeTimer(state, 'pipeAddSimulatorSession', 'pipeAddSession'))
         .then(state => pipeAddSimParams(state))
         // at this point should have session information
         // need to evaluate msg in context of current state
-        .then(state => this.pipeTimer(state, 'pipeSimEval', 'pipeAddSimulatorSession'))
+        // .then(state => this.pipeTimer(state, 'pipeSimEval', 'pipeAddSimulatorSession'))
         .then(state => pipeSimEval(state))
-        .then(state => this.pipeTimer(state, 'pipeAdjustQueue', 'pipeSimEval'))
+        // .then(state => this.pipeTimer(state, 'pipeAdjustQueue', 'pipeSimEval'))
         // .then(state => this.sendFeedbackResponse(state))
         // adjust queue based on evaluation
         .then(state => pipeAdjustQueue(state))
-        .then(state => this.pipeTimer(state, 'pipeAdvanceSimState', 'pipeAdjustQueue'))
-        // advance session state
-        .then(state => pipeAdvanceSimState(state))
-        .then(state => this.pipeTimer(state, 'pipeRecordSimStats', 'pipeAdvanceSimState'))
-        // .then(state => {
-        //   return pipeAddPaths(state);
-        // })
-        // record new session state
+        // .then(state => this.pipeTimer(state, 'pipeAdvanceSimState', 'pipeAdjustQueue'))
         .then(state => pipeRecordSimStats(state))
-        .then(state => this.pipeTimer(state, 'pipeRecord', 'pipeRecordSimStats'))
+        // .then(state => this.pipeTimer(state, 'pipeRecord', 'pipeRecordSimStats'))
         .then(state => pipeRecord(state))
-        .then(state => this.pipeTimer(state, 'pipeSimNoteRecords', 'pipeRecord'))
-        .then(state => pipeSimNoteRecords(state))
-        .then(state => this.pipeTimer(state, 'pipeSaveSimSession', 'pipeSimNoteRecords'))
+        // .then(state => this.pipeTimer(state, 'pipeSimNoteRecords', 'pipeRecord'))
+        .then(state => pipeAdvanceSimState(state))
+        // .then(state => this.pipeTimer(state, 'pipeRecordSimStats', 'pipeAdvanceSimState'))
+        .then(state => pipeRecordPostSimStats(state))
+        // .then(state => this.pipeTimer(state, 'pipeSaveSimSession', 'pipeSimNoteRecords'))
         // .then(state => pipeSaveSimSession(state))
         // use pipeUpdateLocalSimSession so that we can use pipeSaveSimSession
         // outside of the controller only at the very end of simulation.
         // This avoids hitting the database and slowing down sim
         .then(state => pipeUpdateLocalSimSession(state))
-        .then(state => this.pipeTimer(state, '', 'pipeSaveSimSession'))
+        // .then(state => this.pipeTimer(state, '', 'pipeSaveSimSession'))
         .then(state => {
           this.pipeTimer({}, '', 'controller', 3);
           // don't include this in return chain because this final update

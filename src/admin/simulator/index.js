@@ -5,7 +5,7 @@ import { ObjectID } from '~/db/collection';
 import pipeSaveSimSession from '~/admin/simulator/pipe_save_sim_session';
 
 const HARDCODED_SUBJECT_ID = ObjectID('f64c57184a4ef7f0357f9cd6');
-const DEBUG = true;
+const DEBUG = false;
 
 export const SIM_TYPE = {
   Days: 'DAYS',

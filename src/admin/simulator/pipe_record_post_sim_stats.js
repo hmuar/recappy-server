@@ -30,13 +30,24 @@ function updateSimRecord(appState) {
       }
     }
 
-    const simStep = session.simulator.step;
-    const simRec = session.simRecords[simStep];
+    const { baseQueueLength, noteQueue, simulator, simRecords, } = session;
+
+    const simStep = simulator.step;
+    const simRec = simRecords[simStep];
+
+    const newNotes = noteQueue.slice(0, baseQueueLength).filter(n => n.queueStatus === 'new');
+    const oldNotesSeen = simulator.notesSeen ? simulator.notesSeen : 0;
+    const notesSeen = oldNotesSeen + newNotes.length;
+
+    simRec.notesSeen = notesSeen;
+    simRec.noteGlobalIndexes = newNotes.map(note => note.globalIndex);
     simRec.noteRecords = {
       counts,
       intervals,
     };
-    session.simulator.noteRecordsMap = recsByNoteID;
+
+    simulator.noteRecordsMap = recsByNoteID;
+    simulator.notesSeen = notesSeen;
 
     return appState;
 

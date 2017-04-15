@@ -157,18 +157,29 @@ export default function pipe(appState) {
     return appState;
   }
 
-  const session = appState.session;
+  const { session, } = appState;
 
   if (!recordableStates.includes(session.state)) {
     return appState;
   }
 
-  const note = session.noteQueue[session.queueIndex];
-  const evalCtx = appState.evalCtx;
-  if (!session.noteQueue || session.noteQueue.length === 0) {
+  const { queueIndex, baseQueueLength, noteQueue, } = session;
+  if (!noteQueue || noteQueue.length === 0) {
     log('No notes in noteQueue, could not record activity.');
     return appState;
   }
+
+  // if evaluating a note that has been re-added to end of queue
+  // because of a previous failure eval, don't record any stats
+  // if (queueIndex > baseQueueLength - 1) {
+  //   console.log('----------------------- Note is from extended queue, skipping note record');
+  //   console.log(noteQueue[queueIndex]._id);
+  //   log('Note is from extended queue, skipping note record');
+  //   return appState;
+  // }
+
+  const note = noteQueue[queueIndex];
+  const evalCtx = appState.evalCtx;
 
   return NoteRecord.findOne({
     userID: appState.userID,

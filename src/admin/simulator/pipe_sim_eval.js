@@ -50,11 +50,21 @@ export default function pipe(appState) {
       console.log('No current note, aborting eval');
       return appState;
     }
+  } else if (
+    appState.session.state === SessionState.INIT ||
+    appState.session.state === SessionState.DONE_QUEUE
+  ) {
+    success = true;
   } else if (currentNote.type === 'info') {
     success = true;
   } else {
     success = calcSuccess(appState, currentNote);
   }
+
+  if (currentNote) {
+    console.log(`Note type: ${currentNote.type}`);
+  }
+  console.log(`Note success: ${success}`);
 
   return insertEval(appState, success ? successEval(Answer.max) : successEval(Answer.min));
 }
