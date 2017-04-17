@@ -74,8 +74,9 @@ function createNewSimRecord(appState) {
     });
 }
 
-export default function pipe(appState) {
+export default function pipe(appState, force = false) {
   if (
+    !force &&
     appState.session.state !== SessionState.DONE_QUEUE &&
     appState.session.state !== SessionState.INIT
   ) {

@@ -50,17 +50,21 @@ function setPostEvalState(appState) {
       }
       break;
     case SessionState.INFO:
+      postEvalState = getPaths(appState.session)
+        ? SessionState.SHOW_PATHS
+        : SessionState.WAIT_NEXT_IN_QUEUE;
+      break;
     case SessionState.INPUT:
     case SessionState.RECALL_RESPONSE:
     case SessionState.MULT_CHOICE:
       if (validEval) {
         // if min quality response, check for possible note paths
-        if (isFailResponse(appState.evalCtx.answerQuality)) {
-          const paths = getPaths(appState.session);
-          postEvalState = paths ? SessionState.SHOW_PATHS : SessionState.WAIT_NEXT_IN_QUEUE;
-        } else {
-          postEvalState = SessionState.WAIT_NEXT_IN_QUEUE;
-        }
+        // if (isFailResponse(appState.evalCtx.answerQuality)) {
+        //   const paths = getPaths(appState.session);
+        //   postEvalState = paths ? SessionState.SHOW_PATHS : SessionState.WAIT_NEXT_IN_QUEUE;
+        // } else {
+        postEvalState = SessionState.WAIT_NEXT_IN_QUEUE;
+        // }
       }
       break;
     default:

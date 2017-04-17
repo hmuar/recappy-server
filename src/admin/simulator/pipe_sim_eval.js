@@ -61,10 +61,10 @@ export default function pipe(appState) {
     success = calcSuccess(appState, currentNote);
   }
 
-  if (currentNote) {
-    console.log(`Note type: ${currentNote.type}`);
-  }
-  console.log(`Note success: ${success}`);
+  // if (currentNote) {
+  //   console.log(`Note type: ${currentNote.type}`);
+  // }
+  // console.log(`Note success: ${success}`);
 
   return insertEval(appState, success ? successEval(Answer.max) : successEval(Answer.min));
 }

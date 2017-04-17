@@ -15,7 +15,7 @@ function getAllNoteRecords(userID, subjectID) {
   });
 }
 
-function updateSimRecord(appState) {
+function updateSimRecord(appState, skipDay) {
   const { userID, subjectID, session, } = appState;
   return getAllNoteRecords(userID, subjectID).then(recs => {
     const recsByNoteID = {};
@@ -37,7 +37,7 @@ function updateSimRecord(appState) {
 
     const newNotes = noteQueue.slice(0, baseQueueLength).filter(n => n.queueStatus === 'new');
     const oldNotesSeen = simulator.notesSeen ? simulator.notesSeen : 0;
-    const notesSeen = oldNotesSeen + newNotes.length;
+    const notesSeen = skipDay ? oldNotesSeen : oldNotesSeen + newNotes.length;
 
     simRec.notesSeen = notesSeen;
     simRec.noteGlobalIndexes = newNotes.map(note => note.globalIndex);
@@ -61,12 +61,12 @@ function updateSimRecord(appState) {
   });
 }
 
-export default function pipe(appState) {
+export default function pipe(appState, skipDay = false) {
   const { session, } = appState;
   const simStep = session.simulator.step;
 
   if (session.simRecords && session.simRecords[simStep]) {
-    return updateSimRecord(appState);
+    return updateSimRecord(appState, skipDay);
   }
 
   return appState;

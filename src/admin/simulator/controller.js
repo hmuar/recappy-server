@@ -4,6 +4,7 @@ import pipeAddSimParams from '~/admin/simulator/pipe_add_sim_params';
 import pipeRecord from '~/controller/pipe_record';
 import pipeSimEval from '~/admin/simulator/pipe_sim_eval';
 import pipeAdvanceSimState from '~/admin/simulator/pipe_advance_sim_state';
+import pipeAdvanceSimDay from '~/admin/simulator/pipe_advance_sim_day';
 // import pipeSaveSimSession from '~/admin/simulator/pipe_save_sim_session';
 import pipeUpdateLocalSimSession from '~/admin/simulator/pipe_update_local_sim_session';
 // import pipeStudentModel from '~/controller/pipe_student_model';
@@ -39,6 +40,27 @@ export default class SimulatorController {
 
   sendResponse(state) {
     return state;
+  }
+
+  registerSkipMsg(msg) {
+    const appState = msg;
+    return this.pipeUser(appState)
+      .then(state => {
+        if (state.session != null) {
+          return state;
+        }
+        return pipeAddSession(state);
+      })
+      .then(state => pipeAddSimParams(state))
+      .then(state => pipeRecordSimStats(state, true))
+      .then(state => pipeAdvanceSimDay(state))
+      .then(state => pipeRecordPostSimStats(state, true))
+      .then(state => pipeUpdateLocalSimSession(state))
+      .then(state => this.sendResponse(state))
+      .catch(err => {
+        logErr('error registering skip message in controller');
+        logErr(err);
+      });
   }
 
   // msg should have additional simulator params

@@ -171,12 +171,12 @@ export default function pipe(appState) {
 
   // if evaluating a note that has been re-added to end of queue
   // because of a previous failure eval, don't record any stats
-  // if (queueIndex > baseQueueLength - 1) {
-  //   console.log('----------------------- Note is from extended queue, skipping note record');
-  //   console.log(noteQueue[queueIndex]._id);
-  //   log('Note is from extended queue, skipping note record');
-  //   return appState;
-  // }
+  if (queueIndex > baseQueueLength - 1) {
+    // console.log('----------------------- Note is from extended queue, skipping note record');
+    // console.log(noteQueue[queueIndex]._id);
+    // log('Note is from extended queue, skipping note record');
+    return appState;
+  }
 
   const note = noteQueue[queueIndex];
   const evalCtx = appState.evalCtx;

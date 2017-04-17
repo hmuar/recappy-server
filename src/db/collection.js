@@ -34,6 +34,7 @@ const catSchema = new mongoose.Schema({
   parent: [mongoose.Schema.Types.ObjectId],
   ckey: String,
   globalIndex: Number,
+  exclude: Boolean,
   subjectParent: mongoose.Schema.Types.ObjectId,
 });
 

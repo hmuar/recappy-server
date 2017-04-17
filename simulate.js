@@ -3,9 +3,11 @@
 import Database from '~/db/db';
 import Simulator, { SIM_TYPE } from '~/admin/simulator';
 import { ObjectID } from '~/db/collection';
+import { simBaseProb } from '~/core/hyperparam';
 
 const HARDCODED_SIM_USER_ID = ObjectID('58ec1b70509986fe34517f71');
-const SUCCESS_BASE_PROB = 0.6;
+const SUCCESS_BASE_PROB = simBaseProb;
+const DAILY_ACTIVE_PROB = 0.7;
 
 function start() {
   console.time('Total sim time');
@@ -15,7 +17,13 @@ function start() {
   const userProfile = {
     id: HARDCODED_SIM_USER_ID,
     successBaseProb: SUCCESS_BASE_PROB,
+    dailyActiveProb: DAILY_ACTIVE_PROB,
   };
+
+  if (args.skipDays) {
+    const numDays = args.skipDays;
+    return simulator.runSim(userProfile, numDays, SIM_TYPE.SkipDays);
+  }
 
   if (args.days) {
     const numDays = args.days;
