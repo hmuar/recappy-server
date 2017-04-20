@@ -1,7 +1,7 @@
 import { SessionState, getCurrentNote } from '~/core/session_state';
 import Input from '~/core/input';
 import Answer from '~/core/answer';
-import { EvalStatus } from '~/core/eval';
+import { EvalStatus, evalNoteWithRawInput } from '~/core/eval';
 
 // Evaluate user input in the context of user's current session state.
 // Add a `evalCtx` object to message data.
@@ -86,34 +86,6 @@ function RecallResponseContext(appState) {
   }
 }
 
-function fuzzyAnswerEval(input, answer) {
-  // lowercase response
-  let inputClean = input.toLowerCase().trim();
-  let answerClean = answer.toLowerCase().trim();
-  if (inputClean !== answerClean) {
-    if (inputClean.length === answerClean.length) {
-      return false;
-    }
-    if (inputClean.length > answerClean.length) {
-      inputClean = inputClean.replace(/s\s*$/, '');
-    } else {
-      answerClean = answerClean.replace(/s\s*$/, '');
-    }
-    return inputClean === answerClean;
-  }
-  return true;
-}
-
-function evalNoteWithRawInput(input, note) {
-  const answers = note.answer.split('||').map(s => s.trim());
-  for (let i = 0; i < answers.length; i++) {
-    if (fuzzyAnswerEval(input, answers[i])) {
-      return true;
-    }
-  }
-  return false;
-}
-
 function InputContext(appState) {
   const input = appState.input;
   if (!input) {
@@ -160,6 +132,11 @@ function ShowPathsContext(appState) {
   const input = appState.input;
   if (!input) {
     return appState;
+  }
+  // input is just an accept response, which in this context means continue
+  // without choosing any extra paths
+  if (input.type === Input.Type.ACCEPT) {
+    return insertEval(appState, successEval(Answer.ok));
   }
   if (input.type === Input.Type.CUSTOM && !isNaN(input.payload)) {
     const note = getCurrentNote(appState.session);

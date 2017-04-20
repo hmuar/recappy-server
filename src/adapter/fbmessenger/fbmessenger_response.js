@@ -53,9 +53,8 @@ function sendResponseInContext(state) {
         title: 'No',
         action: Input.Type.REJECT,
       });
-      return sendPossibleImage(fbUserID, note)
-        .then(() => sendText(fbUserID, note.hidden))
-        .then(() => sendQuickReply(fbUserID, 'Is that what you were thinking?', quickReplyData));
+      return sendText(fbUserID, note.hidden).then(() =>
+        sendQuickReply(fbUserID, 'Is that what you were thinking?', quickReplyData));
     }
 
     case SessionState.INPUT: {

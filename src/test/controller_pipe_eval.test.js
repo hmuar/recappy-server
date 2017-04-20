@@ -18,51 +18,55 @@ const SUBJECT_NAME = TestConst.SUBJECT_NAME;
 function getSession(queueIndex = 0, state) {
   return {
     queueIndex,
-    noteQueue:
-      [{ _id: db.createObjectID('9e16c772556579bd6fc6c222'),
-         createdAt: '2016-08-06T00:33:36.808Z',
-         ctype: 'note',
-         order: 1,
-         type: 'info',
-         weight: 1,
-         level: 1,
-         display: '<p>Carbon has 6 protons and 6 neutrons in its nucleus. This makes it a relatively small, flexible atom so it is very useful. This helps make carbon fundamental to life. Without carbon all human, plant, and animal life would not be possible. We are all <strong>carbon-based</strong> lifeforms.</p>',
-         extra: '',
-         extra_media: '',
-         ckey: 'proton-neutron-electron',
-         displayRaw: 'Carbon has 6 protons and 6 neutrons in its nucleus. This makes it a relatively small, flexible atom so it is very useful. This helps make carbon fundamental to life. Without carbon all human, plant, and animal life would not be possible. We are all carbon-based lifeforms.',
-         globalIndex: 0,
-         directParent: db.createObjectID('7980227254feb46736ca47fd'),
-         __v: 0,
-         parent: [] },
-       { _id: db.createObjectID('987e8177faf2c2f03c974482'),
-         createdAt: '2016-08-06T00:33:36.808Z',
-         ctype: 'note',
-         order: 2,
-         type: 'recall',
-         weight: 0.5,
-         level: 0.2,
-         display: '<p>How many protons and neutrons does carbon have?</p>',
-         extra: '',
-         extra_media: '',
-         ckey: 'q-protons-neutrons',
-         displayRaw: 'How many protons and neutrons does carbon have?',
-         globalIndex: 1,
-         directParent: db.createObjectID('7980227254feb46736ca47fd'),
-         paths: [
-           {
-             display: 'polar bonds?',
-             catName: 'polar-covalent-bond',
-             catId: '2980227254feb46732ca491e',
-           },
-           {
-             display: 'electron?',
-             catName: 'electron-shell',
-             catId: '7980227254feb46736ca47fd',
-           },
-         ],
-         __v: 0,
-         parent: [] },
+    noteQueue: [
+      {
+        _id: db.createObjectID('9e16c772556579bd6fc6c222'),
+        createdAt: '2016-08-06T00:33:36.808Z',
+        ctype: 'note',
+        order: 1,
+        type: 'info',
+        weight: 1,
+        level: 1,
+        display: '<p>Carbon has 6 protons and 6 neutrons in its nucleus. This makes it a relatively small, flexible atom so it is very useful. This helps make carbon fundamental to life. Without carbon all human, plant, and animal life would not be possible. We are all <strong>carbon-based</strong> lifeforms.</p>',
+        extra: '',
+        extra_media: '',
+        ckey: 'proton-neutron-electron',
+        displayRaw: 'Carbon has 6 protons and 6 neutrons in its nucleus. This makes it a relatively small, flexible atom so it is very useful. This helps make carbon fundamental to life. Without carbon all human, plant, and animal life would not be possible. We are all carbon-based lifeforms.',
+        globalIndex: 0,
+        directParent: db.createObjectID('7980227254feb46736ca47fd'),
+        __v: 0,
+        parent: [],
+      },
+      {
+        _id: db.createObjectID('987e8177faf2c2f03c974482'),
+        createdAt: '2016-08-06T00:33:36.808Z',
+        ctype: 'note',
+        order: 2,
+        type: 'recall',
+        weight: 0.5,
+        level: 0.2,
+        display: '<p>How many protons and neutrons does carbon have?</p>',
+        extra: '',
+        extra_media: '',
+        ckey: 'q-protons-neutrons',
+        displayRaw: 'How many protons and neutrons does carbon have?',
+        globalIndex: 1,
+        directParent: db.createObjectID('7980227254feb46736ca47fd'),
+        paths: [
+          {
+            display: 'polar bonds?',
+            catName: 'polar-covalent-bond',
+            catId: '2980227254feb46732ca491e',
+          },
+          {
+            display: 'electron?',
+            catName: 'electron-shell',
+            catId: '7980227254feb46736ca47fd',
+          }
+        ],
+        __v: 0,
+        parent: [],
+      },
       {
         _id: db.createObjectID('ff7cbfb397fb2794827739ad'),
         createdAt: '2016-04-15T00:36:56.879Z',
@@ -90,8 +94,10 @@ function getSession(queueIndex = 0, state) {
         phrase: {
           pre: [],
         },
-        label: '' },
-      { _id: db.createObjectID('1abf784a870127cca006e09c'),
+        label: '',
+      },
+      {
+        _id: db.createObjectID('1abf784a870127cca006e09c'),
         createdAt: '2016-04-13T17:16:38.076Z',
         ctype: 'note',
         order: 4,
@@ -107,16 +113,15 @@ function getSession(queueIndex = 0, state) {
         answer: 'valence',
         hidden: 'Remember that an atom likes to get together with other atoms just so it can share and exchange electrons with them and fill this valence shell.',
         phrase: {
-          pre: [
-            'Do you remember',
-            'Can you tell me',
-          ],
+          pre: ['Do you remember', 'Can you tell me'],
         },
         globalIndex: 26,
         subjectParent: db.createObjectID('f64c57184a4ef7f0357f9cd6'),
         directParent: db.createObjectID('f9e515b670e5b8de9210872e'),
-        label: '' },
-      { _id: db.createObjectID('57a533de11aa3f271d51a2ab'),
+        label: '',
+      },
+      {
+        _id: db.createObjectID('57a533de11aa3f271d51a2ab'),
         directParent: db.createObjectID('7980227254feb46736ca47fd'),
         globalIndex: 2,
         displayRaw: 'How many protons and neutrons does carbon have?',
@@ -131,8 +136,10 @@ function getSession(queueIndex = 0, state) {
         ctype: 'note',
         createdAt: '2016-08-06T00:48:29.339Z',
         __v: 0,
-        parent: [] },
-      { _id: db.createObjectID('57a533de11aa3f271d51a2ac'),
+        parent: [],
+      },
+      {
+        _id: db.createObjectID('57a533de11aa3f271d51a2ac'),
         directParent: db.createObjectID('7980227254feb46736ca47fd'),
         globalIndex: 2,
         displayRaw: 'How many protons and neutrons does carbon have?',
@@ -147,8 +154,10 @@ function getSession(queueIndex = 0, state) {
         ctype: 'note',
         createdAt: '2016-08-06T00:48:29.339Z',
         __v: 0,
-        parent: [] },
-      { _id: db.createObjectID('57a533de11aa3f271d51a2ad'),
+        parent: [],
+      },
+      {
+        _id: db.createObjectID('57a533de11aa3f271d51a2ad'),
         directParent: db.createObjectID('7980227254feb46736ca47fd'),
         globalIndex: 2,
         displayRaw: 'How many protons and neutrons does carbon have?',
@@ -163,8 +172,10 @@ function getSession(queueIndex = 0, state) {
         ctype: 'note',
         createdAt: '2016-08-06T00:48:29.339Z',
         __v: 0,
-        parent: [] },
-      { _id: db.createObjectID('57a533de11aa3f271d51a2ae'),
+        parent: [],
+      },
+      {
+        _id: db.createObjectID('57a533de11aa3f271d51a2ae'),
         directParent: db.createObjectID('7980227254feb46736ca47fd'),
         globalIndex: 2,
         displayRaw: 'How many protons and neutrons does carbon have?',
@@ -179,8 +190,10 @@ function getSession(queueIndex = 0, state) {
         ctype: 'note',
         createdAt: '2016-08-06T00:48:29.339Z',
         __v: 0,
-        parent: [] },
-      { _id: db.createObjectID('57a533de11aa3f271d51a2af'),
+        parent: [],
+      },
+      {
+        _id: db.createObjectID('57a533de11aa3f271d51a2af'),
         directParent: db.createObjectID('7980227254feb46736ca47fd'),
         globalIndex: 2,
         displayRaw: 'How many protons and neutrons does carbon have?',
@@ -195,8 +208,10 @@ function getSession(queueIndex = 0, state) {
         ctype: 'note',
         createdAt: '2016-08-06T00:48:29.339Z',
         __v: 0,
-        parent: [] },
-      { _id: db.createObjectID('57a533de11aa3f271d51a2b0'),
+        parent: [],
+      },
+      {
+        _id: db.createObjectID('57a533de11aa3f271d51a2b0'),
         directParent: db.createObjectID('7980227254feb46736ca47fd'),
         globalIndex: 2,
         displayRaw: 'How many protons and neutrons does carbon have?',
@@ -211,8 +226,78 @@ function getSession(queueIndex = 0, state) {
         ctype: 'note',
         createdAt: '2016-08-06T00:48:29.339Z',
         __v: 0,
-        parent: [] },
-       ],
+        parent: [],
+      },
+      {
+        _id: db.createObjectID('1abf784a870127cca006e02a'),
+        createdAt: '2016-04-13T17:16:38.076Z',
+        ctype: 'note',
+        order: 4,
+        type: 'input',
+        weight: 0.5,
+        level: 0.5,
+        display: '<p>the three main particles you find in an atom?</p>',
+        extra: '',
+        extra_media: '',
+        parent: [],
+        ckey: 'atomic-shell-valence',
+        displayRaw: 'the three main particles you find in an atom?',
+        answer: 'protons, neutrons, electrons',
+        phrase: {
+          pre: ['Do you remember', 'Can you tell me'],
+        },
+        globalIndex: 26,
+        subjectParent: db.createObjectID('f64c57184a4ef7f0357f9cd6'),
+        directParent: db.createObjectID('f9e515b670e5b8de9210872e'),
+        label: '',
+      },
+      {
+        _id: db.createObjectID('1abf784a870127cca006e02a'),
+        createdAt: '2016-04-13T17:16:38.076Z',
+        ctype: 'note',
+        order: 4,
+        type: 'input',
+        weight: 0.5,
+        level: 0.5,
+        display: '<p>the three particle types you find in an atom?</p>',
+        extra: '',
+        extra_media: '',
+        parent: [],
+        ckey: 'atomic-shell-valence',
+        displayRaw: 'three particle types you find in an atom?',
+        answer: 'protons, neutrons, electrons || gluons',
+        phrase: {
+          pre: ['Do you remember', 'Can you tell me'],
+        },
+        globalIndex: 26,
+        subjectParent: db.createObjectID('f64c57184a4ef7f0357f9cd6'),
+        directParent: db.createObjectID('f9e515b670e5b8de9210872e'),
+        label: '',
+      },
+      {
+        _id: db.createObjectID('1abf784a870127cca006e02a'),
+        createdAt: '2016-04-13T17:16:38.076Z',
+        ctype: 'note',
+        order: 4,
+        type: 'input',
+        weight: 0.5,
+        level: 0.5,
+        display: '<p>What kind of color is blue?</p>',
+        extra: '',
+        extra_media: '',
+        parent: [],
+        ckey: 'atomic-shell-valence',
+        displayRaw: 'what kind of color is blue?',
+        answer: 'primary || cool',
+        phrase: {
+          pre: ['Do you remember', 'Can you tell me'],
+        },
+        globalIndex: 26,
+        subjectParent: db.createObjectID('f64c57184a4ef7f0357f9cd6'),
+        directParent: db.createObjectID('f9e515b670e5b8de9210872e'),
+        label: '',
+      }
+    ],
     state,
     globalIndex: 0,
   };
@@ -230,8 +315,8 @@ function getAppState(session, input) {
   };
 }
 
-before('before controller pipe evaluator testing',
-  () => db.setup().then(() => db.clean()).then(() => db.loadAllFixtures()));
+before('before controller pipe evaluator testing', () =>
+  db.setup().then(() => db.clean()).then(() => db.loadAllFixtures()));
 
 test('eval with init state', t => {
   const appState = getAppState(getSession(0, SessionState.INIT), {
@@ -490,6 +575,117 @@ test('eval with INPUT state and another invalid input', t => {
   t.equal(evalCtx.answerQuality, null);
   t.equal(evalCtx.correctAnswer, 'valence');
   t.equal(evalCtx.status, EvalStatus.INVALID);
+  t.end();
+});
+
+test('eval with INPUT state and correct multi (AND logic) inputs', t => {
+  const correctResp = [
+    'protons neutrons electrons',
+    'protons electrons neutrons protons electrons neutrons',
+    'protons, neutrons, electrons',
+    'neutrons, protons, electrons',
+    'neutrons and protons and electrons'
+  ];
+
+  for (const resp of correctResp) {
+    const appState = getAppState(getSession(10, SessionState.INPUT), {
+      type: Input.Type.CUSTOM,
+      payload: resp,
+    });
+    const mEvalState = pipeEval(appState);
+    const evalCtx = mEvalState.evalCtx;
+    t.equal(mEvalState.session.state, SessionState.INPUT);
+    t.equal(evalCtx.answerQuality, Answer.max);
+    t.equal(evalCtx.status, EvalStatus.SUCCESS);
+  }
+
+  t.end();
+});
+
+test('eval with INPUT state and correct multi (AND logic with OR logic) inputs', t => {
+  const correctResp = [
+    'protons neutrons electrons',
+    'protons neutrons gluons',
+    'protons electrons neutrons protons electrons neutrons',
+    'protons gluons neutrons protons gluons neutrons',
+    'protons, neutrons, electrons',
+    'protons, neutrons, gluons',
+    'neutrons and protons and electrons',
+    'neutrons and protons and gluons'
+  ];
+
+  for (const resp of correctResp) {
+    const appState = getAppState(getSession(11, SessionState.INPUT), {
+      type: Input.Type.CUSTOM,
+      payload: resp,
+    });
+    const mEvalState = pipeEval(appState);
+    const evalCtx = mEvalState.evalCtx;
+    t.equal(mEvalState.session.state, SessionState.INPUT);
+    t.equal(evalCtx.answerQuality, Answer.max);
+    t.equal(evalCtx.status, EvalStatus.SUCCESS);
+  }
+
+  t.end();
+});
+
+test('eval with INPUT state and incorrect multi (AND logic) inputs', t => {
+  const incorrectResp = [
+    'quarks neutrons electrons',
+    'protons, quarks, electrons',
+    'neutrons, protons, quarks',
+    'neutrons and quarks and electrons',
+    'protons neutrons electrons quarks'
+  ];
+
+  for (const resp of incorrectResp) {
+    const appState = getAppState(getSession(10, SessionState.INPUT), {
+      type: Input.Type.CUSTOM,
+      payload: resp,
+    });
+    const mEvalState = pipeEval(appState);
+    const evalCtx = mEvalState.evalCtx;
+    t.equal(mEvalState.session.state, SessionState.INPUT);
+    t.equal(evalCtx.answerQuality, Answer.min);
+    t.equal(evalCtx.status, EvalStatus.SUCCESS);
+  }
+
+  t.end();
+});
+
+test('eval with INPUT state and correct multi (OR logic) inputs', t => {
+  const correctResp = ['primary', 'cool', '  primary ', ' cool    ', ' primary and cool'];
+
+  for (const resp of correctResp) {
+    const appState = getAppState(getSession(12, SessionState.INPUT), {
+      type: Input.Type.CUSTOM,
+      payload: resp,
+    });
+    const mEvalState = pipeEval(appState);
+    const evalCtx = mEvalState.evalCtx;
+    t.equal(mEvalState.session.state, SessionState.INPUT);
+    t.equal(evalCtx.answerQuality, Answer.max);
+    t.equal(evalCtx.status, EvalStatus.SUCCESS);
+  }
+
+  t.end();
+});
+
+test('eval with INPUT state and incorrect multi (OR logic) inputs', t => {
+  const incorrectResp = ['protons', 'cat', '  dog ', ' protons    ', ' primary and kitty'];
+
+  for (const resp of incorrectResp) {
+    const appState = getAppState(getSession(12, SessionState.INPUT), {
+      type: Input.Type.CUSTOM,
+      payload: resp,
+    });
+    const mEvalState = pipeEval(appState);
+    const evalCtx = mEvalState.evalCtx;
+    t.equal(mEvalState.session.state, SessionState.INPUT);
+    t.equal(evalCtx.answerQuality, Answer.min);
+    t.equal(evalCtx.status, EvalStatus.SUCCESS);
+  }
+
   t.end();
 });
 

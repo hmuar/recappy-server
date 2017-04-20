@@ -4,6 +4,7 @@ import generateQuestion from '~/speech';
 import Answer from '~/core/answer';
 import { logErr } from '~/logger';
 import { sendMessages, sendImage } from './webclient_request';
+import { Media } from '~/db/collection';
 
 export function sendPossibleImage(senderID, note) {
   if ('imgUrl' in note) {
@@ -16,7 +17,7 @@ export function sendPossibleImage(senderID, note) {
 
 function extractFeedbackResp(feedback) {
   if (feedback && feedback.message) {
-    return feedback.message.filter(msg => msg.text);
+    return feedback.message.filter(msg => msg.text || msg.img);
   }
   return [];
 }
@@ -32,6 +33,7 @@ function sendResponseInContext(state) {
         {
           text: "Let's get started!",
           replies: [],
+          img: note.imgUrl ? note.imgUrl : '',
         }
       ]);
       return Promise.resolve([response]);
@@ -49,6 +51,7 @@ function sendResponseInContext(state) {
         {
           text: note.display,
           replies: quickReplyData,
+          img: note.imgUrl ? note.imgUrl : '',
         }
       ]);
       return Promise.resolve([response]);
@@ -67,6 +70,7 @@ function sendResponseInContext(state) {
         {
           text: questionText,
           replies: quickReplyData,
+          img: note.imgUrl ? note.imgUrl : '',
         }
       ]);
       return Promise.resolve([response]);
@@ -89,6 +93,7 @@ function sendResponseInContext(state) {
         {
           text: note.hidden,
           replies: [],
+          img: note.imgUrl ? note.imgUrl : '',
         },
         {
           text: quickReplyText,
@@ -106,6 +111,7 @@ function sendResponseInContext(state) {
         {
           text: questionText,
           replies: [],
+          img: note.imgUrl ? note.imgUrl : '',
         }
       ]);
       return Promise.resolve([response]);
@@ -129,6 +135,7 @@ function sendResponseInContext(state) {
         {
           text: questionText,
           replies: [],
+          img: note.imgUrl ? note.imgUrl : '',
         },
         {
           text: choicesText,
@@ -142,10 +149,17 @@ function sendResponseInContext(state) {
       if (!state.paths || state.paths.length === 0) {
         return Promise.resolve(0);
       }
-      const quickReplyData = state.paths.map(path => ({
-        title: path.display,
-        action: getPathInput(path.index),
-      }));
+      const quickReplyData = [
+        ...state.paths.map(path => ({
+          title: path.display,
+          action: getPathInput(path.index),
+        })),
+        {
+          title: 'Ok keep going',
+          action: Input.Type.ACCEPT,
+        }
+      ];
+
       const response = sendMessages(fbUserID, [
         ...preResponses,
         {
@@ -198,15 +212,32 @@ function negFeedback() {
 
 function sendFeedbackText(toID, isPositive, correctMsg = null) {
   let msg = isPositive ? posFeedback() : negFeedback();
-  if (!isPositive && correctMsg) {
-    msg = `${msg} It's actually ${correctMsg}`;
-  }
-  return sendMessages(toID, [
-    {
-      text: msg,
-      replies: [],
+  if (!isPositive) {
+    if (correctMsg) {
+      msg = `${msg} It's actually ${correctMsg}`;
     }
-  ]);
+    return Promise.resolve(
+      sendMessages(toID, [
+        {
+          text: msg,
+          replies: [],
+        }
+      ])
+    );
+  }
+  return Media.aggregate([{ $sample: { size: 1, }, }]).then(result => {
+    let img = '';
+    if (result && result.length) {
+      img = result[0].url;
+    }
+    return sendMessages(toID, [
+      {
+        text: msg,
+        replies: [],
+        img,
+      }
+    ]);
+  });
 }
 
 // return state
@@ -218,10 +249,10 @@ export function sendFeedbackResp(state) {
     case SessionState.RECALL_RESPONSE:
     case SessionState.INPUT:
     case SessionState.MULT_CHOICE:
-      return Promise.resolve({
+      return sendFeedbackText(fbUserID, isCorrect, state.evalCtx.correctAnswer).then(feedback => ({
         ...state,
-        feedback: sendFeedbackText(fbUserID, isCorrect, state.evalCtx.correctAnswer),
-      });
+        feedback,
+      }));
     // return sendFeedbackText(fbUserID, isCorrect, state.evalCtx.correctAnswer)
     //       .then(() => state);
     default:

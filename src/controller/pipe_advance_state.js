@@ -50,9 +50,11 @@ function setPostEvalState(appState) {
       }
       break;
     case SessionState.INFO:
-      postEvalState = getPaths(appState.session)
-        ? SessionState.SHOW_PATHS
-        : SessionState.WAIT_NEXT_IN_QUEUE;
+      if (validEval) {
+        postEvalState = getPaths(appState.session)
+          ? SessionState.SHOW_PATHS
+          : SessionState.WAIT_NEXT_IN_QUEUE;
+      }
       break;
     case SessionState.INPUT:
     case SessionState.RECALL_RESPONSE:

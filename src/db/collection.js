@@ -61,6 +61,7 @@ const noteSchema = new mongoose.Schema({
   choice3: String,
   choice4: String,
   choice5: String,
+  imgUrl: String,
   parent: [mongoose.Schema.Types.ObjectId],
   phrase: Object,
   ckey: String,
@@ -124,5 +125,13 @@ const simulationSchema = new mongoose.Schema({
 });
 
 export const Simulation = mongoose.model('Simulation', simulationSchema, 'simulation');
+
+const mediaSchema = new mongoose.Schema({
+  type: String,
+  label: [String],
+  url: String,
+});
+
+export const Media = mongoose.model('Media', simulationSchema, 'media');
 
 export const ObjectID = mongoose.Types.ObjectId;

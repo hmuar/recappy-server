@@ -55,6 +55,7 @@ function getSession(queueIndex, state) {
     ],
     state,
     globalIndex: 0,
+    nextGlobalIndex: 1,
   };
 }
 
@@ -156,8 +157,8 @@ test('test transition from state RECALL_RESPONSE success', t => {
 test('test transition from state RECALL_RESPONSE fail', t => {
   const appState = getAppState(getSession(1, SessionState.RECALL_RESPONSE), successEval(Answer.no));
   const nextAppState = pipeStateTransition(appState);
-  t.equal(nextAppState.session.state, SessionState.SHOW_PATHS);
-  t.equal(nextAppState.session.queueIndex, 1);
+  t.equal(nextAppState.session.state, SessionState.INPUT);
+  t.equal(nextAppState.session.queueIndex, 2);
   t.end();
 });
 
@@ -180,8 +181,8 @@ test('test transition from state INPUT success', t => {
 test('test transition from state INPUT fail', t => {
   const appState = getAppState(getSession(2, SessionState.INPUT), successEval(Answer.no));
   const nextAppState = pipeStateTransition(appState);
-  t.equal(nextAppState.session.state, SessionState.SHOW_PATHS);
-  t.equal(nextAppState.session.queueIndex, 2);
+  t.equal(nextAppState.session.state, SessionState.MULT_CHOICE);
+  t.equal(nextAppState.session.queueIndex, 3);
   t.end();
 });
 

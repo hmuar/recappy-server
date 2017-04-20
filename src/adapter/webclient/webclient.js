@@ -7,9 +7,7 @@ const createUser = AdapterFB.createUser;
 const parse = AdapterFB.parse;
 
 function evalSuccess(state) {
-  return (state &&
-          state.evalCtx &&
-          state.evalCtx.status === EvalStatus.SUCCESS);
+  return state && state.evalCtx && state.evalCtx.status === EvalStatus.SUCCESS;
 }
 
 function sendResponse(state) {
@@ -22,7 +20,6 @@ function sendFeedbackResponse(state) {
   }
   return sendFeedbackResp(state);
 }
-
 
 const AdapterWebClient = {
   senderToUser,

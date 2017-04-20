@@ -28,23 +28,27 @@ export default function pipe(appState) {
   if (session.state === SessionState.SHOW_PATHS) {
     if (!isFailResponse(appState.evalCtx.answerQuality)) {
       const path = appState.evalCtx.correctAnswer;
-      return CategoryAssistant.getAllChildNotes(path.catId).then(notes => {
-        const queue = session.noteQueue;
-        const adjustedNoteQueue = [
-          ...queue.slice(0, session.queueIndex + 1),
-          ...notes,
-          ...queue.slice(session.queueIndex + 1, queue.length)
-        ];
-        const adjustedSession = {
-          ...session,
-          noteQueue: adjustedNoteQueue,
-          baseQueueLength: session.baseQueueLength + notes.length,
-        };
-        return {
-          ...appState,
-          session: adjustedSession,
-        };
-      });
+      // if path == null, user did not choose any paths
+      // and probably just wanted to advance current queue
+      if (path != null) {
+        return CategoryAssistant.getAllChildNotes(path.catId).then(notes => {
+          const queue = session.noteQueue;
+          const adjustedNoteQueue = [
+            ...queue.slice(0, session.queueIndex + 1),
+            ...notes,
+            ...queue.slice(session.queueIndex + 1, queue.length)
+          ];
+          const adjustedSession = {
+            ...session,
+            noteQueue: adjustedNoteQueue,
+            baseQueueLength: session.baseQueueLength + notes.length,
+          };
+          return {
+            ...appState,
+            session: adjustedSession,
+          };
+        });
+      }
     }
     return appState;
   }
