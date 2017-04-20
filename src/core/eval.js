@@ -34,15 +34,16 @@ function fuzzyEval(input, answer) {
   return true;
 }
 
-function inputSetMatchWithAnswer(inputSet, answerSet) {
+function checkInputAnswerMatch(inputSet, answerSet) {
   if (inputSet.size === 0 || answerSet.size === 0) {
     return false;
   }
+  if (inputSet.size < answerSet.size) return false;
   // if (inputSet.size !== answerSet.size) return false;
-  for (const input of inputSet) {
+  for (const input of inputSet.elems) {
     // iterate through answer set to check for equivalence
     let match = false;
-    for (const answer of answerSet) {
+    for (const answer of answerSet.elems) {
       // iterate through each element after splitting it based on custom
       // OR delimiter we use to denote multiple answers, each ONE of which
       // by itself is enough for entire answer to be correct
@@ -57,41 +58,45 @@ function inputSetMatchWithAnswer(inputSet, answerSet) {
   }
   return true;
 }
-function separateUserInput(input) {
-  return input.trim().split(/\s*and\s*|\s*,\s*|\s+/).map(s => s.trim());
+
+function parseUserInput(input) {
+  const elems = input.trim().split(/\s*,\s*and\s+|\s+and\s+|\s*,\s*|\s+/).map(s => s.trim());
+  const elemsSet = new Set(elems);
+  return {
+    elems: elemsSet,
+    size: elemsSet.size,
+  };
 }
 
-function separateNoteAnswer(input) {
-  const comp = input.trim().split(/\s*and\s*|\s*,\s*/).map(s => s.trim());
-  return comp.reduce(
+function parseNoteAnswer(input) {
+  const comp = input.trim().split(/\s*,\s*and\s+|\s+and\s+|\s*,\s*/).map(s => s.trim());
+  const length = comp.length;
+  const elems = comp.reduce(
     (acc, val) => {
       const orComponents = val.split('||').map(s => s.trim());
       return [...acc, ...orComponents];
     },
     []
   );
+  return {
+    elems: new Set(elems),
+    size: length,
+  };
 }
 
-function asSet(stringArray) {
-  return new Set(stringArray);
-}
-
-function _setAsString(set) {
-  let finalString = '';
-  for (let s of set) {
-    finalString = `${finalString + s} `;
-  }
-  return finalString;
-}
-
+// function _setAsString(set) {
+//   let finalString = '';
+//   for (let s of set.elems) {
+//     finalString = `${finalString + s} `;
+//   }
+//   return finalString;
+// }
+//
 export function evalNoteWithRawInput(input, note) {
   // look for multiple answers by splitting on 'and' or ','
-
-  const inputSet = asSet(separateUserInput(input));
-  const answerSet = asSet(separateNoteAnswer(note.answer));
-
-  const match = inputSetMatchWithAnswer(inputSet, answerSet);
-
+  const inputSet = parseUserInput(input);
+  const answerSet = parseNoteAnswer(note.answer);
+  const match = checkInputAnswerMatch(inputSet, answerSet);
   return match;
 
   // const answers = note.answer.split('||').map(s => s.trim());

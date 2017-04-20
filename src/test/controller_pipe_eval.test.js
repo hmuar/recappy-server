@@ -242,7 +242,7 @@ function getSession(queueIndex = 0, state) {
         parent: [],
         ckey: 'atomic-shell-valence',
         displayRaw: 'the three main particles you find in an atom?',
-        answer: 'protons, neutrons, electrons',
+        answer: 'electrons, protons, and neutrons',
         phrase: {
           pre: ['Do you remember', 'Can you tell me'],
         },
@@ -265,7 +265,7 @@ function getSession(queueIndex = 0, state) {
         parent: [],
         ckey: 'atomic-shell-valence',
         displayRaw: 'three particle types you find in an atom?',
-        answer: 'protons, neutrons, electrons || gluons',
+        answer: 'neutrons, protons, and electrons || gluons',
         phrase: {
           pre: ['Do you remember', 'Can you tell me'],
         },
@@ -581,6 +581,7 @@ test('eval with INPUT state and another invalid input', t => {
 test('eval with INPUT state and correct multi (AND logic) inputs', t => {
   const correctResp = [
     'protons neutrons electrons',
+    'protons neutrons, electrons',
     'protons electrons neutrons protons electrons neutrons',
     'protons, neutrons, electrons',
     'neutrons, protons, electrons',
@@ -631,6 +632,8 @@ test('eval with INPUT state and correct multi (AND logic with OR logic) inputs',
 
 test('eval with INPUT state and incorrect multi (AND logic) inputs', t => {
   const incorrectResp = [
+    'electrons',
+    'protons neutrons',
     'quarks neutrons electrons',
     'protons, quarks, electrons',
     'neutrons, protons, quarks',
