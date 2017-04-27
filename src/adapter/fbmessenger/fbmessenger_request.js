@@ -20,13 +20,11 @@ function getReqTextBody(text) {
   };
 }
 function getReqPayloadBody(text, buttons) {
-  const btnData = buttons.map((btn) => (
-    {
-      type: 'postback',
-      title: btn.title,
-      payload: btn.action,
-    }
-  ));
+  const btnData = buttons.map(btn => ({
+    type: 'postback',
+    title: btn.title,
+    payload: btn.action,
+  }));
 
   return {
     attachment: {
@@ -41,13 +39,11 @@ function getReqPayloadBody(text, buttons) {
 }
 
 function getReqQuickReplyBody(text, replies) {
-  const replyData = replies.map((reply) => (
-    {
-      content_type: 'text',
-      title: reply.title,
-      payload: reply.action,
-    }
-  ));
+  const replyData = replies.map(reply => ({
+    content_type: 'text',
+    title: reply.title,
+    payload: reply.action,
+  }));
 
   // "text":"Pick a color:",
   // "quick_replies":[
@@ -61,7 +57,7 @@ function getReqQuickReplyBody(text, replies) {
   //     "title":"Green",
   //     "payload":"DEVELOPER_DEFINED_PAYLOAD_FOR_PICKING_GREEN"
   //   }
-    // ]
+  // ]
   return {
     text,
     quick_replies: replyData,
@@ -142,4 +138,13 @@ export function sendImage(senderID, imgURL) {
   log(`sending img: ${imgURL}`);
   const bodyCreator = postBodyCreator(MessageType.IMAGE);
   return sendPostRequest(bodyCreator(senderID, imgURL));
+}
+
+export function sendUserDetailsRequest(senderID) {
+  const uri = `https://graph.facebook.com/v2.6/${senderID}?fields=first_name,last_name,locale,timezone,gender&access_token=${Config.FBToken}`;
+  const options = {
+    uri,
+    json: true,
+  };
+  return request.get(options);
 }

@@ -1,5 +1,7 @@
 import { gifSuccessProb } from '~/core/hyperparam';
 import DBAssist from '~/db/category_assistant';
+import Input from '~/core/input';
+import { updateFacebookUserDetails } from '~/account';
 import { log, logErr, logState } from '~/logger';
 import pipeAddSession from './pipe_add_session';
 import pipeRecord from './pipe_record';
@@ -31,14 +33,24 @@ export default class Controller {
 
   // convert adapter specific sender id into app user id
   pipeUser(appState) {
-    return this.adapter.senderToUser(appState).then(newState => {
-      // create a new user if user could not be found
-      if (!newState.userID) {
-        return this.adapter.createUser(newState);
-      }
-      return newState;
-    });
-    // return this.adapter.senderToUser(appState);
+    return this.adapter
+      .senderToUser(appState)
+      .then(newState => {
+        // create a new user if user could not be found
+        if (!newState.userID) {
+          return this.adapter.createUser(newState);
+        }
+        return newState;
+      })
+      .then(state => {
+        // check if initializing user. if so, grab user details
+        if (state.input.type === Input.Type.INITIALIZE_NEW_USER) {
+          this.adapter
+            .getUserDetails(appState.senderID)
+            .then(userDetails => updateFacebookUserDetails(appState.senderID, userDetails));
+        }
+        return state;
+      });
   }
 
   debugDBAssist(msg) {

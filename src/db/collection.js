@@ -5,7 +5,11 @@ import mongoose from 'mongoose';
 // Main user account. Has access info from other adapters.
 // E.g. facebook messenger ID
 const userSchema = new mongoose.Schema({
-  name: String,
+  firstName: String,
+  lastName: String,
+  locale: String,
+  timezone: String,
+  gender: String,
   email: String,
   facebookMessageID: String,
 });

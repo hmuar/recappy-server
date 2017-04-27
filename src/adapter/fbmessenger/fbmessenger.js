@@ -1,8 +1,9 @@
-import Account from '~/account/account';
+import Account from '~/account';
 import Input from '~/core/input';
 import { EvalStatus } from '~/core/eval';
 import MessageType from './fbmessage_type';
 import sendResp, { sendFeedbackResp } from './fbmessenger_response';
+import { sendUserDetailsRequest } from './fbmessenger_request';
 
 // Adapter for parsing incoming requests and responding
 // if user is using Facebook Messenger platform.
@@ -98,6 +99,8 @@ function contentInjector(msgType) {
         mtype = Input.Type.ACCEPT;
       } else if (content === 'reject') {
         mtype = Input.Type.REJECT;
+      } else if (content === 'GET_STARTED_PAYLOAD') {
+        mtype = Input.Type.INITIALIZE_NEW_USER;
       } else {
         mtype = Input.Type.CUSTOM;
         if (~content.indexOf('choice-') || ~content.indexOf('path-')) {
@@ -162,6 +165,10 @@ function evalSuccess(state) {
 //           state.preEvalState !== state.session.state);
 // }
 
+export function getUserDetails(userID) {
+  return sendUserDetailsRequest(userID);
+}
+
 export function sendResponse(state) {
   // if (!advancedState(state)) {
   //   return state;
@@ -182,6 +189,7 @@ const AdapterFBMessenger = {
   parse,
   sendResponse,
   sendFeedbackResponse,
+  getUserDetails,
 };
 
 export default AdapterFBMessenger;

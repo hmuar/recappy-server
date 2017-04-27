@@ -1,13 +1,13 @@
 import test from 'blue-tape';
-import Account from '~/account/account';
+import Account from '~/account';
 import TestDatabase from './test_database';
 
 const before = test;
 const after = test;
 const db = new TestDatabase();
 
-before('before account testing',
-  () => db.setup().then(() => db.clean()).then(() => db.loadUserFixtures()));
+before('before account testing', () =>
+  db.setup().then(() => db.clean()).then(() => db.loadUserFixtures()));
 
 test('Get user using FacebookID', t => {
   const fbID = '1028279607252619';

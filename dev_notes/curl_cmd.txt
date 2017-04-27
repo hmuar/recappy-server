@@ -1,9 +1,14 @@
+// ----- INIT APP
 curl -ik -X POST "https://graph.facebook.com/v2.6/me/subscribed_apps?access_token="
 
-GET STARTED BUTTON:
 
+// ----- GET STARTED BUTTON:
 curl -X POST -H "Content-Type: application/json" -d '{
   "get_started":{
     "payload":"GET_STARTED_PAYLOAD"
   }
-}' "https://graph.facebook.com/v2.6/me/messenger_profile?access_token="  
+}' "https://graph.facebook.com/v2.6/me/messenger_profile?access_token=EAAIkwPmW9ZB4BAHO5F3ZAdaquHqekWaRBZCYYXj2d7ZBHZAbhhomhclCWW8YNxZCTqgtDEYtPAa6okrgoNRzZBa1ZCP8I7OFwvScODiSN57PfZBRsH6VvuhJA2ZBDt7jJuZCw84JZCX2losIuFb3rQRbwVdto7N5g85gLCCe8g2tdnXhMQZDZD"
+
+
+// ----- GET USER DETAILS
+curl -X GET "https://graph.facebook.com/v2.6/1028279607252642?fields=first_name,last_name,locale,timezone,gender&access_token=EAAIkwPmW9ZB4BAHO5F3ZAdaquHqekWaRBZCYYXj2d7ZBHZAbhhomhclCWW8YNxZCTqgtDEYtPAa6okrgoNRzZBa1ZCP8I7OFwvScODiSN57PfZBRsH6VvuhJA2ZBDt7jJuZCw84JZCX2losIuFb3rQRbwVdto7N5g85gLCCe8g2tdnXhMQZDZD"
