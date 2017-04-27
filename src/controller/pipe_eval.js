@@ -31,7 +31,11 @@ export function insertEval(state, evalCtx) {
 // properly format compound answers, e.g. those that contain
 // multiple acceptable answers
 function formatAnswer(answer) {
-  return answer.replace(/\|\|/g, 'or');
+  const answers = answer.split('||');
+  if (!answers || answer.length === 0) {
+    throw new Error('Could not format note answer.');
+  }
+  return answers[0].trim();
 }
 
 // Ignore input and advance state
@@ -52,7 +56,7 @@ function InfoContext(appState) {
 
   return insertEval(
     appState,
-    input.type === Input.Type.ACCEPT ? successEval(Answer.ok) : invalidEval()
+    input.type !== Input.Type.REJECT ? successEval(Answer.ok) : invalidEval()
   );
 }
 
@@ -66,7 +70,7 @@ function RecallContext(appState) {
 
   return insertEval(
     appState,
-    input.type === Input.Type.ACCEPT ? successEval(Answer.ok) : invalidEval()
+    input.type !== Input.Type.REJECT ? successEval(Answer.ok) : invalidEval()
   );
 }
 

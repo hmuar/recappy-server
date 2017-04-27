@@ -347,6 +347,20 @@ test('eval with INFO state and correct input', t => {
   t.end();
 });
 
+test('eval with INFO state and random custom input', t => {
+  const appState = getAppState(getSession(0, SessionState.INFO), {
+    type: Input.Type.CUSTOM,
+    payload: 'cool story dude',
+  });
+  const mEvalState = pipeEval(appState);
+  const evalCtx = mEvalState.evalCtx;
+  t.equal(mEvalState.session.state, SessionState.INFO);
+  t.equal(evalCtx.answerQuality, Answer.ok);
+  t.equal(evalCtx.correctAnswer, null);
+  t.equal(evalCtx.status, EvalStatus.SUCCESS);
+  t.end();
+});
+
 test('eval with INFO state and invalid input', t => {
   const appState = getAppState(getSession(0, SessionState.INFO), {
     type: Input.Type.REJECT,
@@ -366,6 +380,20 @@ test('eval with RECALL state and correct input', t => {
   const appState = getAppState(getSession(1, SessionState.RECALL), {
     type: Input.Type.ACCEPT,
     payload: null,
+  });
+  const mEvalState = pipeEval(appState);
+  const evalCtx = mEvalState.evalCtx;
+  t.equal(mEvalState.session.state, SessionState.RECALL);
+  t.equal(evalCtx.answerQuality, Answer.ok);
+  t.equal(evalCtx.correctAnswer, null);
+  t.equal(evalCtx.status, EvalStatus.SUCCESS);
+  t.end();
+});
+
+test('eval with RECALL state and random custom input', t => {
+  const appState = getAppState(getSession(1, SessionState.RECALL), {
+    type: Input.Type.CUSTOm,
+    payload: 'hallooo',
   });
   const mEvalState = pipeEval(appState);
   const evalCtx = mEvalState.evalCtx;
@@ -686,6 +714,31 @@ test('eval with INPUT state and incorrect multi (OR logic) inputs', t => {
     const evalCtx = mEvalState.evalCtx;
     t.equal(mEvalState.session.state, SessionState.INPUT);
     t.equal(evalCtx.answerQuality, Answer.min);
+    t.equal(evalCtx.status, EvalStatus.SUCCESS);
+  }
+
+  t.end();
+});
+
+test('eval with INPUT state and input with leading articles', t => {
+  const correctResp = [
+    'the primary',
+    'the cool',
+    ' a  the an   primary ',
+    ' a cool  ',
+    ' an primary the',
+    'an cool the'
+  ];
+
+  for (const resp of correctResp) {
+    const appState = getAppState(getSession(12, SessionState.INPUT), {
+      type: Input.Type.CUSTOM,
+      payload: resp,
+    });
+    const mEvalState = pipeEval(appState);
+    const evalCtx = mEvalState.evalCtx;
+    t.equal(mEvalState.session.state, SessionState.INPUT);
+    t.equal(evalCtx.answerQuality, Answer.max);
     t.equal(evalCtx.status, EvalStatus.SUCCESS);
   }
 

@@ -60,7 +60,7 @@ function checkInputAnswerMatch(inputSet, answerSet) {
 }
 
 function parseUserInput(input) {
-  const elems = input.trim().split(/\s*,\s*and\s+|\s+and\s+|\s*,\s*|\s+/).map(s => s.trim());
+  const elems = input.split(/\s*,\s*and\s+|\s+and\s+|\s*,\s*|\s+/).map(s => s.trim());
   const elemsSet = new Set(elems);
   return {
     elems: elemsSet,
@@ -69,7 +69,7 @@ function parseUserInput(input) {
 }
 
 function parseNoteAnswer(input) {
-  const comp = input.trim().split(/\s*,\s*and\s+|\s+and\s+|\s*,\s*/).map(s => s.trim());
+  const comp = input.split(/\s*,\s*and\s+|\s+and\s+|\s*,\s*/).map(s => s.trim());
   const length = comp.length;
   const elems = comp.reduce(
     (acc, val) => {
@@ -92,9 +92,24 @@ function parseNoteAnswer(input) {
 //   return finalString;
 // }
 //
+
+function _removeEmptySpace(input) {
+  return input.trim();
+}
+
+function _removeArticles(input) {
+  return input.replace(/\bthe\b|\ban\b|\ba\b/g, '');
+}
+
+function preProcessInput(input) {
+  return _removeEmptySpace(_removeArticles(input));
+}
+
 export function evalNoteWithRawInput(input, note) {
   // look for multiple answers by splitting on 'and' or ','
-  const inputSet = parseUserInput(input);
+  // const inputSet = preProcessInput(parseUserInput(input));
+  const preProcessedInput = preProcessInput(input);
+  const inputSet = parseUserInput(preProcessedInput);
   const answerSet = parseNoteAnswer(note.answer);
   const match = checkInputAnswerMatch(inputSet, answerSet);
   return match;

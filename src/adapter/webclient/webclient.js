@@ -1,3 +1,4 @@
+import { gifSuccessProb } from '~/core/hyperparam';
 import AdapterFB from '~/adapter/fbmessenger/fbmessenger';
 import { EvalStatus } from '~/core/eval';
 import sendResp, { sendFeedbackResp } from './webclient_response';
@@ -18,7 +19,8 @@ function sendFeedbackResponse(state) {
   if (!evalSuccess(state)) {
     return state;
   }
-  return sendFeedbackResp(state);
+  const withSuccessMedia = Math.random() < gifSuccessProb;
+  return sendFeedbackResp(state, withSuccessMedia);
 }
 
 const AdapterWebClient = {

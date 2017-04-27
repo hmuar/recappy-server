@@ -1,14 +1,22 @@
+import { SessionState, getCurrentNote } from '~/core/session_state';
 import Input, { getChoiceInput, getPathInput } from '~/core/input';
-import { SessionState } from '~/core/session_state';
 import generateQuestion from '~/speech';
 import Answer from '~/core/answer';
 import { logErr } from '~/logger';
+import { Media } from '~/db/collection';
 import { sendText, sendImage, sendQuickReply } from './fbmessenger_request';
+
+function sendImageWithUrl(senderID, imgUrl) {
+  if (!imgUrl) {
+    return Promise.resolve(0);
+  }
+  return sendImage(senderID, imgUrl);
+}
 
 export function sendPossibleImage(senderID, note) {
   if ('imgUrl' in note) {
     if (note.imgUrl != null) {
-      return sendImage(senderID, note.imgUrl);
+      return sendImageWithUrl(senderID, note.imgUrl);
     }
   }
   return Promise.resolve(0);
@@ -25,7 +33,7 @@ function sendResponseInContext(state) {
     case SessionState.INFO: {
       const quickReplyData = [];
       quickReplyData.push({
-        title: 'Ok keep going',
+        title: 'ok keep going',
         action: Input.Type.ACCEPT,
       });
       return sendPossibleImage(fbUserID, note).then(() =>
@@ -85,15 +93,32 @@ function sendResponseInContext(state) {
       if (!state.paths) {
         return Promise.resolve(0);
       }
-      const quickReplyData = state.paths.map(path => ({
-        title: path.display,
-        action: getPathInput(path.index),
-      }));
+      const quickReplyData = [
+        ...state.paths.map(path => ({
+          title: path.display,
+          action: getPathInput(path.index),
+        })),
+        {
+          title: 'ok, keep going',
+          action: Input.Type.ACCEPT,
+        }
+      ];
       return sendQuickReply(fbUserID, 'Where to from here?', quickReplyData);
     }
 
     case SessionState.DONE_QUEUE:
-      return sendText(fbUserID, 'No more to learn for today, all done! Check back in tomorrow :)');
+      return Media.aggregate([{ $sample: { size: 1, }, }]).then(result => {
+        let img = '';
+        if (result && result.length) {
+          img = result[0].url;
+          return sendImageWithUrl(fbUserID, img).then(() =>
+            sendText(fbUserID, 'No more to learn for today, all done! Check back in tomorrow :)'));
+        }
+        return sendText(
+          fbUserID,
+          'No more to learn for today, all done! Check back in tomorrow :)'
+        );
+      });
 
     default:
       logErr(`Unrecognized state ${session.state}, could not properly respond`);
@@ -102,7 +127,6 @@ function sendResponseInContext(state) {
 }
 
 export default function sendResponse(state) {
-  console.error('sendResponse --------------------------------------------');
   return sendResponseInContext(state).then(() => state).catch(err => {
     if (state.session) {
       logErr(`Error sending response from ${state.session.state} state`);
@@ -117,28 +141,52 @@ function posFeedback() {
   return 'Great job!';
 }
 
-function negFeedback() {
-  return 'Not quite :(\n';
+function negFeedback(state) {
+  if (state.session.state === SessionState.RECALL_RESPONSE) {
+    return "that's ok";
+  }
+  return 'Not quite.';
 }
 
-function sendFeedbackText(toID, isPositive, correctMsg = null) {
-  let msg = isPositive ? posFeedback() : negFeedback();
-  if (!isPositive && correctMsg) {
-    msg = `${msg} It's actually ${correctMsg}`;
+function sendFeedbackText(state, withHiddenContent = false, withSuccessMedia = false) {
+  const toID = state.senderID;
+  const isPositive = state.evalCtx.answerQuality === Answer.max;
+  const correctMsg = state.evalCtx.correctAnswer;
+
+  let msg = isPositive ? posFeedback() : negFeedback(state);
+  if (!isPositive) {
+    if (correctMsg) {
+      msg = `${msg} It's actually ${correctMsg}`;
+    }
+    const curNote = getCurrentNote(state.session);
+    if (withHiddenContent && curNote.hidden) {
+      msg = `${msg}. ${curNote.hidden}`;
+    }
+    return sendText(toID, msg);
+  }
+  // try to send a success GIF
+  if (withSuccessMedia) {
+    return Media.aggregate([{ $sample: { size: 1, }, }]).then(result => {
+      let img = '';
+      if (result && result.length) {
+        img = result[0].url;
+        return sendImageWithUrl(toID, img).then(() => sendText(toID, msg));
+      }
+      return sendText(toID, msg);
+    });
   }
   return sendText(toID, msg);
 }
 
 // return state
-export function sendFeedbackResp(state) {
-  const fbUserID = state.senderID;
-  const isCorrect = state.evalCtx.answerQuality === Answer.max;
+export function sendFeedbackResp(state, withSuccessMedia = false) {
   const session = state.session;
   switch (session.state) {
     case SessionState.RECALL_RESPONSE:
+      return sendFeedbackText(state, false, withSuccessMedia).then(() => state);
     case SessionState.INPUT:
     case SessionState.MULT_CHOICE:
-      return sendFeedbackText(fbUserID, isCorrect, state.evalCtx.correctAnswer).then(() => state);
+      return sendFeedbackText(state, true, withSuccessMedia).then(() => state);
     default:
       break;
   }

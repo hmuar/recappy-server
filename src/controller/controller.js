@@ -1,3 +1,4 @@
+import { gifSuccessProb } from '~/core/hyperparam';
 import DBAssist from '~/db/category_assistant';
 import { log, logErr, logState } from '~/logger';
 import pipeAddSession from './pipe_add_session';
@@ -58,7 +59,8 @@ export default class Controller {
 
   sendFeedbackResponse(state) {
     // return state;
-    return this.adapter.sendFeedbackResponse(state);
+    const withSuccessMedia = Math.random() < gifSuccessProb;
+    return this.adapter.sendFeedbackResponse(state, withSuccessMedia);
   }
 
   // main entry method called by external adapters
