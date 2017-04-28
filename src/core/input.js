@@ -3,6 +3,7 @@ const InputType = {
   REJECT: 'reject',
   INITIALIZE_NEW_USER: 'initialize_new_user',
   CUSTOM: 'custom',
+  PATH: 'path',
   UNKOWN: 'unknown',
 };
 

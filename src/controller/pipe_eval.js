@@ -54,6 +54,17 @@ function InfoContext(appState) {
     return appState;
   }
 
+  // response was for an explore path
+  if (input.type === Input.Type.PATH && !isNaN(input.payload)) {
+    const note = getCurrentNote(appState.session);
+    const dataAsNum = parseInt(input.payload, 10);
+    const validPayload = dataAsNum != null && note.paths && dataAsNum < note.paths.length;
+    if (validPayload) {
+      return insertEval(appState, successEval(Answer.max, note.paths[dataAsNum]));
+    }
+    return insertEval(appState, invalidEval());
+  }
+
   return insertEval(
     appState,
     input.type !== Input.Type.REJECT ? successEval(Answer.ok) : invalidEval()
@@ -142,7 +153,7 @@ function ShowPathsContext(appState) {
   if (input.type === Input.Type.ACCEPT) {
     return insertEval(appState, successEval(Answer.ok));
   }
-  if (input.type === Input.Type.CUSTOM && !isNaN(input.payload)) {
+  if (input.type === Input.Type.PATH && !isNaN(input.payload)) {
     const note = getCurrentNote(appState.session);
     const dataAsNum = parseInt(input.payload, 10);
     const validPayload = dataAsNum != null && note.paths && dataAsNum < note.paths.length;

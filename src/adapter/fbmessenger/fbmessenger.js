@@ -101,16 +101,18 @@ function contentInjector(msgType) {
         mtype = Input.Type.REJECT;
       } else if (content === 'GET_STARTED_PAYLOAD') {
         mtype = Input.Type.INITIALIZE_NEW_USER;
-      } else {
+      } else if (~content.indexOf('choice-')) {
         mtype = Input.Type.CUSTOM;
-        if (~content.indexOf('choice-') || ~content.indexOf('path-')) {
           // if 'choice-' or 'path-' is in content, it was a payload representing
           // a predefined choice made by user, so strip out choice num
-          dataVal = stripChoiceNum(content);
-        } else {
+        dataVal = stripChoiceNum(content);
+      } else if (~content.indexOf('path-')) {
+        mtype = Input.Type.PATH;
+        dataVal = stripChoiceNum(content);
+      } else {
           // just set data to entirety of input text
-          dataVal = content;
-        }
+        mtype = Input.Type.CUSTOM;
+        dataVal = content;
       }
       return {
         ...msg,

@@ -33,11 +33,6 @@ function routes(apiVersionPath) {
       const controller = new Controller(AdapterFB);
       const msg = AdapterFB.parse(postBody);
 
-      // if (msg.input.type === Input.Type.INITIALIZE_NEW_USER) {
-      //   AdapterFB.getUserDetails(msg.senderID).then(userDetails =>
-      //     updateFacebookUserDetails(msg.senderID, userDetails));
-      // }
-
       if (msg.input.type != null) {
         controller.registerMsg(msg).catch(err => logErr(err));
       } else {

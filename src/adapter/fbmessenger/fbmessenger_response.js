@@ -4,6 +4,7 @@ import generateQuestion from '~/speech';
 import Answer from '~/core/answer';
 import { logErr } from '~/logger';
 import { Media } from '~/db/collection';
+import { NoteType } from '~/core/note';
 import { sendText, sendImage, sendQuickReply } from './fbmessenger_request';
 
 function sendImageWithUrl(senderID, imgUrl) {
@@ -31,13 +32,24 @@ function sendResponseInContext(state) {
       return sendText(fbUserID, "Let's get started!").then(() => state);
 
     case SessionState.INFO: {
-      const quickReplyData = [];
+      const displayText = note.displayRaw;
+      let quickReplyData = [];
+
+      if (state.paths) {
+        quickReplyData = [
+          ...state.paths.map(path => ({
+            title: path.display,
+            action: getPathInput(path.index),
+          }))
+        ];
+      }
+
       quickReplyData.push({
         title: 'ok keep going',
         action: Input.Type.ACCEPT,
       });
       return sendPossibleImage(fbUserID, note).then(() =>
-        sendQuickReply(fbUserID, note.displayRaw, quickReplyData));
+        sendQuickReply(fbUserID, displayText, quickReplyData));
     }
 
     case SessionState.RECALL: {
@@ -93,6 +105,10 @@ function sendResponseInContext(state) {
       if (!state.paths) {
         return Promise.resolve(0);
       }
+      let displayText = '';
+      if (note.type === NoteType.INFO) {
+        displayText = note.displayRaw;
+      }
       const quickReplyData = [
         ...state.paths.map(path => ({
           title: path.display,
@@ -103,7 +119,7 @@ function sendResponseInContext(state) {
           action: Input.Type.ACCEPT,
         }
       ];
-      return sendQuickReply(fbUserID, 'Where to from here?', quickReplyData);
+      return sendQuickReply(fbUserID, displayText, quickReplyData);
     }
 
     case SessionState.DONE_QUEUE:
