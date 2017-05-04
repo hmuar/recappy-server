@@ -103,14 +103,14 @@ function contentInjector(msgType) {
         mtype = Input.Type.INITIALIZE_NEW_USER;
       } else if (~content.indexOf('choice-')) {
         mtype = Input.Type.CUSTOM;
-          // if 'choice-' or 'path-' is in content, it was a payload representing
-          // a predefined choice made by user, so strip out choice num
+        // if 'choice-' or 'path-' is in content, it was a payload representing
+        // a predefined choice made by user, so strip out choice num
         dataVal = stripChoiceNum(content);
       } else if (~content.indexOf('path-')) {
         mtype = Input.Type.PATH;
         dataVal = stripChoiceNum(content);
       } else {
-          // just set data to entirety of input text
+        // just set data to entirety of input text
         mtype = Input.Type.CUSTOM;
         dataVal = content;
       }
@@ -133,8 +133,8 @@ function contentInjector(msgType) {
   });
 }
 
-// Parse incoming POST body and return a msg object
-// object with standard message data
+// Parse incoming POST body and return an array of  msgs objects
+// with standard message data
 function parse(requestBody) {
   const entry = requestBody.entry[0];
   const msg = entry.messaging[0];

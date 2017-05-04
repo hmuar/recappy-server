@@ -27,6 +27,10 @@ test('controller pipe user', t => {
   const mData = {
     senderID: '1028279607252642',
     subjectName: SUBJECT_NAME,
+    input: {
+      type: Input.Type.CUSTOM,
+      payload: 'hi!',
+    },
   };
   return controller.pipeUser(mData).then(mDataWithUser => {
     t.ok(mDataWithUser);

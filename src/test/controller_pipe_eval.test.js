@@ -745,9 +745,21 @@ test('eval with INPUT state and input with leading articles', t => {
   t.end();
 });
 
+test('eval with SHOW_PATHS state with valid input skipping paths', t => {
+  const appState = getAppState(getSession(1, SessionState.SHOW_PATHS), {
+    type: Input.Type.ACCEPT,
+  });
+  const mEvalState = pipeEval(appState);
+  const evalCtx = mEvalState.evalCtx;
+  t.equal(mEvalState.session.state, SessionState.SHOW_PATHS);
+  t.equal(evalCtx.answerQuality, Answer.max);
+  t.equal(evalCtx.status, EvalStatus.SUCCESS);
+  t.end();
+});
+
 test('eval with SHOW_PATHS state with valid input', t => {
   const appState = getAppState(getSession(1, SessionState.SHOW_PATHS), {
-    type: Input.Type.CUSTOM,
+    type: Input.Type.PATH,
     payload: '0',
   });
   const mEvalState = pipeEval(appState);
@@ -761,7 +773,7 @@ test('eval with SHOW_PATHS state with valid input', t => {
 
 test('eval with SHOW_PATHS state with valid input for note no paths', t => {
   const appState = getAppState(getSession(0, SessionState.SHOW_PATHS), {
-    type: Input.Type.CUSTOM,
+    type: Input.Type.PATH,
     payload: '0',
   });
   const mEvalState = pipeEval(appState);
@@ -785,16 +797,28 @@ test('eval with SHOW_PATHS state with invalid input', t => {
   t.end();
 });
 
-test('eval with DONE_QUEUE state and valid input', t => {
+test('eval with DONE_QUEUE state and valid input but not enough waited time', t => {
   const appState = getAppState(getSession(10, SessionState.DONE_QUEUE), {
     type: Input.Type.CUSTOM,
-    payload: 'extend',
+    payload: 'keep going!',
   });
   const mEvalState = pipeEval(appState);
   const evalCtx = mEvalState.evalCtx;
   t.equal(mEvalState.session.state, SessionState.DONE_QUEUE);
-  t.equal(evalCtx.answerQuality, Answer.ok);
-  t.equal(evalCtx.correctAnswer, null);
+  t.equal(evalCtx.answerQuality, Answer.min);
+  t.equal(evalCtx.status, EvalStatus.SUCCESS);
+  t.end();
+});
+
+test('eval with DONE_QUEUE state and valid input and dev loophole', t => {
+  const appState = getAppState(getSession(10, SessionState.DONE_QUEUE), {
+    type: Input.Type.CUSTOM,
+    payload: '1',
+  });
+  const mEvalState = pipeEval(appState);
+  const evalCtx = mEvalState.evalCtx;
+  t.equal(mEvalState.session.state, SessionState.DONE_QUEUE);
+  t.equal(evalCtx.answerQuality, Answer.max);
   t.equal(evalCtx.status, EvalStatus.SUCCESS);
   t.end();
 });
