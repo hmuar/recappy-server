@@ -18,7 +18,7 @@ export function isFailResponse(responseQuality) {
 
 function fuzzyEval(input, answer) {
   // lowercase response
-  let inputClean = input.toLowerCase().trim();
+  let inputClean = input.toLowerCase().trim().replace(/[.\/#?!$%\^&\*;:{}=\-_`~()]/g, '');
   let answerClean = answer.toLowerCase().trim();
   if (inputClean !== answerClean) {
     if (inputClean.length === answerClean.length) {

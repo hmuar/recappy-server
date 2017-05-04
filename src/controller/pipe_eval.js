@@ -2,6 +2,9 @@ import { SessionState, getCurrentNote } from '~/core/session_state';
 import Input from '~/core/input';
 import Answer from '~/core/answer';
 import { EvalStatus, evalNoteWithRawInput } from '~/core/eval';
+import { minSessionWaitHours } from '~/core/hyperparam';
+
+const MILLISECONDS_TO_HOURS = 1.0 / 3600000;
 
 // Evaluate user input in the context of user's current session state.
 // Add a `evalCtx` object to message data.
@@ -171,7 +174,44 @@ function DoneContext(appState) {
     return appState;
   }
 
-  return insertEval(appState, successEval(Answer.ok));
+  const { lastCompleted, } = appState.session;
+  // XXX Dev loophole to allow date control
+  // Check if user input was a number. If so, treat it as an offset
+  // for number of days from current Date, and then use that date
+  // as cutoff date when getting next note queue from scheduler.
+  const cutoffDate = new Date();
+  if (input.type === Input.Type.CUSTOM) {
+    const tryInt = parseInt(input.payload, 10);
+    if (!isNaN(tryInt)) {
+      cutoffDate.setDate(cutoffDate.getDate() + tryInt);
+      // set correct answer value to the cutoffDate
+      return insertEval(appState, successEval(Answer.ok, { cutoffDate, remainingWaitHours: 0, }));
+    }
+  }
+
+  let sessionWaitTimeReached = false;
+  let waitedHours = 0;
+
+  const curDate = new Date();
+  if (lastCompleted) {
+    // console.log(`Looking to advance state from ${appState.postEvalState}`);
+    // console.log(`Current lastCompleted: ${lastCompleted}`);
+    waitedHours = Math.ceil((curDate - lastCompleted) * MILLISECONDS_TO_HOURS);
+    sessionWaitTimeReached = waitedHours >= minSessionWaitHours;
+  }
+  // console.log(`Ended up with sessionWaitTimeReached: ${sessionWaitTimeReached}`);
+
+  if (!sessionWaitTimeReached) {
+    return insertEval(
+      appState,
+      successEval(Answer.min, {
+        cutoffDate: null,
+        remainingWaitHours: minSessionWaitHours - waitedHours,
+      })
+    );
+  }
+
+  return insertEval(appState, successEval(Answer.ok, { cutoffDate, remainingWaitHours: 0, }));
 }
 
 function UnknownContext(appState) {
@@ -180,6 +220,7 @@ function UnknownContext(appState) {
 
 function getEvalContext(state) {
   switch (state) {
+    case SessionState.INTRO:
     case SessionState.INIT:
       return InitContext;
     case SessionState.INFO:

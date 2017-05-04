@@ -1,5 +1,4 @@
-import { SessionState, getEntryStateForNoteType, getPaths } from '~/core/session_state';
-import Input from '~/core/input';
+import { SessionState, getEntryStateForNoteType } from '~/core/session_state';
 import { getNextNotes, TARGET_NUM_NOTES_IN_SESSION } from '~/core/scheduler';
 import { EvalStatus, isFailResponse } from '~/core/eval';
 
@@ -34,6 +33,7 @@ function setPostEvalState(appState) {
   const validEval = isValidEval(appState);
 
   switch (sessionState) {
+    case SessionState.INTRO:
     case SessionState.INIT:
       if (validEval) {
         postEvalState = SessionState.START_QUEUE;
@@ -42,6 +42,14 @@ function setPostEvalState(appState) {
     case SessionState.RECALL:
       if (validEval) {
         postEvalState = SessionState.RECALL_RESPONSE;
+      }
+      break;
+    case SessionState.DONE_QUEUE:
+      if (validEval) {
+        const { evalCtx, } = appState;
+        postEvalState = isFailResponse(evalCtx.answerQuality)
+          ? SessionState.DONE_QUEUE
+          : SessionState.START_NEW_SESSION;
       }
       break;
     case SessionState.SHOW_PATHS:
@@ -79,24 +87,26 @@ function advanceState(appState) {
   // set proper next state based on next note
   if (appState.session && appState.postEvalState) {
     if (appState.postEvalState === SessionState.DONE_QUEUE) {
+      const { evalCtx, } = appState;
+      const { correctAnswer, } = evalCtx;
+      return {
+        ...appState,
+        session: {
+          ...appState.session,
+          remainingWaitHours: correctAnswer.remainingWaitHours,
+        },
+      };
+    }
+
+    if (appState.postEvalState === SessionState.START_NEW_SESSION) {
       // update note queue
       // update queueIndex
       // update globalIndex
+
+      const { evalCtx, } = appState;
+      const { cutoffDate, } = evalCtx.correctAnswer;
       const { userID, subjectID, } = appState;
       const nextGlobalIndex = appState.session.nextGlobalIndex;
-
-      // XXX Dev loophole to allow date control
-      // Check if user input was a number. If so, treat it as an offset
-      // for number of days from current Date, and then use that date
-      // as cutoff date when getting next note queue from scheduler.
-      const cutoffDate = new Date();
-      const input = appState.input;
-      if (input.type === Input.Type.CUSTOM) {
-        const tryInt = parseInt(input.payload, 10);
-        if (!isNaN(tryInt)) {
-          cutoffDate.setDate(cutoffDate.getDate() + tryInt);
-        }
-      }
 
       return getNextNotes(
         userID,
@@ -154,6 +164,9 @@ function advanceState(appState) {
           ...appState.session,
           queueIndex: nextQueueIndex,
           state: nextSessionState,
+          lastCompleted: nextSessionState === SessionState.DONE_QUEUE
+            ? new Date()
+            : appState.session.lastCompleted,
         },
       };
     }

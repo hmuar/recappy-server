@@ -10,6 +10,7 @@ export default function pipe(appState) {
     globalIndex,
     nextGlobalIndex,
     baseQueueLength,
+    lastCompleted,
   } = appState.session;
   return updateSessionForUser(
     userID,
@@ -19,6 +20,7 @@ export default function pipe(appState) {
     state,
     globalIndex,
     nextGlobalIndex,
-    baseQueueLength
+    baseQueueLength,
+    lastCompleted
   ).then(() => appState);
 }

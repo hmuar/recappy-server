@@ -28,8 +28,8 @@ function sendResponseInContext(state) {
   const session = state.session;
   const note = session.noteQueue[session.queueIndex];
   switch (session.state) {
-    case SessionState.INIT:
-      return sendText(fbUserID, "Let's get started!").then(() => state);
+    // case SessionState.INIT:
+    //   return sendText(fbUserID, "Let's get started!").then(() => state);
 
     case SessionState.INFO: {
       const displayText = note.displayRaw;
@@ -123,6 +123,19 @@ function sendResponseInContext(state) {
     }
 
     case SessionState.DONE_QUEUE:
+      if (
+        state.preEvalState === SessionState.DONE_QUEUE &&
+        state.postEvalState === SessionState.DONE_QUEUE
+      ) {
+        const waitedHours = session.remainingWaitHours;
+        let respMessage = "Whew I'm tired! 😓 We already learned a lot today, don't ya think? Let's take a break! An important part of learning is resting and letting the new stuff sink in.";
+        if (waitedHours) {
+          const hoursMsg = waitedHours > 1 ? `${waitedHours}ish hours` : 'about an hour or two';
+          respMessage = `${respMessage} Why don't we chat again in ${hoursMsg}? Nap time for me. 😴`;
+        }
+        return sendText(fbUserID, respMessage);
+      }
+
       return Media.aggregate([{ $sample: { size: 1, }, }]).then(result => {
         let img = '';
         if (result && result.length) {
@@ -194,15 +207,33 @@ function sendFeedbackText(state, withHiddenContent = false, withSuccessMedia = f
   return sendText(toID, msg);
 }
 
+function sendDoneQueueFeedback(appState) {
+  const { answerQuality, correctAnswer, } = appState.evalCtx;
+  const isPositive = answerQuality === Answer.max;
+
+  if (isPositive) {
+    const toID = appState.senderID;
+    return sendText(toID, 'Welcome back!');
+  }
+  return Promise.resolve(appState);
+}
+
 // return state
 export function sendFeedbackResp(state, withSuccessMedia = false) {
   const session = state.session;
   switch (session.state) {
+    case SessionState.INTRO: {
+      const toID = state.senderID;
+      const msg = "Hey! 🤗 Have you ever tried to learn something and then realize later you forgot everything? Learning the right way can be tough on your own. That's why I'm here! Every day we chat we'll learn something new together. Most importantly, we'll always spend some of our time looking at what we've already learned on other days. This is the best way to help us remember and really learn. Let's go, it's learnin time wooo! 😄";
+      return sendText(toID, msg).then(() => state);
+    }
     case SessionState.RECALL_RESPONSE:
       return sendFeedbackText(state, false, withSuccessMedia).then(() => state);
     case SessionState.INPUT:
     case SessionState.MULT_CHOICE:
       return sendFeedbackText(state, true, withSuccessMedia).then(() => state);
+    case SessionState.DONE_QUEUE:
+      return sendDoneQueueFeedback(state).then(() => state);
     default:
       break;
   }

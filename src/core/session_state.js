@@ -3,7 +3,12 @@
 // what note user is currently on, waiting for note, waiting to start
 // note queue, etc.
 export const SessionState = {
+  // intro is used for very beginning of app use with a new user
+  INTRO: 'intro',
+  // init is used for very beginning of a new subject with user
   INIT: 'init',
+  // at the start of a new returning session
+  START_NEW_SESSION: 'start-new-session',
   RECALL: 'recall',
   RECALL_RESPONSE: 'recall-response',
   INPUT: 'input',
@@ -32,9 +37,8 @@ export function getEntryStateForNoteType(ntype) {
 }
 
 export function getCurrentNote(session) {
-  if (session.queueIndex != null &&
-      session.noteQueue) {
-    const { queueIndex, noteQueue } = session;
+  if (session.queueIndex != null && session.noteQueue) {
+    const { queueIndex, noteQueue, } = session;
     if (queueIndex < noteQueue.length) {
       return noteQueue[queueIndex];
     }
@@ -48,8 +52,4 @@ export function getPaths(session) {
     return curNote.paths;
   }
   return null;
-}
-
-export function getStartState() {
-  return SessionState.INIT;
 }

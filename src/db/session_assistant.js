@@ -1,5 +1,5 @@
+import { SessionState } from '~/core/session_state';
 import { StudentSession } from '~/db/collection';
-import { getStartState } from '~/core/session_state';
 
 // Return a session if user exists and they have a session already for
 // `subjectID` subject.
@@ -49,7 +49,8 @@ export function updateSessionForUser(
   state,
   globalIndex,
   nextGlobalIndex,
-  baseQueueLength
+  baseQueueLength,
+  lastCompleted
 ) {
   return StudentSession.findOne({ userID, }).then(session => {
     const subjectIDString = subjectID.valueOf();
@@ -62,6 +63,7 @@ export function updateSessionForUser(
       globalIndex,
       nextGlobalIndex,
       baseQueueLength,
+      lastCompleted: lastCompleted || null,
     };
 
     return StudentSession.findByIdAndUpdate(session._id, {
@@ -88,10 +90,11 @@ export function createSession(
         [subjectIDString]: {
           queueIndex: 0,
           noteQueue,
-          state: getStartState(),
+          state: SessionState.INTRO,
           globalIndex,
           nextGlobalIndex,
           baseQueueLength,
+          lastCompleted: null,
         },
       };
       const newSession = {
@@ -109,10 +112,11 @@ export function createSession(
     subjects[subjectIDString] = {
       queueIndex: 0,
       noteQueue,
-      state: getStartState(),
+      state: SessionState.INIT,
       globalIndex,
       nextGlobalIndex,
       baseQueueLength,
+      lastCompleted: null,
     };
     return StudentSession.findByIdAndUpdate(session._id, {
       $set: { subjects, },
