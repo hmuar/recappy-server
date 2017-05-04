@@ -58,20 +58,16 @@ function getMsgType(msg) {
   return MessageType.UNKNOWN;
 }
 
-// return a function that properly extracts content
-// based on given `msgType`
-function contentExtractor(msgType) {
-  // return prop nested inside parent
-  function getNestedProp(parent, prop) {
-    return obj => obj[parent][prop];
-  }
-  const extMap = {};
-  extMap[MessageType.TEXT] = getNestedProp('message', 'text');
-  extMap[MessageType.POSTBACK] = getNestedProp('postback', 'payload');
-  extMap[MessageType.QUICK_REPLY] = obj => obj.message.quick_reply.payload;
-  extMap[MessageType.UNKNOWN] = () => null;
-  return extMap[msgType];
+function getNestedProp(parent, prop) {
+  return obj => obj[parent][prop];
 }
+
+const contentExtractor = {
+  [MessageType.TEXT]: getNestedProp('message', 'text'),
+  [MessageType.POSTBACK]: getNestedProp('postback', 'payload'),
+  [MessageType.QUICK_REPLY]: obj => obj.message.quick_reply.payload,
+  [MessageType.UNKNOWN]: () => null,
+};
 
 function stripChoiceNum(choice) {
   const c = choice.split('-');
@@ -133,48 +129,59 @@ function contentInjector(msgType) {
   });
 }
 
-// Parse incoming POST body and return an array of  msgs objects
-// with standard message data
+function parseEntry(entry) {
+  if (!entry || !entry.messaging) {
+    return [];
+  }
+  return entry.messaging.map(msg => {
+    // TODO: Need to dynamically get this from request
+    const HARDCODED_SUBJ_NAME = 'biology';
+
+    if (!msg.sender || !msg.sender.id || !msg.message) {
+      return [];
+    }
+
+    const initMsgData = {
+      timestamp: msg.timestamp,
+      senderID: msg.sender.id,
+      subjectName: HARDCODED_SUBJ_NAME,
+      input: null,
+      seq: msg.message.seq,
+    };
+
+    const msgType = getMsgType(msg);
+    const content = contentExtractor[msgType](msg);
+    const finalMsgData = contentInjector(msgType)(initMsgData, content);
+    return finalMsgData;
+  });
+}
+
+// Parse incoming POST body and return an array of msgs objects
+// with standard message data. Sort by msg's seq param
 function parse(requestBody) {
-  const entry = requestBody.entry[0];
-  const msg = entry.messaging[0];
-
-  // TODO: Need to dynamically get this from request
-  const HARDCODED_SUBJ_NAME = 'biology';
-
-  const initMsgData = {
-    timestamp: msg.timestamp,
-    senderID: msg.sender.id,
-    subjectName: HARDCODED_SUBJ_NAME,
-    input: null,
-  };
-
-  const msgType = getMsgType(msg);
-  const content = contentExtractor(msgType)(msg);
-  const finalMsgData = contentInjector(msgType)(initMsgData, content);
-  return finalMsgData;
+  if (!requestBody || !requestBody.entry) {
+    return [];
+  }
+  return requestBody.entry
+    .reduce(
+      (acc, entry) => {
+        const entryMsgs = parseEntry(entry);
+        return [...acc, ...entryMsgs];
+      },
+      []
+    )
+    .sort((a, b) => a.seq - b.seq);
 }
 
 function evalSuccess(state) {
   return state && state.evalCtx && state.evalCtx.status === EvalStatus.SUCCESS;
 }
 
-// function advancedState(state) {
-//   return (state &&
-//           state.session &&
-//           state.preEvalState &&
-//           state.session.state &&
-//           state.preEvalState !== state.session.state);
-// }
-
 export function getUserDetails(userID) {
   return sendUserDetailsRequest(userID);
 }
 
 export function sendResponse(state) {
-  // if (!advancedState(state)) {
-  //   return state;
-  // }
   return sendResp(state);
 }
 

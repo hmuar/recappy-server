@@ -56,7 +56,7 @@ test('parse text request into message data', t => {
       }
     ],
   };
-  const mData = AdapterFB.parse(request);
+  const mData = AdapterFB.parse(request)[0];
   t.ok({}.hasOwnProperty.call(mData, 'timestamp'));
   t.equal(mData.timestamp, 1460245672080);
   t.ok({}.hasOwnProperty.call(mData, 'senderID'));
@@ -83,15 +83,18 @@ test('parse accept payload request into message data', t => {
               id: 'PAGE_ID',
             },
             timestamp: 1460245672080,
-            postback: {
-              payload: 'accept',
+            message: {
+              quick_reply: { payload: 'accept', },
+              mid: 'mid.$cAADC6JqUd5piBUMhiFb0_3k8oII5',
+              seq: 158707,
+              text: 'ok keep going',
             },
           }
         ],
       }
     ],
   };
-  const mData = AdapterFB.parse(request);
+  const mData = AdapterFB.parse(request)[0];
   t.ok({}.hasOwnProperty.call(mData, 'timestamp'));
   t.equal(mData.timestamp, 1460245672080);
   t.ok({}.hasOwnProperty.call(mData, 'senderID'));
@@ -118,15 +121,18 @@ test('parse reject payload request into message data', t => {
               id: 'PAGE_ID',
             },
             timestamp: 1460245672080,
-            postback: {
-              payload: 'reject',
+            message: {
+              quick_reply: { payload: 'reject', },
+              mid: 'mid.$cAADC6JqUd5piBUMhiFb0_3k8oII5',
+              seq: 158707,
+              text: 'ok keep going',
             },
           }
         ],
       }
     ],
   };
-  const mData = AdapterFB.parse(request);
+  const mData = AdapterFB.parse(request)[0];
   t.ok({}.hasOwnProperty.call(mData, 'timestamp'));
   t.equal(mData.timestamp, 1460245672080);
   t.ok({}.hasOwnProperty.call(mData, 'senderID'));
@@ -153,15 +159,18 @@ test('parse choice payload request into message data', t => {
               id: 'PAGE_ID',
             },
             timestamp: 1460245672080,
-            postback: {
-              payload: 'choice-5',
+            message: {
+              quick_reply: { payload: 'choice-5', },
+              mid: 'mid.$cAADC6JqUd5piBUMhiFb0_3k8oII5',
+              seq: 158707,
+              text: 'ok keep going',
             },
           }
         ],
       }
     ],
   };
-  const mData = AdapterFB.parse(request);
+  const mData = AdapterFB.parse(request)[0];
   t.ok({}.hasOwnProperty.call(mData, 'timestamp'));
   t.equal(mData.timestamp, 1460245672080);
   t.ok({}.hasOwnProperty.call(mData, 'senderID'));
