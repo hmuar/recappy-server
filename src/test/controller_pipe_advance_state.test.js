@@ -241,8 +241,23 @@ test('test transition from last note in queue', t => {
   t.end();
 });
 
-test('test transition from done queue', t => {
-  const appState = getAppState(getSession(4, SessionState.DONE_QUEUE), successEval(Answer.ok));
+test('test transition from done queue failure, not enough waited hours', t => {
+  const appState = getAppState(
+    getSession(4, SessionState.DONE_QUEUE),
+    successEval(Answer.min, { cutoffDate: new Date(), remainingWaitHours: 0, })
+  );
+  return pipeStateTransition(appState).then(ns => {
+    t.ok(ns.session.state);
+    t.equal(ns.session.state, SessionState.DONE_QUEUE);
+    t.equal(ns.session.noteQueue.length, 4);
+  });
+});
+
+test('test transition from done queue success, enough waited hours', t => {
+  const appState = getAppState(
+    getSession(4, SessionState.DONE_QUEUE),
+    successEval(Answer.ok, { cutoffDate: new Date(), remainingWaitHours: 0, })
+  );
   return pipeStateTransition(appState).then(ns => {
     t.ok(ns.session.state);
     t.notEqual(ns.session.state, SessionState.DONE_QUEUE);

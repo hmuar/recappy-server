@@ -89,13 +89,13 @@ function advanceState(appState) {
     if (appState.postEvalState === SessionState.DONE_QUEUE) {
       const { evalCtx, } = appState;
       const { correctAnswer, } = evalCtx;
-      return {
+      return Promise.resolve({
         ...appState,
         session: {
           ...appState.session,
           remainingWaitHours: correctAnswer.remainingWaitHours,
         },
-      };
+      });
     }
 
     if (appState.postEvalState === SessionState.START_NEW_SESSION) {
