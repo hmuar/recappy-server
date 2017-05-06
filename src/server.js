@@ -15,7 +15,8 @@ export default class Server {
     this.server = new Hapi.Server();
   }
 
-  setup(port) {
+  setup(targetPort) {
+    const port = process.env.PORT || targetPort || 5000;
     this.server.connection({
       port,
     });
