@@ -1,6 +1,7 @@
 import Account from '~/account';
 import Input from '~/core/input';
 import { EvalStatus } from '~/core/eval';
+import { log, logErr } from '~/logger';
 import MessageType from './fbmessage_type';
 import sendResp, { sendFeedbackResp } from './fbmessenger_response';
 import { sendUserDetailsRequest } from './fbmessenger_request';
@@ -136,8 +137,7 @@ function parseEntry(entry) {
   return entry.messaging.map(msg => {
     // TODO: Need to dynamically get this from request
     const HARDCODED_SUBJ_NAME = 'biology';
-
-    if (!msg.sender || !msg.sender.id || !msg.message) {
+    if (!msg.sender || !msg.sender.id || (!msg.message && !msg.postback)) {
       return [];
     }
 
@@ -146,7 +146,7 @@ function parseEntry(entry) {
       senderID: msg.sender.id,
       subjectName: HARDCODED_SUBJ_NAME,
       input: null,
-      seq: msg.message.seq,
+      seq: msg.message ? msg.message.seq : 0,
     };
 
     const msgType = getMsgType(msg);
