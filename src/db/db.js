@@ -20,10 +20,22 @@ export default class Database {
   }
 
   initialize() {
+    const dbUser = process.env.DB_USER;
+    const dbPass = process.env.DB_PASS;
+    const dbUrl = process.env.DB_URL;
+    const dbName = process.env.DB_NAME;
+
+    if (!dbUser || !dbPass || !dbUrl || !dbName) {
+      return Promise.reject(
+        'No db user, password, url, or name found. Make sure the proper environment variables are setup.'
+      );
+    }
+
     return new Promise((resolve, reject) => {
       if (!this.loaded) {
-        const connection =
-            mongoose.connect('mongodb://127.0.0.1:3001/meteor').connection;
+        const connection = mongoose.connect(
+          `mongodb://${dbUser}:${dbPass}@${dbUrl}/${dbName}`
+        ).connection;
         connection.on('error', () => reject('Could not connect to database'));
         connection.on('open', () => {
           this.loaded = true;

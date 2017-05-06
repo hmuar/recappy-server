@@ -1,5 +1,5 @@
 const winston = require('winston');
-// require('winston-loggly-bulk');
+require('winston-loggly-bulk');
 
 winston.level = 'info';
 
@@ -16,12 +16,12 @@ winston.add(winston.transports.File, {
 });
 
 // Loggly support
-// winston.add(winston.transports.Loggly, {
-//   token: 'a83fa8e7-216d-4f0b-ace4-bdeed10cdf39',
-//   subdomain: 'sadbandit',
-//   tags: ['Winston-NodeJS'],
-//   json: true,
-// });
+winston.add(winston.transports.Loggly, {
+  token: 'a83fa8e7-216d-4f0b-ace4-bdeed10cdf39',
+  subdomain: 'sadbandit',
+  tags: ['Winston-NodeJS'],
+  json: true,
+});
 
 export default winston;
 
@@ -52,7 +52,8 @@ export function logState(appState) {
     noteType = session.noteQueue[queueIndex].type;
   }
   const tState = {
-    sender: `${senderID}, user: ${userID}`,
+    senderID,
+    userID,
     note: `${queueIndex}: (${queueIndex + 1}/${maxQueueIndex + 1}) ${noteType}`,
     input,
     evalCtx,

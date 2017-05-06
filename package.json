@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "engines": {
+    "node": "6.2.2",
+    "npm": "3.9.5"
+  },
   "scripts": {
     "lint": "esw -w src",
     "test-watch": "watch 'npm run test' src",
@@ -10,7 +14,8 @@
     "testone": "clear && blue-tape -r babel-register src/test/controller_pipe_advance_state.test.js | faucet",
     "docs": "watch 'rm -rf docs && docco src/**/**.js && rm -rf docs/*.test.html' src",
     "sim": "node_modules/.bin/babel-node simulate.js",
-    "start": "nodemon register.js",
+    "start": "node register.js",
+    "start-local": "nodemon register.js",
     "start-clean": "npm run clean-logs && npm run start",
     "clean-logs": "rm -rf logs/*.log"
   },

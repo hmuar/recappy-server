@@ -28,7 +28,7 @@ const POS_ENCOURAGE_PHRASES = [
   'great! 👍🏼',
   'yes!',
   'nice work!',
-  'yepp, good job!'
+  'yep, good job!'
 ];
 
 export function positiveEncourage() {
@@ -70,10 +70,10 @@ export function welcomeBack() {
 }
 
 const SESSION_DONE_PHRASE = [
-  'no more to learn for today, all done! Check back in tomorrow 🙂',
-  "annd we're done! Yay let's learn more later tomorrow. See ya!",
-  "whew we learned alot, let's take a break and learn more tomorrow.",
-  "wooo we got through everything for today! Time to take a break and let it sink in. Let's learn more later, k? Byeee 👋🏼",
+  'no more to learn for today, all done! Great job! Check back in tomorrow 🙂',
+  "annd we're done! Nice work today! Yay let's learn more later tomorrow. See ya!",
+  "Good job today! whew we learned alot, let's take a break and learn more tomorrow.",
+  "wooo we got through everything for today! Great work! Time to take a break and let it sink in. Let's learn more later, k? Byeee 👋🏼",
   'done done and done! Great job today. More learning later, see ya later 🙃'
 ];
 
@@ -83,13 +83,10 @@ export function doneSession() {
 
 const CONTINUE_PHRASE = [
   'got it, keep going',
-  'k, next...',
   "what's next?",
-  'keep going 👍🏼',
-  '👍🏼',
+  'keep going',
   'got it',
   'ok',
-  'k, next?',
   'cool',
   'alright'
 ];
@@ -99,11 +96,11 @@ export function keepGoing() {
 }
 
 const GET_IT_RIGHT_QUESTION_PHRASE = [
-  'Did you get it right?',
-  'Is that what you were thinking?',
-  'Were you thinking that?',
-  'Were you thinking the same thing?',
-  'Is that what you thought too?'
+  'did you get it right?',
+  'is that what you were thinking?',
+  'were you thinking that?',
+  'were you thinking the same thing?',
+  'is that what you thought too?'
 ];
 
 export function isThatWhatYouThought() {
