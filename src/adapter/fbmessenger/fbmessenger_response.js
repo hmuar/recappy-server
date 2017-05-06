@@ -1,11 +1,26 @@
 import { SessionState, getCurrentNote } from '~/core/session_state';
 import Input, { getChoiceInput, getPathInput } from '~/core/input';
-import generateQuestion from '~/speech';
+import {
+  generateQuestion,
+  backToOriginalTopic,
+  positiveEncourage,
+  negativeEncourage,
+  wrongAnswer,
+  welcomeBack,
+  doneSession,
+  keepGoing,
+  isThatWhatYouThought
+} from '~/speech';
 import Answer from '~/core/answer';
 import { logErr } from '~/logger';
 import { Media } from '~/db/collection';
 import { NoteType } from '~/core/note';
+import CategoryAssistant from '~/db/category_assistant';
 import { sendText, sendImage, sendQuickReply } from './fbmessenger_request';
+
+function continuePhrase() {
+  return keepGoing();
+}
 
 function sendImageWithUrl(senderID, imgUrl) {
   if (!imgUrl) {
@@ -21,6 +36,17 @@ export function sendPossibleImage(senderID, note) {
     }
   }
   return Promise.resolve(0);
+}
+
+function prependPendingMessages(appState, msg) {
+  if (appState.transitionFromPathToMain) {
+    const curNote = getCurrentNote(appState.session);
+    const curNoteParent = curNote.directParent;
+    return CategoryAssistant.getCategoryById(curNoteParent).then(
+      parent => `${backToOriginalTopic(parent.ckey)} ${msg}`
+    );
+  }
+  return Promise.resolve(msg);
 }
 
 function sendResponseInContext(state) {
@@ -45,11 +71,13 @@ function sendResponseInContext(state) {
       }
 
       quickReplyData.push({
-        title: 'ok keep going',
+        title: continuePhrase(),
         action: Input.Type.ACCEPT,
       });
-      return sendPossibleImage(fbUserID, note).then(() =>
-        sendQuickReply(fbUserID, displayText, quickReplyData));
+
+      return sendPossibleImage(fbUserID, note)
+        .then(() => prependPendingMessages(state, displayText))
+        .then(finalMsg => sendQuickReply(fbUserID, finalMsg, quickReplyData));
     }
 
     case SessionState.RECALL: {
@@ -59,33 +87,43 @@ function sendResponseInContext(state) {
         action: Input.Type.ACCEPT,
       });
       const questionText = generateQuestion(note);
-      return sendPossibleImage(fbUserID, note).then(() =>
-        sendQuickReply(fbUserID, questionText, quickReplyData));
+
+      return sendPossibleImage(fbUserID, note)
+        .then(() => prependPendingMessages(state, questionText))
+        .then(finalMsg =>
+          sendQuickReply(
+            fbUserID,
+            `${finalMsg} Think about it to yourself and we'll look at the answer together.`,
+            quickReplyData
+          ));
     }
 
     case SessionState.RECALL_RESPONSE: {
       const quickReplyData = [];
       quickReplyData.push({
-        title: 'Yes',
+        title: 'Yep',
         action: Input.Type.ACCEPT,
       });
       quickReplyData.push({
-        title: 'No',
+        title: 'Nope',
         action: Input.Type.REJECT,
       });
       return sendText(fbUserID, note.hidden).then(() =>
-        sendQuickReply(fbUserID, 'Is that what you were thinking?', quickReplyData));
+        sendQuickReply(fbUserID, isThatWhatYouThought(), quickReplyData));
     }
 
     case SessionState.INPUT: {
       const questionText = generateQuestion(note);
-      return sendPossibleImage(fbUserID, note).then(() => sendText(fbUserID, questionText));
+      return sendPossibleImage(fbUserID, note)
+        .then(() => prependPendingMessages(state, questionText))
+        .then(finalMsg => sendText(fbUserID, finalMsg));
     }
 
     case SessionState.MULT_CHOICE: {
       const questionText = generateQuestion(note);
       return sendPossibleImage(fbUserID, note)
-        .then(() => sendText(fbUserID, questionText))
+        .then(() => prependPendingMessages(state, questionText))
+        .then(finalMsg => sendText(fbUserID, finalMsg))
         .then(() => {
           let choicesText = '';
           choicesText += `(1) ${note.choice1}\n`;
@@ -115,7 +153,7 @@ function sendResponseInContext(state) {
           action: getPathInput(path.index),
         })),
         {
-          title: 'ok, keep going',
+          title: continuePhrase(),
           action: Input.Type.ACCEPT,
         }
       ];
@@ -140,13 +178,9 @@ function sendResponseInContext(state) {
         let img = '';
         if (result && result.length) {
           img = result[0].url;
-          return sendImageWithUrl(fbUserID, img).then(() =>
-            sendText(fbUserID, 'No more to learn for today, all done! Check back in tomorrow :)'));
+          return sendImageWithUrl(fbUserID, img).then(() => sendText(fbUserID, doneSession()));
         }
-        return sendText(
-          fbUserID,
-          'No more to learn for today, all done! Check back in tomorrow :)'
-        );
+        return sendText(fbUserID, doneSession());
       });
 
     default:
@@ -167,14 +201,14 @@ export default function sendResponse(state) {
 }
 
 function posFeedback() {
-  return 'Great job!';
+  return positiveEncourage();
 }
 
-function negFeedback(state) {
+function negFeedback(state, correctMsg) {
   if (state.session.state === SessionState.RECALL_RESPONSE) {
-    return "that's ok";
+    return negativeEncourage();
   }
-  return 'Not quite.';
+  return wrongAnswer(correctMsg);
 }
 
 function sendFeedbackText(state, withHiddenContent = false, withSuccessMedia = false) {
@@ -185,7 +219,7 @@ function sendFeedbackText(state, withHiddenContent = false, withSuccessMedia = f
   let msg = isPositive ? posFeedback() : negFeedback(state);
   if (!isPositive) {
     if (correctMsg) {
-      msg = `${msg} It's actually ${correctMsg}`;
+      msg = negFeedback(state, correctMsg);
     }
     const curNote = getCurrentNote(state.session);
     if (withHiddenContent && curNote.hidden) {
@@ -213,7 +247,7 @@ function sendDoneQueueFeedback(appState) {
 
   if (isPositive) {
     const toID = appState.senderID;
-    return sendText(toID, 'Welcome back!');
+    return sendText(toID, welcomeBack());
   }
   return Promise.resolve(appState);
 }
@@ -224,7 +258,7 @@ export function sendFeedbackResp(state, withSuccessMedia = false) {
   switch (session.state) {
     case SessionState.INTRO: {
       const toID = state.senderID;
-      const msg = "Hey! 🤗 Have you ever tried to learn something and then realize later you forgot everything? Learning the right way can be tough on your own. That's why I'm here! Every day we chat we'll learn something new together. Most importantly, we'll always spend some of our time looking at what we've already learned on other days. This is the best way to help us remember and really learn. Let's go, it's learnin time wooo! 😄";
+      const msg = "Hey! 🤗 Have you ever tried to learn something and then realize later you forgot everything? Learning the right way can be tough on your own. That's why I'm here! Every day we chat we'll learn something new together. Most importantly, we'll always spend some of our time reviewing what we've already learned so we won't forget. Let's go, it's learnin time wooo! 😄";
       return sendText(toID, msg).then(() => state);
     }
     case SessionState.RECALL_RESPONSE:

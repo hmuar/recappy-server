@@ -144,6 +144,8 @@ function advanceState(appState) {
       let nextSessionState = appState.postEvalState;
       let nextQueueIndex = queueIndex;
 
+      let transitionFromPathToMain = false;
+
       if (noteQueue && queueIndex != null) {
         // only advance queue if waiting for next in queue
         // (e.g. shouldn't advance note if we are just START_QUEUE)
@@ -153,6 +155,9 @@ function advanceState(appState) {
         if (nextQueueIndex < noteQueue.length) {
           const nextNote = noteQueue[nextQueueIndex];
           nextSessionState = getEntryStateForNoteType(nextNote.type);
+          if (noteQueue[queueIndex].addedFromPath && !noteQueue[nextQueueIndex].addedFromPath) {
+            transitionFromPathToMain = true;
+          }
         } else {
           nextSessionState = SessionState.DONE_QUEUE;
         }
@@ -160,6 +165,7 @@ function advanceState(appState) {
 
       return {
         ...appState,
+        transitionFromPathToMain,
         session: {
           ...appState.session,
           queueIndex: nextQueueIndex,

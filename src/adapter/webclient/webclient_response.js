@@ -1,6 +1,6 @@
 import Input, { getChoiceInput, getPathInput } from '~/core/input';
 import { SessionState, getCurrentNote } from '~/core/session_state';
-import generateQuestion from '~/speech';
+import { generateQuestion } from '~/speech';
 import Answer from '~/core/answer';
 import { logErr } from '~/logger';
 import { sendMessages, sendImage } from './webclient_request';

@@ -26,13 +26,10 @@ winston.add(winston.transports.File, {
 export default winston;
 
 export function log(msg) {
-  // console.log(msg);
-  winston.log('info', msg);
   return msg;
 }
 
 export function logErr(msg) {
-  // console.log(msg);
   winston.log('error', msg);
   return msg;
 }

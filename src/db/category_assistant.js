@@ -74,7 +74,7 @@ function getConceptsInOrder(subjectID, unitID, topicID) {
 //   return Category.find({ ctype: 'note', $and: parentQuery }).sort('order');
 // }
 
-function getAllChildNotes(catID) {
+function getAllChildNotes(catID, readOnly = false) {
   const formatCatID = typeof catID === 'string' ? ObjectID(catID) : catID;
   return getCategoryById(formatCatID).then(cat => {
     let noteParents = [cat._id];
@@ -82,6 +82,9 @@ function getAllChildNotes(catID) {
       noteParents = [...cat.parent, ...noteParents];
     }
     const childNotesQuery = { ctype: 'note', parent: { $all: noteParents, }, };
+    if (readOnly) {
+      return Note.find(childNotesQuery).sort('globalIndex').lean();
+    }
     return Note.find(childNotesQuery).sort('globalIndex');
   });
 }

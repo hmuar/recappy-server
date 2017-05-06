@@ -47,7 +47,6 @@ export default function pipe(appState) {
     if (appState.session.state === SessionState.DONE_QUEUE) {
       success = true;
     } else {
-      console.log('No current note, aborting eval');
       return appState;
     }
   } else if (

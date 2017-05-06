@@ -28,7 +28,7 @@ function routes(apiVersionPath) {
           ObjectID(request.query.sid),
           globalIndex,
           null,
-          cutoffDate,
+          cutoffDate
         ).then(resNotes => {
           const nextNotes = resNotes.notes.map(note => ({
             _id: note._id,
@@ -59,7 +59,7 @@ function routes(apiVersionPath) {
                   conceptName: conceptParent.ckey,
                   conceptIndex: conceptParent.globalIndex,
                 };
-              }),
+              })
             );
           });
         });

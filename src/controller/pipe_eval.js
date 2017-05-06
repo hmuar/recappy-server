@@ -194,12 +194,9 @@ function DoneContext(appState) {
 
   const curDate = new Date();
   if (lastCompleted) {
-    // console.log(`Looking to advance state from ${appState.postEvalState}`);
-    // console.log(`Current lastCompleted: ${lastCompleted}`);
     waitedHours = Math.ceil((curDate - lastCompleted) * MILLISECONDS_TO_HOURS);
     sessionWaitTimeReached = waitedHours >= minSessionWaitHours;
   }
-  // console.log(`Ended up with sessionWaitTimeReached: ${sessionWaitTimeReached}`);
 
   if (!sessionWaitTimeReached) {
     return insertEval(

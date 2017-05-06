@@ -1,9 +1,11 @@
 import { isFailResponse, EvalStatus } from '~/core/eval';
 import { SessionState, getCurrentNote } from '~/core/session_state';
+import Input from '~/core/input';
 import CategoryAssistant from '~/db/category_assistant';
 import { log } from '~/logger';
 
 const adjustableStates = [
+  SessionState.INFO,
   SessionState.RECALL_RESPONSE,
   SessionState.INPUT,
   SessionState.MULT_CHOICE,
@@ -34,34 +36,70 @@ export default function pipe(appState) {
     return appState;
   }
 
+  const { input, } = appState;
   // adjust session with additional notes from path
-  if (session.state === SessionState.SHOW_PATHS) {
+  if (input.type === Input.Type.PATH) {
     if (!isFailResponse(appState.evalCtx.answerQuality)) {
       const path = appState.evalCtx.correctAnswer;
       // if path == null, user did not choose any paths
       // and probably just wanted to advance current queue
       if (path != null) {
-        return CategoryAssistant.getAllChildNotes(path.catId).then(notes => {
-          const queue = session.noteQueue;
-          const adjustedNoteQueue = [
-            ...queue.slice(0, session.queueIndex + 1),
-            ...notes,
-            ...queue.slice(session.queueIndex + 1, queue.length)
-          ];
-          const adjustedSession = {
-            ...session,
-            noteQueue: adjustedNoteQueue,
-            baseQueueLength: session.baseQueueLength + notes.length,
-          };
-          return {
-            ...appState,
-            session: adjustedSession,
-          };
+        return CategoryAssistant.getAllChildNotes(path.catId, true).then(notes => {
+          if (notes && notes.length) {
+            const queue = session.noteQueue;
+            const adjustedNoteQueue = [
+              ...queue.slice(0, session.queueIndex + 1),
+              ...notes.map(n => ({
+                ...n,
+                addedFromPath: true,
+              })),
+              ...queue.slice(session.queueIndex + 1, queue.length)
+            ];
+            const adjustedSession = {
+              ...session,
+              noteQueue: adjustedNoteQueue,
+              baseQueueLength: session.baseQueueLength + notes.length,
+            };
+            return {
+              ...appState,
+              session: adjustedSession,
+            };
+          }
+          return appState;
         });
       }
     }
     return appState;
   }
+
+  // adjust session with additional notes from path
+  // if (session.state === SessionState.SHOW_PATHS) {
+  //   if (!isFailResponse(appState.evalCtx.answerQuality)) {
+  //     const path = appState.evalCtx.correctAnswer;
+  //     // if path == null, user did not choose any paths
+  //     // and probably just wanted to advance current queue
+  //     if (path != null) {
+  //       return CategoryAssistant.getAllChildNotes(path.catId).then(notes => {
+  //         const queue = session.noteQueue;
+  //         const adjustedNoteQueue = [
+  //           ...queue.slice(0, session.queueIndex + 1),
+  //           ...notes,
+  //           ...queue.slice(session.queueIndex + 1, queue.length)
+  //         ];
+  //         const adjustedSession = {
+  //           ...session,
+  //           noteQueue: adjustedNoteQueue,
+  //           baseQueueLength: session.baseQueueLength + notes.length,
+  //         };
+  //         return {
+  //           ...appState,
+  //           session: adjustedSession,
+  //         };
+  //       });
+  //     }
+  //   }
+  //   return appState;
+  // }
 
   const answerQuality = appState.evalCtx.answerQuality;
   if (isFailResponse(answerQuality)) {

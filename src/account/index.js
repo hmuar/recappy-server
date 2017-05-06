@@ -20,13 +20,10 @@ function getFacebookMsgID(userID) {
 }
 
 export function updateFacebookUserDetails(fbMsgID, userDetails) {
-  console.log(`trying to update user details for ${fbMsgID}`);
-  console.log(`with details ${userDetails}`);
   return User.findOne({ facebookMessageID: fbMsgID, }).then(user => {
     if (user) {
       const existingUser = user;
       const { first_name, last_name, timezone, locale, gender, } = userDetails;
-      console.log(`${first_name}, ${last_name}, ${timezone}, ${locale}, ${gender}`);
       existingUser.firstName = first_name;
       existingUser.lastName = last_name;
       existingUser.timezone = timezone;
