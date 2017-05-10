@@ -48,7 +48,8 @@ export function negativeEncourage() {
 
 const WRONG_ANSWER_PHRASE = [
   "not quite. I think it's actually",
-  "i'd say it's",
+  "actually I think it's",
+  'the answer is actually',
   'i actually think the answer is',
   "not exactly, it's"
 ];

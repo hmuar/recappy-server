@@ -4,6 +4,10 @@ import { log } from '~/logger';
 import MessageType from './fbmessage_type';
 
 const FB_REQUEST_URL = `https://graph.facebook.com/v2.6/me/messages?access_token=${Config.FBToken}`;
+const MIN_TYPING_DELAY_MILLISECONDS = 1000;
+const MAX_TYPING_DELAY_MILLISECONDS = 3500;
+const AVG_WORDS_PER_SECOND = 12;
+const SECS_TO_MILLISECONDS = 1000;
 
 function getReqBodyTemplate(senderID) {
   return {
@@ -114,24 +118,59 @@ function sendPostRequest(body) {
   return request.post(options);
 }
 
+function delay(t) {
+  return new Promise(resolve => {
+    setTimeout(resolve, t);
+  });
+}
+// add artificial delay
+// setTimeout((function() {res.send(items)}), 2000)
+
+export function getTypingDelay(text) {
+  const numWords = text.split(' ').length;
+  console.log(
+    `Looking at ${numWords} words: ${numWords / AVG_WORDS_PER_SECOND * SECS_TO_MILLISECONDS}`
+  );
+  return Math.min(
+    Math.max(MIN_TYPING_DELAY_MILLISECONDS, numWords / AVG_WORDS_PER_SECOND * SECS_TO_MILLISECONDS),
+    MAX_TYPING_DELAY_MILLISECONDS
+  );
+}
+
+function sendTypingIndicator(senderID) {
+  const postBody = {
+    recipient: {
+      id: senderID,
+    },
+    sender_action: 'typing_on',
+  };
+  return postBody;
+}
+
 export function sendText(senderID, text) {
   log(`sending text: ${text}`);
   const bodyCreator = postBodyCreator(MessageType.TEXT);
-  return sendPostRequest(bodyCreator(senderID, text));
+  const delayDuration = getTypingDelay(text);
+  sendPostRequest(sendTypingIndicator(senderID));
+  return delay(delayDuration).then(() => sendPostRequest(bodyCreator(senderID, text)));
 }
 
 // replies is list of {title, action}
 export function sendQuickReply(senderID, text, replies) {
   log(`sending replies: ${text}`);
   const bodyCreator = postBodyCreator(MessageType.QUICK_REPLY);
-  return sendPostRequest(bodyCreator(senderID, text, replies));
+  const delayDuration = getTypingDelay(text);
+  sendPostRequest(sendTypingIndicator(senderID));
+  return delay(delayDuration).then(() => sendPostRequest(bodyCreator(senderID, text, replies)));
 }
 
 // buttons is list of {title, action}
 export function sendButtons(senderID, text, buttons) {
   log(`sending buttons: ${text}`);
   const bodyCreator = postBodyCreator(MessageType.POSTBACK);
-  return sendPostRequest(bodyCreator(senderID, text, buttons));
+  const delayDuration = getTypingDelay(text);
+  sendPostRequest(sendTypingIndicator(senderID));
+  return delay(delayDuration).then(() => sendPostRequest(bodyCreator(senderID, text, buttons)));
 }
 
 export function sendImage(senderID, imgURL) {

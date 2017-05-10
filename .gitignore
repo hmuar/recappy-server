@@ -41,3 +41,5 @@ jspm_packages
 docs
 
 dev_notes/init.txt
+
+setup_env.sh
