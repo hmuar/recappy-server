@@ -1,11 +1,13 @@
 import mongoose from 'mongoose';
 import Promise from 'bluebird';
-import { NoteRecord,
-         Category,
-         StudentSession,
-         User,
-         StudentModel,
-         ObjectID } from '~/db/collection';
+import {
+  NoteRecord,
+  Category,
+  StudentSession,
+  User,
+  StudentModel,
+  ObjectID
+} from '~/db/collection';
 import fixture from './test_fixture';
 
 Promise.promisifyAll(mongoose);
@@ -43,19 +45,12 @@ export default class TestDatabase {
       return Promise.reject(new Error('DB not loaded'));
     }
 
-    return User.remove({}).then(() => (
-      StudentSession.remove({}).then(() => {
-      })
-      .then(() => (
-        Category.remove({})
-      ))
-      .then(() => (
-        NoteRecord.remove({})
-      ))
-      .then(() => (
-        StudentModel.remove({})
-      ))
-    ));
+    return User.remove({}).then(() =>
+      StudentSession.remove({})
+        .then(() => {})
+        .then(() => Category.remove({}))
+        .then(() => NoteRecord.remove({}))
+        .then(() => StudentModel.remove({})));
   }
 
   close() {
