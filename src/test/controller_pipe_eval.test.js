@@ -418,6 +418,34 @@ test('eval with RECALL state and invalid input', t => {
   t.end();
 });
 
+test('eval with RECALL_RESPONSE state and success text input', t => {
+  const appState = getAppState(getSession(1, SessionState.RECALL_RESPONSE), {
+    type: Input.Type.CUSTOM,
+    payload: 'yes',
+  });
+  const mEvalState = pipeEval(appState);
+  const evalCtx = mEvalState.evalCtx;
+  t.equal(mEvalState.session.state, SessionState.RECALL_RESPONSE);
+  t.equal(evalCtx.answerQuality, Answer.ok);
+  t.equal(evalCtx.correctAnswer, null);
+  t.equal(evalCtx.status, EvalStatus.SUCCESS);
+  t.end();
+});
+
+test('eval with RECALL_RESPONSE state and fail text input', t => {
+  const appState = getAppState(getSession(1, SessionState.RECALL_RESPONSE), {
+    type: Input.Type.CUSTOM,
+    payload: 'no',
+  });
+  const mEvalState = pipeEval(appState);
+  const evalCtx = mEvalState.evalCtx;
+  t.equal(mEvalState.session.state, SessionState.RECALL_RESPONSE);
+  t.equal(evalCtx.answerQuality, Answer.min);
+  t.equal(evalCtx.correctAnswer, null);
+  t.equal(evalCtx.status, EvalStatus.SUCCESS);
+  t.end();
+});
+
 test('eval with RECALL_RESPONSE state and correct input', t => {
   const appState = getAppState(getSession(1, SessionState.RECALL_RESPONSE), {
     type: Input.Type.ACCEPT,
@@ -444,6 +472,21 @@ test('eval with RECALL_RESPONSE state and incorrect input', t => {
   t.equal(evalCtx.answerQuality, Answer.min);
   t.equal(evalCtx.correctAnswer, null);
   t.equal(evalCtx.status, EvalStatus.SUCCESS);
+  t.end();
+});
+
+test('eval with RECALL_RESPONSE state and unknown text input', t => {
+  const appState = getAppState(getSession(1, SessionState.RECALL_RESPONSE), {
+    type: Input.Type.CUSTOM,
+    payload: 'halloooo',
+  });
+
+  const mEvalState = pipeEval(appState);
+  const evalCtx = mEvalState.evalCtx;
+  t.equal(mEvalState.session.state, SessionState.RECALL_RESPONSE);
+  t.equal(evalCtx.answerQuality, null);
+  t.equal(evalCtx.correctAnswer, null);
+  t.equal(evalCtx.status, EvalStatus.INVALID);
   t.end();
 });
 
@@ -665,8 +708,7 @@ test('eval with INPUT state and incorrect multi (AND logic) inputs', t => {
     'quarks neutrons electrons',
     'protons, quarks, electrons',
     'neutrons, protons, quarks',
-    'neutrons and quarks and electrons',
-    'protons neutrons electrons quarks'
+    'neutrons and quarks and electrons'
   ];
 
   for (const resp of incorrectResp) {
@@ -703,7 +745,7 @@ test('eval with INPUT state and correct multi (OR logic) inputs', t => {
 });
 
 test('eval with INPUT state and incorrect multi (OR logic) inputs', t => {
-  const incorrectResp = ['protons', 'cat', '  dog ', ' protons    ', ' primary and kitty'];
+  const incorrectResp = ['protons', 'cat', '  dog ', ' protons    '];
 
   for (const resp of incorrectResp) {
     const appState = getAppState(getSession(12, SessionState.INPUT), {

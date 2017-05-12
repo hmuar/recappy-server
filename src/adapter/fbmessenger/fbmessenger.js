@@ -173,9 +173,9 @@ function parse(requestBody) {
     .sort((a, b) => a.seq - b.seq);
 }
 
-function evalSuccess(state) {
-  return state && state.evalCtx && state.evalCtx.status === EvalStatus.SUCCESS;
-}
+// function evalSuccess(state) {
+//   return state && state.evalCtx && state.evalCtx.status === EvalStatus.SUCCESS;
+// }
 
 export function getUserDetails(userID) {
   return sendUserDetailsRequest(userID);
@@ -186,9 +186,9 @@ export function sendResponse(state) {
 }
 
 export function sendFeedbackResponse(state) {
-  if (!evalSuccess(state)) {
-    return state;
-  }
+  // if (!evalSuccess(state)) {
+  //   return state;
+  // }
   return sendFeedbackResp(state);
 }
 

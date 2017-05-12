@@ -7,6 +7,10 @@ function addNewSession(appState) {
   const subjectID = appState.subjectID;
   const userID = appState.userID;
 
+  if (!subjectID || !userID) {
+    return appState;
+  }
+
   return getStartingNotes(subjectID, TARGET_NUM_NOTES_IN_SESSION)
     .then(notesInfo => {
       const noteQueue = notesInfo.notes;
@@ -30,6 +34,9 @@ function addNewSession(appState) {
 // find existing user session for given subject and set `session` key
 // to session object. If no session exists, create new session first.
 export default function pipe(appState) {
+  if (!appState.userID || !appState.subjectID) {
+    return Promise.resolve(appState);
+  }
   return getSessionForUserAndSubject(appState.userID, appState.subjectID)
     .then(session => {
       if (!session) {
@@ -43,6 +50,6 @@ export default function pipe(appState) {
     .catch(err => {
       logErr(`Error finding session for user ${appState.userID}`);
       logErr(err);
-      return appState;
+      return Promise.resolve(appState);
     });
 }

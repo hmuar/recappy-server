@@ -75,6 +75,10 @@ export default class Controller {
     return this.adapter.sendFeedbackResponse(state, withSuccessMedia);
   }
 
+  logCurrentState(state) {
+    return logState(state);
+  }
+
   // main entry method called by external adapters
   registerMsg(msg) {
     return DBAssist.getCategoryByName('subject', msg.subjectName)
@@ -103,10 +107,9 @@ export default class Controller {
               // advance session state
               .then(state => pipeAdvanceState(state))
               .then(state => pipeAddPaths(state))
-              // .then(state => logState(state))
               // record new session state
               .then(state => pipeSaveSession(state))
-              .then(state => logState(state))
+              .then(state => this.logCurrentState(state))
               .then(state => {
                 // don't include this in return chain because this final update
                 // can happen asynchronously

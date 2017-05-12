@@ -1,7 +1,7 @@
 import { SessionState, getCurrentNote } from '~/core/session_state';
 import Input from '~/core/input';
 import Answer from '~/core/answer';
-import { EvalStatus, evalNoteWithRawInput } from '~/core/eval';
+import { EvalStatus, evalNoteWithRawInput, evalWithYesNo } from '~/core/eval';
 import { minSessionWaitHours } from '~/core/hyperparam';
 
 const MILLISECONDS_TO_HOURS = 1.0 / 3600000;
@@ -99,6 +99,21 @@ function RecallResponseContext(appState) {
       return insertEval(appState, successEval(Answer.max));
     case Input.Type.REJECT:
       return insertEval(appState, successEval(Answer.min));
+    case Input.Type.CUSTOM: {
+      // look for yes/no answer
+      // true means user input yes
+      // false means user input no
+      // null means user input some unknown message
+      const yesNoEval = evalWithYesNo(input.payload);
+      if (yesNoEval === null) {
+        return insertEval(appState, invalidEval());
+      } else if (yesNoEval === true) {
+        return insertEval(appState, successEval(Answer.max));
+      } else if (yesNoEval === false) {
+        return insertEval(appState, successEval(Answer.min));
+      }
+      return insertEval(appState, invalidEval());
+    }
     default:
       return insertEval(appState, invalidEval());
   }

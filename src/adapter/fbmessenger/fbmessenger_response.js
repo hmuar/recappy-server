@@ -1,5 +1,7 @@
 import { SessionState, getCurrentNote } from '~/core/session_state';
 import Input, { getChoiceInput, getPathInput } from '~/core/input';
+import { isValidEval, isFailResponse } from '~/core/eval';
+
 import {
   generateQuestion,
   backToOriginalTopic,
@@ -16,7 +18,7 @@ import { logErr } from '~/logger';
 import { Media } from '~/db/collection';
 import { NoteType } from '~/core/note';
 import CategoryAssistant from '~/db/category_assistant';
-import { sendText, sendImage, sendQuickReply } from './fbmessenger_request';
+import { sendText, sendImage, sendQuickReply, sendButtons } from './fbmessenger_request';
 
 function continuePhrase() {
   return keepGoing();
@@ -213,7 +215,15 @@ function negFeedback(state, correctMsg) {
 
 function sendFeedbackText(state, withHiddenContent = false, withSuccessMedia = false) {
   const toID = state.senderID;
-  const isPositive = state.evalCtx.answerQuality === Answer.max;
+
+  if (!isValidEval(state.evalCtx)) {
+    return sendText(
+      toID,
+      "I didn't understand your answer 😕 can you try to tell me in a different way? Let me repeat and let's try again."
+    );
+  }
+
+  const isPositive = !isFailResponse(state.evalCtx.answerQuality);
   const correctMsg = state.evalCtx.correctAnswer;
 
   let msg = isPositive ? posFeedback() : negFeedback(state);
@@ -225,6 +235,16 @@ function sendFeedbackText(state, withHiddenContent = false, withSuccessMedia = f
     if (withHiddenContent && curNote.hidden) {
       msg = `${msg}. ${curNote.hidden}`;
     }
+    // const quickReplyData = [{ title: 'Wait you misunderstood me', action: Input.Type.CHALLENGE, }];
+    // const buttonData = [
+    //   {
+    //     title: "That's what I said!",
+    //     action: Input.Type.CHALLENGE,
+    //   }
+    // ];
+    //
+    // return sendQuickReply(toID, msg, quickReplyData);
+    // return sendButtons(toID, msg, buttonData);
     return sendText(toID, msg);
   }
   // try to send a success GIF

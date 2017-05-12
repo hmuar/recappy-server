@@ -38,7 +38,7 @@ export default function pipe(appState) {
 
   const { input, } = appState;
   // adjust session with additional notes from path
-  if (input.type === Input.Type.PATH) {
+  if (input && input.type === Input.Type.PATH) {
     if (!isFailResponse(appState.evalCtx.answerQuality)) {
       const path = appState.evalCtx.correctAnswer;
       // if path == null, user did not choose any paths

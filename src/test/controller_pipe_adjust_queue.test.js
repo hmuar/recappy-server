@@ -1,6 +1,6 @@
 /* eslint-disable max-len */
-
 import test from 'blue-tape';
+import Input from '~/core/input';
 import { SessionState } from '~/core/session_state';
 import pipeAdjustQueue from '~/controller/pipe_adjust_queue';
 import Answer from '~/core/answer';
@@ -165,14 +165,20 @@ test('adjust queue - max note queue length, low answer quality', t => {
 });
 
 test('adjust queue - show paths first choice', t => {
-  const appState = getAppState(
-    getSession(2, SessionState.SHOW_PATHS, MAX_NOTES_IN_QUEUE),
-    successEval(Answer.max, {
-      display: 'polar bonds?',
-      catName: 'polar-covalent-bond',
-      catId: '2980227254feb46732ca491e',
-    })
-  );
+  const appState = {
+    ...getAppState(
+      getSession(2, SessionState.SHOW_PATHS, MAX_NOTES_IN_QUEUE),
+      successEval(Answer.max, {
+        display: 'polar bonds?',
+        catName: 'polar-covalent-bond',
+        catId: '2980227254feb46732ca491e',
+      })
+    ),
+    input: {
+      type: Input.Type.PATH,
+      payload: '0',
+    },
+  };
   const startQueueLength = appState.session.noteQueue.length;
   return pipeAdjustQueue(appState).then(adjustState => {
     const endAdjustQueueLength = adjustState.session.noteQueue.length;

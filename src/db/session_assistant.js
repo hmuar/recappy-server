@@ -11,33 +11,23 @@ import { StudentSession } from '~/db/collection';
 export function getSessionForUserAndSubject(userID, subjectID) {
   // Do sync code checking params and throwing errors inside Promise
   // so that errors are properly caught
-  return new Promise((resolve, reject) => {
-    if (!userID) {
-      reject(new Error('No userID specified, cannot find session'));
-    }
-    if (!subjectID) {
-      reject(new Error('No subjectID specified, cannot find session'));
-    }
-    resolve();
-  }).then(() => {
-    if (userID && subjectID) {
-      return StudentSession.findOne({ userID, }).then(session => {
-        if (session) {
-          const subjects = session.subjects;
-          const subjectIDString = subjectID.valueOf();
-          if (subjects && subjectIDString in subjects) {
-            return subjects[subjectIDString];
-          }
-          // TODO: should return entire session here
-          //       so that we can use it to update subjects later,
-          //       instead of having to query for session again.
-          return null;
+  if (userID && subjectID) {
+    return StudentSession.findOne({ userID, }).then(session => {
+      if (session) {
+        const subjects = session.subjects;
+        const subjectIDString = subjectID.valueOf();
+        if (subjects && subjectIDString in subjects) {
+          return subjects[subjectIDString];
         }
+        // TODO: should return entire session here
+        //       so that we can use it to update subjects later,
+        //       instead of having to query for session again.
         return null;
-      });
-    }
-    return null;
-  });
+      }
+      return null;
+    });
+  }
+  return Promise.resolve(null);
 }
 
 // return Promise

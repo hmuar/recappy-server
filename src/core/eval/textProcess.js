@@ -131,12 +131,11 @@ function checkMatch(inputMatchSet, answerMatchSet) {
 
 // check for match between raw user input with structured note answer
 export function checkInputAgainstAnswer(input, answer) {
+  if (input == null || answer == null) {
+    return false;
+  }
   // step 1 - clean, tokenize, and stem
   const inputSet = createInputMatchSet(preProcess(input));
   const answerSet = createAnswerMatchSet(preProcess(answer));
-
-  console.log(inputSet);
-  console.log(answerSet);
-
   return checkMatch(inputSet, answerSet);
 }
