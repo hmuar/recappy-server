@@ -40,11 +40,15 @@ export function updateSessionForUser(
   globalIndex,
   nextGlobalIndex,
   baseQueueLength,
-  lastCompleted
+  lastCompleted,
+  newStartSessionTime = null
 ) {
   return StudentSession.findOne({ userID, }).then(session => {
     const subjectIDString = subjectID.valueOf();
     const subjects = session.subjects;
+
+    const subject = subjects[subjectIDString];
+    const { startSessionTime, } = subject;
 
     subjects[subjectIDString] = {
       queueIndex,
@@ -54,6 +58,7 @@ export function updateSessionForUser(
       nextGlobalIndex,
       baseQueueLength,
       lastCompleted: lastCompleted || null,
+      startSessionTime: newStartSessionTime || (startSessionTime || new Date()),
     };
 
     return StudentSession.findByIdAndUpdate(session._id, {
@@ -85,6 +90,7 @@ export function createSession(
           nextGlobalIndex,
           baseQueueLength,
           lastCompleted: null,
+          startSessionTime: new Date(),
         },
       };
       const newSession = {
@@ -107,6 +113,7 @@ export function createSession(
       nextGlobalIndex,
       baseQueueLength,
       lastCompleted: null,
+      startSessionTime: new Date(),
     };
     return StudentSession.findByIdAndUpdate(session._id, {
       $set: { subjects, },
