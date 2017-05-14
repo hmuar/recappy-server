@@ -20,9 +20,4 @@ const DevConfig = {
 // https://synapse-chat.herokuapp.com/api/v1/fbmessage
 
 const isProduction = process.env.NODE_ENV === 'production';
-if (isProduction) {
-  console.log('PROD CONFIG detected.................');
-} else {
-  console.log('DEV CONFIG detected.................');
-}
 export default (isProduction ? ProdConfig : DevConfig);

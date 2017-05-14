@@ -128,9 +128,6 @@ function delay(t) {
 
 export function getTypingDelay(text) {
   const numWords = text.split(' ').length;
-  console.log(
-    `Looking at ${numWords} words: ${numWords / AVG_WORDS_PER_SECOND * SECS_TO_MILLISECONDS}`
-  );
   return Math.min(
     Math.max(MIN_TYPING_DELAY_MILLISECONDS, numWords / AVG_WORDS_PER_SECOND * SECS_TO_MILLISECONDS),
     MAX_TYPING_DELAY_MILLISECONDS

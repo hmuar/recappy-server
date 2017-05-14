@@ -189,7 +189,7 @@ function DoneContext(appState) {
     return appState;
   }
 
-  const { lastCompleted, } = appState.session;
+  const { startSessionTime, } = appState.session;
   // XXX Dev loophole to allow date control
   // Check if user input was a number. If so, treat it as an offset
   // for number of days from current Date, and then use that date
@@ -208,8 +208,8 @@ function DoneContext(appState) {
   let waitedHours = 0;
 
   const curDate = new Date();
-  if (lastCompleted) {
-    waitedHours = Math.ceil((curDate - lastCompleted) * MILLISECONDS_TO_HOURS);
+  if (startSessionTime) {
+    waitedHours = Math.ceil((curDate - startSessionTime) * MILLISECONDS_TO_HOURS);
     sessionWaitTimeReached = waitedHours >= minSessionWaitHours;
   }
 

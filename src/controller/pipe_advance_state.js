@@ -77,7 +77,6 @@ function setPostEvalState(appState) {
   };
 }
 
-// if postEvalState === WAIT_NEXT_IN_QUEUE, need to advance noteQueue, next state
 function advanceState(appState) {
   if (!appState) {
     return appState;
@@ -128,6 +127,7 @@ function advanceState(appState) {
               nextGlobalIndex: notesInfo.nextGlobalIndex,
               baseQueueLength: nextNotes.length,
               state: getEntryStateForNoteType(nextNotes[0].type),
+              startSessionTime: new Date(),
             },
           };
         }

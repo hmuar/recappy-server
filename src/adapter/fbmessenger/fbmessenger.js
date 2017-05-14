@@ -144,6 +144,7 @@ function parseEntry(entry) {
     const initMsgData = {
       timestamp: msg.timestamp,
       senderID: msg.sender.id,
+      pageID: msg.recipient.id,
       subjectName: HARDCODED_SUBJ_NAME,
       input: null,
       seq: msg.message ? msg.message.seq : 0,

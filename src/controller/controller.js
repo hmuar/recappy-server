@@ -91,7 +91,6 @@ export default class Controller {
             subjectID: subject._id,
           };
           // convert adapter specific sender id into app user
-          log('------------------------------------------------------');
           return (
             this.pipeUser(appState)
               // at this point should have app user information

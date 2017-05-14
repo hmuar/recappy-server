@@ -3,7 +3,7 @@ require('winston-loggly-bulk');
 
 winston.level = 'info';
 
-winston.add(winston.transports.File, {
+const logFileOptions = {
   name: 'file',
   filename: 'logs/server.log',
   level: 'info',
@@ -13,7 +13,17 @@ winston.add(winston.transports.File, {
   // prettyPrint: object => JSON.stringify(object),
   timestamp: true,
   colorize: false,
+};
+
+winston.loggers.add('fileOnly', {
+  file: logFileOptions,
+  console: {
+    level: 'error',
+    colorize: true,
+  },
 });
+
+winston.add(winston.transports.File, logFileOptions);
 
 // Loggly support
 winston.add(winston.transports.Loggly, {
@@ -35,6 +45,7 @@ export function logErr(msg) {
 }
 
 export function logState(appState) {
+  const fileLogger = winston.loggers.get('fileOnly');
   const {
     input,
     userID,
@@ -53,18 +64,20 @@ export function logState(appState) {
   }
   const tState = {
     senderID,
-    userID,
-    note: `${queueIndex}: (${queueIndex + 1}/${maxQueueIndex + 1}) ${noteType}`,
+    userID: userID.toString(),
+    note: `queueIndex: (${queueIndex}/${maxQueueIndex}), noteType: ${noteType}`,
     input,
     evalCtx,
     paths,
     state: `${preEvalState} --> ${postEvalState} --> ${state}`,
     globalIndex,
-    queue: session.noteQueue.map(note => ({
-      display: note.displayRaw.slice(0, 20),
+    queue: session.noteQueue.map((note, i) => ({
+      i,
+      display: note.displayRaw.slice(0, 10),
       type: note.type,
     })),
   };
-  winston.log('info', tState);
+  fileLogger.log('info', '-------------------------------------------------');
+  fileLogger.log('info', tState);
   return appState;
 }
