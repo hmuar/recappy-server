@@ -3,27 +3,31 @@ require('winston-loggly-bulk');
 
 winston.level = 'info';
 
-const logFileOptions = {
-  name: 'file',
-  filename: 'logs/server.log',
-  level: 'info',
-  eol: '\n', // for Windows, or `eol: ‘n’,` for *NIX OSs
-  json: false,
-  prettyPrint: true,
-  // prettyPrint: object => JSON.stringify(object),
-  timestamp: true,
-  colorize: false,
-};
+const isProduction = process.env.NODE_ENV === 'production';
 
-winston.loggers.add('fileOnly', {
-  file: logFileOptions,
-  console: {
-    level: 'error',
-    colorize: true,
-  },
-});
+if (!isProduction) {
+  const logFileOptions = {
+    name: 'file',
+    filename: 'logs/server.log',
+    level: 'info',
+    eol: '\n', // for Windows, or `eol: ‘n’,` for *NIX OSs
+    json: false,
+    prettyPrint: true,
+    // prettyPrint: object => JSON.stringify(object),
+    timestamp: true,
+    colorize: false,
+  };
 
-winston.add(winston.transports.File, logFileOptions);
+  winston.loggers.add('fileOnly', {
+    file: logFileOptions,
+    console: {
+      level: 'error',
+      colorize: true,
+    },
+  });
+
+  winston.add(winston.transports.File, logFileOptions);
+}
 
 // Loggly support
 winston.add(winston.transports.Loggly, {
@@ -45,6 +49,10 @@ export function logErr(msg) {
 }
 
 export function logState(appState) {
+  if (isProduction) {
+    return;
+  }
+
   const fileLogger = winston.loggers.get('fileOnly');
   const {
     input,
