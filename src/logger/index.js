@@ -50,7 +50,7 @@ export function logErr(msg) {
 
 export function logState(appState) {
   if (isProduction) {
-    return;
+    return appState;
   }
 
   const fileLogger = winston.loggers.get('fileOnly');
