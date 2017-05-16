@@ -88,7 +88,6 @@ const CONTINUE_PHRASE = [
   'keep going',
   'got it',
   'ok',
-  'cool',
   'alright'
 ];
 

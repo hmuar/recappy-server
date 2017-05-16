@@ -211,6 +211,8 @@ function DoneContext(appState) {
   if (startSessionTime) {
     waitedHours = Math.ceil((curDate - startSessionTime) * MILLISECONDS_TO_HOURS);
     sessionWaitTimeReached = waitedHours >= minSessionWaitHours;
+  } else {
+    return insertEval(appState, successEval(Answer.ok, { cutoffDate, remainingWaitHours: 0, }));
   }
 
   if (!sessionWaitTimeReached) {
