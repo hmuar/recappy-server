@@ -1,10 +1,9 @@
 import { SessionState, getCurrentNote } from '~/core/session_state';
 import Input from '~/core/input';
 import Answer from '~/core/answer';
-import { EvalStatus, evalNoteWithRawInput, evalWithYesNo } from '~/core/eval';
+import { EvalStatus, evalNoteWithRawInput, evalWithYesNo, hasWaitedMinHours } from '~/core/eval';
 import { minSessionWaitHours } from '~/core/hyperparam';
-
-const MILLISECONDS_TO_HOURS = 1.0 / 3600000;
+import { isProduction } from '~/core/production';
 
 // Evaluate user input in the context of user's current session state.
 // Add a `evalCtx` object to message data.
@@ -189,13 +188,12 @@ function DoneContext(appState) {
     return appState;
   }
 
-  const { startSessionTime, } = appState.session;
   // XXX Dev loophole to allow date control
   // Check if user input was a number. If so, treat it as an offset
   // for number of days from current Date, and then use that date
   // as cutoff date when getting next note queue from scheduler.
   const cutoffDate = new Date();
-  if (input.type === Input.Type.CUSTOM) {
+  if (input.type === Input.Type.CUSTOM && !isProduction()) {
     const tryInt = parseInt(input.payload, 10);
     if (!isNaN(tryInt)) {
       cutoffDate.setDate(cutoffDate.getDate() + tryInt);
@@ -204,17 +202,14 @@ function DoneContext(appState) {
     }
   }
 
-  let sessionWaitTimeReached = false;
-  let waitedHours = 0;
-
-  const curDate = new Date();
-  if (startSessionTime) {
-    waitedHours = Math.ceil((curDate - startSessionTime) * MILLISECONDS_TO_HOURS);
-    sessionWaitTimeReached = waitedHours >= minSessionWaitHours;
-  } else {
+  const { startSessionTime, } = appState.session;
+  // if user doesn't have a startsession time store, just continue to next concept
+  // this represents an edge case for older users that may not have new startSessionTime property
+  if (!startSessionTime) {
     return insertEval(appState, successEval(Answer.ok, { cutoffDate, remainingWaitHours: 0, }));
   }
 
+  const { success: sessionWaitTimeReached, waitedHours, } = hasWaitedMinHours(startSessionTime);
   if (!sessionWaitTimeReached) {
     return insertEval(
       appState,

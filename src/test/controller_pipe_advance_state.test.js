@@ -5,7 +5,6 @@ import pipeStateTransition from '~/controller/pipe_advance_state';
 import Input from '~/core/input';
 import { SessionState } from '~/core/session_state';
 import DBAssist from '~/db/category_assistant';
-import { EvalStatus } from '~/core/eval';
 // import { TARGET_NUM_NOTES_IN_SESSION } from '~/core/scheduler';
 import { invalidEval, successEval } from '~/controller/pipe_eval';
 import TestDatabase from './test_database';
@@ -22,6 +21,7 @@ let testUser = null;
 function getSession(queueIndex, state) {
   return {
     queueIndex,
+    startSessionTime: new Date(),
     noteQueue: [
       {
         _id: db.createObjectID('9e16c772556579bd6fc6c222'),

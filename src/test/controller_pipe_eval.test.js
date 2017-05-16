@@ -18,6 +18,7 @@ const SUBJECT_NAME = TestConst.SUBJECT_NAME;
 function getSession(queueIndex = 0, state) {
   return {
     queueIndex,
+    startSessionTime: new Date(),
     noteQueue: [
       {
         _id: db.createObjectID('9e16c772556579bd6fc6c222'),

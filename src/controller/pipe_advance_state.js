@@ -1,6 +1,6 @@
 import { SessionState, getEntryStateForNoteType } from '~/core/session_state';
 import { getNextNotes, TARGET_NUM_NOTES_IN_SESSION } from '~/core/scheduler';
-import { EvalStatus, isFailResponse } from '~/core/eval';
+import { EvalStatus, isFailResponse, hasWaitedMinHours } from '~/core/eval';
 
 // Given current info in app state, determine next study state for user.
 // Only need to look at current session state to determine next state.
@@ -77,6 +77,40 @@ function setPostEvalState(appState) {
   };
 }
 
+function advanceToNextConcept(appState, _cutoffDate) {
+  const cutoffDate = _cutoffDate || new Date();
+  const { userID, subjectID, } = appState;
+  const nextGlobalIndex = appState.session.nextGlobalIndex;
+
+  return getNextNotes(
+    userID,
+    subjectID,
+    nextGlobalIndex,
+    TARGET_NUM_NOTES_IN_SESSION,
+    cutoffDate
+  ).then(notesInfo => {
+    const nextNotes = notesInfo.notes;
+    if (nextNotes && nextNotes.length > 0) {
+      return {
+        ...appState,
+        // postEvalState: null,
+        session: {
+          ...appState.session,
+          noteQueue: nextNotes,
+          queueIndex: 0,
+          globalIndex: notesInfo.globalIndex,
+          nextGlobalIndex: notesInfo.nextGlobalIndex,
+          baseQueueLength: nextNotes.length,
+          state: getEntryStateForNoteType(nextNotes[0].type),
+          startSessionTime: new Date(),
+        },
+      };
+    }
+    // no new notes exist, user has finished everything.
+    return appState;
+  });
+}
+
 function advanceState(appState) {
   if (!appState) {
     return appState;
@@ -104,36 +138,7 @@ function advanceState(appState) {
 
       const { evalCtx, } = appState;
       const { cutoffDate, } = evalCtx.correctAnswer;
-      const { userID, subjectID, } = appState;
-      const nextGlobalIndex = appState.session.nextGlobalIndex;
-
-      return getNextNotes(
-        userID,
-        subjectID,
-        nextGlobalIndex,
-        TARGET_NUM_NOTES_IN_SESSION,
-        cutoffDate
-      ).then(notesInfo => {
-        const nextNotes = notesInfo.notes;
-        if (nextNotes && nextNotes.length > 0) {
-          return {
-            ...appState,
-            // postEvalState: null,
-            session: {
-              ...appState.session,
-              noteQueue: nextNotes,
-              queueIndex: 0,
-              globalIndex: notesInfo.globalIndex,
-              nextGlobalIndex: notesInfo.nextGlobalIndex,
-              baseQueueLength: nextNotes.length,
-              state: getEntryStateForNoteType(nextNotes[0].type),
-              startSessionTime: new Date(),
-            },
-          };
-        }
-        // no new notes exist, user has finished everything.
-        return appState;
-      });
+      return advanceToNextConcept(appState, cutoffDate);
     }
 
     if (
@@ -159,6 +164,23 @@ function advanceState(appState) {
             transitionFromPathToMain = true;
           }
         } else {
+          const { startSessionTime, } = appState.session;
+          // if user has already waited minimum amount of hours, dont allow
+          // session to end. Just continue on with next concept. This is needed
+          // to account for times when user leaves in middle of a session
+          // and doesn't come back until days after. In this case we want user
+          // to be able to finish current concept and then keep going, without
+          // us prematurely ending their day after just a few notes just because
+          // they have reached the end of current concept.
+
+          const { success: sessionWaitTimeReached, waitedHours, } = hasWaitedMinHours(
+            startSessionTime
+          );
+
+          if (startSessionTime && sessionWaitTimeReached) {
+            return advanceToNextConcept(appState, new Date());
+          }
+
           nextSessionState = SessionState.DONE_QUEUE;
         }
       }

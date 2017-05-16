@@ -1,5 +1,6 @@
 import { checkInputAgainstAnswer } from '~/core/eval/textProcess';
 import { AffirmitiveInputs, NegativeInputs } from '~/core/input';
+import { minSessionWaitHours } from '~/core/hyperparam';
 
 const minResponseQuality = 1.0;
 const maxResponseQuality = 5.0;
@@ -14,6 +15,15 @@ export const EvalStatus = {
   INVALID: 'invalid',
   SUCCESS: 'success',
 };
+
+const MILLISECONDS_TO_HOURS = 1.0 / 3600000;
+
+export function hasWaitedMinHours(startDate) {
+  const curDate = new Date();
+  const waitedHours = (curDate - startDate) * MILLISECONDS_TO_HOURS;
+  const success = waitedHours >= minSessionWaitHours;
+  return { success, waitedHours, };
+}
 
 export function isValidEval(evalCtx) {
   if (!evalCtx) {
