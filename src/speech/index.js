@@ -47,15 +47,21 @@ export function negativeEncourage() {
 }
 
 const WRONG_ANSWER_PHRASE = [
-  "not quite. I think it's actually",
-  "actually I think it's",
-  'the answer is actually',
-  'i actually think the answer is',
-  "not exactly, it's"
+  "Not quite. I think it's actually",
+  "Actually I think it's",
+  'The answer is actually',
+  'I actually think the answer is',
+  "Not exactly, it's"
 ];
 
 export function wrongAnswer(correctAnswer) {
   return `${randomChoice(WRONG_ANSWER_PHRASE)} ${correctAnswer}`;
+}
+
+const TRIGGER_FOLLOWUP_PHRASE = ['The actual answer is', 'So the answer is actually'];
+
+export function triggerFollowup(correctAnswer) {
+  return `${randomChoice(TRIGGER_FOLLOWUP_PHRASE)} ${correctAnswer}`;
 }
 
 const WELCOME_BACK_PHRASE = [

@@ -7,6 +7,7 @@ import {
   backToOriginalTopic,
   positiveEncourage,
   negativeEncourage,
+  triggerFollowup,
   wrongAnswer,
   welcomeBack,
   doneSession,
@@ -213,7 +214,24 @@ function negFeedback(state, correctMsg) {
   return wrongAnswer(correctMsg);
 }
 
-function sendFeedbackText(state, withHiddenContent = false, withSuccessMedia = false) {
+function getTriggerResponse(note, inputText) {
+  console.log('trying to get trigger response..........');
+  const responses = note.responses;
+  if (!responses || !responses.length) {
+    return null;
+  }
+  for (let i = 0; i < responses.length; i++) {
+    const response = responses[i];
+    console.log(`looking at response with trigger ${response.trigger}`);
+    if (response.trigger === inputText) {
+      console.log(`found trigger response! returning ${response.display}`);
+      return response.display;
+    }
+  }
+  return null;
+}
+
+function sendFeedbackText(state, withTriggerResponse = false, withSuccessMedia = false) {
   const toID = state.senderID;
 
   if (!isValidEval(state.evalCtx)) {
@@ -228,13 +246,22 @@ function sendFeedbackText(state, withHiddenContent = false, withSuccessMedia = f
 
   let msg = isPositive ? posFeedback() : negFeedback(state);
   if (!isPositive) {
-    if (correctMsg) {
-      msg = negFeedback(state, correctMsg);
-    }
     const curNote = getCurrentNote(state.session);
-    if (withHiddenContent && curNote.hidden) {
-      msg = `${msg}. ${curNote.hidden}`;
+    if (withTriggerResponse) {
+      const inputText = state.input.payload;
+      const triggerResp = getTriggerResponse(curNote, inputText);
+      if (triggerResp && correctMsg) {
+        msg = triggerFollowup(correctMsg);
+        msg = `${triggerResp}. ${msg}`;
+      } else if (curNote.hidden) {
+        if (correctMsg) {
+          msg = negFeedback(state, correctMsg);
+        }
+        msg = `${msg}. ${curNote.hidden}`;
+      }
     }
+    // if (withTriggerResponse && curNote.hidden) {
+    // }
     // const quickReplyData = [{ title: 'Wait you misunderstood me', action: Input.Type.CHALLENGE, }];
     // const buttonData = [
     //   {
