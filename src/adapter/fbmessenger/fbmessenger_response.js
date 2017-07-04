@@ -1,6 +1,7 @@
 import { SessionState, getCurrentNote } from '~/core/session_state';
 import Input, { getChoiceInput, getPathInput } from '~/core/input';
 import { isValidEval, isFailResponse } from '~/core/eval';
+import { divideLongText } from '~/core/text_utils';
 
 import {
   generateQuestion,
@@ -61,6 +62,7 @@ function sendResponseInContext(state) {
     //   return sendText(fbUserID, "Let's get started!").then(() => state);
 
     case SessionState.INFO: {
+      // split up displayRaw text into separate bubbles of text
       const displayText = note.displayRaw;
       let quickReplyData = [];
 
@@ -80,7 +82,14 @@ function sendResponseInContext(state) {
 
       return sendPossibleImage(fbUserID, note)
         .then(() => prependPendingMessages(state, displayText))
-        .then(finalMsg => sendQuickReply(fbUserID, finalMsg, quickReplyData));
+        .then(finalMsg => {
+          const shortenedMsgs = divideLongText(finalMsg, 100);
+          if (shortenedMsgs.length > 1) {
+            return sendText(fbUserID, shortenedMsgs[0]).then(() =>
+              sendQuickReply(fbUserID, shortenedMsgs[1], quickReplyData));
+          }
+          return sendQuickReply(fbUserID, finalMsg, quickReplyData);
+        });
     }
 
     case SessionState.RECALL: {
