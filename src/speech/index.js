@@ -112,3 +112,9 @@ const GET_IT_RIGHT_QUESTION_PHRASE = [
 export function isThatWhatYouThought() {
   return randomChoice(GET_IT_RIGHT_QUESTION_PHRASE);
 }
+
+const THE_ANSWER_WAS = ['the best answer was', 'I was looking for '];
+
+export function theAnswerWas() {
+  return randomChoice(THE_ANSWER_WAS);
+}

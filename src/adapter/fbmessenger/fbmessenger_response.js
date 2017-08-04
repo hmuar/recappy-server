@@ -13,7 +13,8 @@ import {
   welcomeBack,
   doneSession,
   keepGoing,
-  isThatWhatYouThought
+  isThatWhatYouThought,
+  theAnswerWas
 } from '~/speech';
 import Answer from '~/core/answer';
 import { logErr } from '~/logger';
@@ -212,8 +213,10 @@ export default function sendResponse(state) {
   });
 }
 
-function posFeedback() {
-  return positiveEncourage();
+function posFeedback(correctMsg) {
+  const positiveEncourageMsg = positiveEncourage();
+  const answerWasPhrase = theAnswerWas();
+  return `${positiveEncourageMsg} ${answerWasPhrase} '${correctMsg}'`;
 }
 
 function negFeedback(state, correctMsg) {
@@ -253,7 +256,7 @@ function sendFeedbackText(state, withTriggerResponse = false, withSuccessMedia =
   const isPositive = !isFailResponse(state.evalCtx.answerQuality);
   const correctMsg = state.evalCtx.correctAnswer;
 
-  let msg = isPositive ? posFeedback() : negFeedback(state);
+  let msg = isPositive ? posFeedback(correctMsg) : negFeedback(state);
   if (!isPositive) {
     const curNote = getCurrentNote(state.session);
     if (withTriggerResponse) {
