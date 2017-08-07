@@ -43,6 +43,7 @@ function setPostEvalState(appState) {
   const validEval = isValidEval(appState);
 
   switch (sessionState) {
+    case SessionState.INTRO:
     case SessionState.INIT:
       if (validEval) {
         postEvalState = SessionState.START_QUEUE;

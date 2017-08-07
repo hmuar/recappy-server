@@ -49,10 +49,12 @@ class Simulator {
 
   // Core sim step execution
   _step(user, initSession = null, debug = false) {
+    console.log('running a single step');
     const { id, successBaseProb, } = user;
     // const success = Math.random() < successProb;
     const msg = this.generateMsg(id, successBaseProb, initSession);
     const finalState = this.controller.registerMsg(msg, debug).then(state => {
+      console.log(`final controller state: ${state.session.state}`);
       if (state.session.state === SessionState.DONE_QUEUE) {
         this.registerDayCompleted(true);
         console.log(`----- [ Day ${this.activeDaysCompleted} ] -------`);

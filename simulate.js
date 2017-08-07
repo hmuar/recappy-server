@@ -7,7 +7,7 @@ import { simBaseProb } from '~/core/hyperparam';
 
 const HARDCODED_SIM_USER_ID = ObjectID('58ec1b70509986fe34517f71');
 const SUCCESS_BASE_PROB = simBaseProb;
-const DAILY_ACTIVE_PROB = 0.7;
+const DAILY_ACTIVE_PROB = 1.0;
 
 function start() {
   console.time('Total sim time');
@@ -27,10 +27,12 @@ function start() {
 
   if (args.days) {
     const numDays = args.days;
+    console.log(`Running sim for ${numDays} days`);
     return simulator.runSim(userProfile, numDays, SIM_TYPE.Days);
   }
   if (args.steps) {
     const numSteps = args.steps;
+    console.log(`Running sim for ${numSteps} days`);
     return simulator.runSim(userProfile, numSteps, SIM_TYPE.Steps);
   }
   console.log('No acceptable flags submitted, no simulaton run');

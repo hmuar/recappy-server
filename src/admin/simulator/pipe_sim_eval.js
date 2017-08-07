@@ -51,7 +51,8 @@ export default function pipe(appState) {
     }
   } else if (
     appState.session.state === SessionState.INIT ||
-    appState.session.state === SessionState.DONE_QUEUE
+    appState.session.state === SessionState.DONE_QUEUE ||
+    appState.session.state === SessionState.INTRO
   ) {
     success = true;
   } else if (currentNote.type === 'info') {
