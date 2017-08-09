@@ -6,6 +6,8 @@ import MessageType from './fbmessage_type';
 import sendResp, { sendFeedbackResp } from './fbmessenger_response';
 import { sendUserDetailsRequest } from './fbmessenger_request';
 
+const HARDCODED_SUBJ_NAME = 'news';
+
 // Adapter for parsing incoming requests and responding
 // if user is using Facebook Messenger platform.
 
@@ -136,7 +138,6 @@ function parseEntry(entry) {
   }
   return entry.messaging.map(msg => {
     // TODO: Need to dynamically get this from request
-    const HARDCODED_SUBJ_NAME = 'biology';
     if (!msg.sender || !msg.sender.id || (!msg.message && !msg.postback)) {
       return [];
     }

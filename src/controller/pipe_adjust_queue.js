@@ -51,7 +51,7 @@ export default function pipe(appState) {
               ...queue.slice(0, session.queueIndex + 1),
               ...notes.map(n => ({
                 ...n,
-                addedFromPath: true,
+                addedFromPath: path.catId,
               })),
               ...queue.slice(session.queueIndex + 1, queue.length)
             ];

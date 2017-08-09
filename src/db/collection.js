@@ -68,6 +68,7 @@ const noteSchema = new mongoose.Schema({
   imgUrl: String,
   parent: [mongoose.Schema.Types.ObjectId],
   phrase: Object,
+  paths: [],
   ckey: String,
   displayRaw: String,
   globalIndex: Number,

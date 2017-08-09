@@ -11,5 +11,5 @@ export function divideLongText(text, maxLength) {
       ];
     }
   }
-  return text;
+  return [text];
 }

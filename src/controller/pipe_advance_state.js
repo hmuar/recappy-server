@@ -106,8 +106,23 @@ function advanceToNextConcept(appState, _cutoffDate) {
         },
       };
     }
-    // no new notes exist, user has finished everything.
-    return appState;
+    // no new notes exist in entire subject, user has finished EVERYTHING.
+    // TODO: add a new session state to handle this situation
+    return {
+      ...appState,
+      // postEvalState: null,
+      session: {
+        ...appState.session,
+        noteQueue: [],
+        queueIndex: 0,
+        globalIndex: notesInfo.globalIndex,
+        nextGlobalIndex: notesInfo.nextGlobalIndex,
+        baseQueueLength: 0,
+        state: SessionState.DONE_QUEUE,
+        startSessionTime: new Date(),
+      },
+    };
+    // return appState;
   });
 }
 
@@ -160,7 +175,9 @@ function advanceState(appState) {
         if (nextQueueIndex < noteQueue.length) {
           const nextNote = noteQueue[nextQueueIndex];
           nextSessionState = getEntryStateForNoteType(nextNote.type);
-          if (noteQueue[queueIndex].addedFromPath && !noteQueue[nextQueueIndex].addedFromPath) {
+          const curAddFromPath = noteQueue[queueIndex].addedFromPath;
+          const nextAddFromPath = noteQueue[nextQueueIndex].addedFromPath;
+          if (curAddFromPath && nextAddFromPath && curAddFromPath !== nextAddFromPath) {
             transitionFromPathToMain = true;
           }
         } else {

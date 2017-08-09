@@ -1,7 +1,7 @@
 import { isProduction } from '~/core/production';
 
 const prodTargetNumNotesInSession = 15;
-const devTargetNumNotesInSession = 2;
+const devTargetNumNotesInSession = 1;
 
 export const targetNumNotesInSession = isProduction()
   ? prodTargetNumNotesInSession
@@ -13,7 +13,7 @@ export const maxIntervalDays = 365;
 // amount of time in hours users must wait before beginning a new session
 
 const prodMinSessionWaitHours = 7;
-const devMinSessionWaitHours = 1;
+const devMinSessionWaitHours = 2;
 
 export const minSessionWaitHours = isProduction()
   ? prodMinSessionWaitHours

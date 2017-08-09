@@ -43,14 +43,16 @@ export function sendPossibleImage(senderID, note) {
   return Promise.resolve(0);
 }
 
+// prepend a message stating "Ok back to ......" if the user had
+// jumped down a path and is not coming back to main topic
 function prependPendingMessages(appState, msg) {
-  if (appState.transitionFromPathToMain) {
-    const curNote = getCurrentNote(appState.session);
-    const curNoteParent = curNote.directParent;
-    return CategoryAssistant.getCategoryById(curNoteParent).then(
-      parent => `${backToOriginalTopic(parent.ckey)} ${msg}`
-    );
-  }
+  // if (appState.transitionFromPathToMain) {
+  //   const curNote = getCurrentNote(appState.session);
+  //   const curNoteParent = curNote.directParent;
+  //   return CategoryAssistant.getCategoryById(curNoteParent).then(
+  //     parent => `${backToOriginalTopic(parent.ckey)} ${msg}`
+  //   );
+  // }
   return Promise.resolve(msg);
 }
 
@@ -202,17 +204,6 @@ function sendResponseInContext(state) {
   }
 }
 
-export default function sendResponse(state) {
-  return sendResponseInContext(state).then(() => state).catch(err => {
-    if (state.session) {
-      logErr(`Error sending response from ${state.session.state} state`);
-    } else {
-      logErr('Error sending response');
-    }
-    logErr(err);
-  });
-}
-
 function posFeedback(correctMsg) {
   const positiveEncourageMsg = positiveEncourage();
   const answerWasPhrase = theAnswerWas();
@@ -227,16 +218,13 @@ function negFeedback(state, correctMsg) {
 }
 
 function getTriggerResponse(note, inputText) {
-  console.log('trying to get trigger response..........');
   const responses = note.responses;
   if (!responses || !responses.length) {
     return null;
   }
   for (let i = 0; i < responses.length; i++) {
     const response = responses[i];
-    console.log(`looking at response with trigger ${response.trigger}`);
     if (response.trigger === inputText) {
-      console.log(`found trigger response! returning ${response.display}`);
       return response.display;
     }
   }
@@ -256,7 +244,10 @@ function sendFeedbackText(state, withTriggerResponse = false, withSuccessMedia =
   const isPositive = !isFailResponse(state.evalCtx.answerQuality);
   const correctMsg = state.evalCtx.correctAnswer;
 
-  let msg = isPositive ? posFeedback(correctMsg) : negFeedback(state);
+  let msg = isPositive ? posFeedback(correctMsg) : negFeedback(state, correctMsg);
+  // check for possible trigger response based on incorrect answer
+  // trigger responses are custom responses crafted for specific incorrect
+  // answers that we anticipate the user to give
   if (!isPositive) {
     const curNote = getCurrentNote(state.session);
     if (withTriggerResponse) {
@@ -317,7 +308,8 @@ export function sendFeedbackResp(state, withSuccessMedia = false) {
   switch (session.state) {
     case SessionState.INTRO: {
       const toID = state.senderID;
-      const msg = "Hey! 🤗 Have you ever tried to learn something and then realize later you forgot everything? Learning the right way can be tough on your own. That's why I'm here! Every day we chat we'll learn something new together. Most importantly, we'll always spend some of our time reviewing what we've already learned so we won't forget. Let's go, it's learnin time wooo! 😄";
+      // const msg = "Hey! 🤗 Have you ever tried to learn something and then realize later you forgot everything? Learning the right way can be tough on your own. That's why I'm here! Every day we chat we'll learn something new together. Most importantly, we'll always spend some of our time reviewing what we've already learned so we won't forget. Let's go, it's learnin time wooo! 😄";
+      const msg = "Hey! 🤗 The news isn't always easy to understand. I'm here to help you explore so we can really get to the bottom of what is going on. Most importantly, we'll always spend some of our time reviewing what we've already learned in previous days so we won't forget. Let's go, it's exploring time wooo! 😄";
       return sendText(toID, msg).then(() => state);
     }
     case SessionState.RECALL_RESPONSE:
@@ -332,4 +324,15 @@ export function sendFeedbackResp(state, withSuccessMedia = false) {
   }
 
   return state;
+}
+
+export default function sendResponse(state) {
+  return sendResponseInContext(state).then(() => state).catch(err => {
+    if (state.session) {
+      logErr(`Error sending response from ${state.session.state} state`);
+    } else {
+      logErr('Error sending response');
+    }
+    logErr(err);
+  });
 }

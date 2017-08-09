@@ -76,12 +76,18 @@ export function welcomeBack() {
   return randomChoice(WELCOME_BACK_PHRASE);
 }
 
+// const SESSION_DONE_PHRASE = [
+//   'no more to learn for today, all done! Great job! Check back in tomorrow 🙂',
+//   "annd we're done! Nice work today! Yay let's learn more later tomorrow. See ya!",
+//   "Good job today! whew we learned alot, let's take a break and learn more tomorrow.",
+//   "wooo we got through everything for today! Great work! Time to take a break and let it sink in. Let's learn more later, k? Byeee 👋🏼",
+//   'done done and done! Great job today. More learning later, see ya 🙃'
+// ];
+
 const SESSION_DONE_PHRASE = [
-  'no more to learn for today, all done! Great job! Check back in tomorrow 🙂',
-  "annd we're done! Nice work today! Yay let's learn more later tomorrow. See ya!",
-  "Good job today! whew we learned alot, let's take a break and learn more tomorrow.",
-  "wooo we got through everything for today! Great work! Time to take a break and let it sink in. Let's learn more later, k? Byeee 👋🏼",
-  'done done and done! Great job today. More learning later, see ya later 🙃'
+  'no more news for today, all done! Great job! Check back in tomorrow 🙂',
+  "annd we're done! more tomorrow. See ya!",
+  "I'm all out of stuff for today, more tomorrow. see ya 🙃"
 ];
 
 export function doneSession() {
@@ -113,7 +119,7 @@ export function isThatWhatYouThought() {
   return randomChoice(GET_IT_RIGHT_QUESTION_PHRASE);
 }
 
-const THE_ANSWER_WAS = ['the best answer was', 'I was looking for '];
+const THE_ANSWER_WAS = ['the best answer was', 'I was looking for'];
 
 export function theAnswerWas() {
   return randomChoice(THE_ANSWER_WAS);
