@@ -94,7 +94,7 @@ function getAppState(session, evalCtx) {
   };
 }
 
-before('before controller advance state testing', () =>
+before('before controller pipe add paths testing', () =>
   db
     .setup()
     .then(() => db.clean())
@@ -160,4 +160,4 @@ test('test add paths wrong state', t => {
   });
 });
 
-after('after controller pipe record testing', () => db.close());
+after('after controller pipe add paths testing', () => db.close());

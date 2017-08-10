@@ -7,6 +7,7 @@ import { SessionState } from '~/core/session_state';
 import DBAssist from '~/db/category_assistant';
 // import { TARGET_NUM_NOTES_IN_SESSION } from '~/core/scheduler';
 import { invalidEval, successEval } from '~/controller/pipe_eval';
+import { targetNumNotesInSession } from '~/core/hyperparam';
 import TestDatabase from './test_database';
 import TestConst from './test_const';
 
@@ -106,6 +107,7 @@ before('before controller advance state testing', () =>
 test('test transition from state INIT', t => {
   const appState = getAppState(getSession(0, SessionState.INIT), successEval(Answer.ok));
   const nextAppState = pipeStateTransition(appState);
+  console.log('halloooooooooooooo');
   t.equal(nextAppState.session.state, SessionState.INFO);
   t.equal(nextAppState.session.queueIndex, 0);
   t.end();
@@ -261,10 +263,10 @@ test('test transition from done queue success, enough waited hours', t => {
   return pipeStateTransition(appState).then(ns => {
     t.ok(ns.session.state);
     t.notEqual(ns.session.state, SessionState.DONE_QUEUE);
-    t.equal(ns.session.noteQueue.length, 24);
+    t.equal(ns.session.noteQueue.length, targetNumNotesInSession);
     t.equal(ns.session.queueIndex, 0);
     t.equal(ns.session.globalIndex, 1);
   });
 });
 
-after('after controller pipe record testing', () => db.close());
+after('after controller advance state testing', () => db.close());

@@ -123,7 +123,7 @@ function getAppState(userID, queueIndex, state) {
   };
 }
 
-before('before knowledge model testing', () =>
+before('before student model testing', () =>
   // db.setup().then(() => db.clean()).then(() => db.loadStudentModelFixtures()));
   db.setup().then(() => db.clean()).then(() => db.loadAllFixtures()));
 
@@ -201,4 +201,4 @@ test('Handle note that already exists', t => {
   });
 });
 
-after('student model testing', () => db.close());
+after('after student model testing', () => db.close());

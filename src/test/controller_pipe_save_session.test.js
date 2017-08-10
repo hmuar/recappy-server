@@ -21,19 +21,24 @@ let testUser = null; // eslint-disable-line
 function getSession(queueIndex, state) {
   return {
     queueIndex,
-    noteQueue:
-      [{ _id: db.createObjectID('9e16c772556579bd6fc6c222'),
+    noteQueue: [
+      {
+        _id: db.createObjectID('9e16c772556579bd6fc6c222'),
         type: 'info',
       },
-      { _id: db.createObjectID('987e8177faf2c2f03c974482'),
-         type: 'recall',
+      {
+        _id: db.createObjectID('987e8177faf2c2f03c974482'),
+        type: 'recall',
       },
-      { _id: db.createObjectID('987e8177faf2c2f03c974482'),
+      {
+        _id: db.createObjectID('987e8177faf2c2f03c974482'),
         type: 'input',
       },
-      { _id: db.createObjectID('ff7cbfb397fb2794827739ad'),
+      {
+        _id: db.createObjectID('ff7cbfb397fb2794827739ad'),
         type: 'choice',
-      }],
+      }
+    ],
     state,
     globalIndex: 0,
   };
@@ -55,17 +60,19 @@ function getAppState(session, evalCtx) {
   };
 }
 
-before('before controller pipe record testing', () => (
-  db.setup().then(() => db.clean()).then(() => db.loadAllFixtures()))
-  .then(() => DBAssist.getCategoryByName('subject', SUBJECT_NAME))
-  .then(subj => {
-    subject = subj;
-    return db.getTestUser();
-  })
-  .then(user => {
-    testUser = user;
-  }
-));
+before('before controller pipe save session testing', () =>
+  db
+    .setup()
+    .then(() => db.clean())
+    .then(() => db.loadAllFixtures())
+    .then(() => DBAssist.getCategoryByName('subject', SUBJECT_NAME))
+    .then(subj => {
+      subject = subj;
+      return db.getTestUser();
+    })
+    .then(user => {
+      testUser = user;
+    }));
 
 test('test pipe save session', t => {
   const appState = getAppState(getSession(0, SessionState.MULT_CHOICE), {
@@ -74,19 +81,18 @@ test('test pipe save session', t => {
   });
   let oldSession = null;
   return getSessionForUserAndSubject(testUser._id, subject._id)
-  .then((session) => {
-    oldSession = session;
-    return pipeSaveSession(appState);
-  })
-  .then(nextAppState => {
-    t.deepEqual(nextAppState, appState);
-    return getSessionForUserAndSubject(testUser._id, subject._id)
-    .then((session) => {
-      t.notDeepEqual(session, oldSession);
-      t.equal(session.state, SessionState.MULT_CHOICE);
-      t.equal(session.noteQueue.length, 4);
+    .then(session => {
+      oldSession = session;
+      return pipeSaveSession(appState);
+    })
+    .then(nextAppState => {
+      t.deepEqual(nextAppState, appState);
+      return getSessionForUserAndSubject(testUser._id, subject._id).then(session => {
+        t.notDeepEqual(session, oldSession);
+        t.equal(session.state, SessionState.MULT_CHOICE);
+        t.equal(session.noteQueue.length, 4);
+      });
     });
-  });
 });
 
-after('after controller pipe record testing', () => db.close());
+after('after controller pipe save session testing', () => db.close());

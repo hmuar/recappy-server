@@ -46,4 +46,4 @@ test('test add session when user has no existing session', t => {
   });
 });
 
-after('after controller pipe record testing', () => db.close());
+after('after controller pipe add session testing', () => db.close());

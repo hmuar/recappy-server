@@ -8,7 +8,6 @@ test('Divide long message', t => {
 
   const longMsg2 = "How do we know to use a C or H or O? Each element like Carbon, Oxygen, Hydrogen, has its own symbol. It's a short version of the name that makes it easier to use. Remember when you first learned that A is for Apple? B is Banana? Well C is for Carbon. O is for Oxygen. H is Hydrogen.";
   const result2 = divideLongText(longMsg2, 150);
-  console.error(result2);
   t.equal(result2.length, 2);
 
   t.end();
