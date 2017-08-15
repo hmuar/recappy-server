@@ -92,6 +92,7 @@ const defaultConcept = {
   weight: 1,
   globalIndex: 0,
   subjectParent: defaultSubject._id,
+  expireDate: new Date('08/10/2017'),
 };
 
 const defaultConcept2 = {
@@ -108,6 +109,7 @@ const defaultConcept2 = {
   weight: 1,
   globalIndex: 1,
   subjectParent: defaultSubject._id,
+  expireDate: new Date('08/12/2017'),
 };
 
 const noteParent = [

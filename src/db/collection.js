@@ -39,6 +39,7 @@ const catSchema = new mongoose.Schema({
   ckey: String,
   globalIndex: Number,
   exclude: Boolean,
+  expireDate: Date,
   subjectParent: mongoose.Schema.Types.ObjectId,
 });
 

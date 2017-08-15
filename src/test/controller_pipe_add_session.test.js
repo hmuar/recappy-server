@@ -42,6 +42,18 @@ test('test add session when user has no existing session', t => {
   return pipeAddSession(
     getAppState(db.createObjectID('7716893a8c8aff3221812149'), existingSenderID)
   ).then(state => {
+    t.equal(state.session.noteQueue.length, 22);
+    t.ok(state.session);
+  });
+});
+
+test('test add session when user has no existing session with empty startingNotes', t => {
+  const existingSenderID = '1028279607252642';
+  return pipeAddSession(
+    getAppState(db.createObjectID('8716893a8c8aff3221812149'), existingSenderID),
+    []
+  ).then(state => {
+    t.equal(state.session.noteQueue.length, 0);
     t.ok(state.session);
   });
 });

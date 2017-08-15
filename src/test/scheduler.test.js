@@ -1,5 +1,10 @@
 import test from 'blue-tape';
-import { getOldMaterial, getNewMaterial, getNextNotes } from '~/core/scheduler';
+import {
+  getOldMaterial,
+  getNewMaterial,
+  getNewMaterialWithExpireDate,
+  getNextNotes
+} from '~/core/scheduler';
 import DBAssist from '~/db/category_assistant';
 import TestDatabase from './test_database';
 import TestConst from './test_const';
@@ -32,15 +37,27 @@ test('schedule old notes based on due date', t =>
   }));
 
 test('schedule new notes', t =>
-  getNewMaterial(subject._id, 20, 0).then(nextNotes => {
-    t.equal(nextNotes.notes.length, 22);
+  getNewMaterial(subject._id, 20, 1).then(nextNotes => {
+    t.equal(nextNotes.notes.length, 10);
   }));
 
 test('schedule combined old and new notes', t =>
-  getNextNotes(testUser._id, subject._id, 0, 20).then(nextNotes => {
+  getNextNotes(testUser._id, subject._id, 1, 20).then(nextNotes => {
     // const oldNotes = nextNotes[0];
     // const newNotes = nextNotes[1];
-    t.equal(nextNotes.notes.length, 22);
+    t.equal(nextNotes.notes.length, 24);
+  }));
+
+test('schedule new notes based on expireDate early', t =>
+  getNewMaterialWithExpireDate(subject._id, new Date('08/10/2017')).then(nextNotesInfo => {
+    const nextNotes = nextNotesInfo.notes;
+    t.equal(nextNotes.length, 22);
+  }));
+
+test('schedule new notes based on expireDate late', t =>
+  getNewMaterialWithExpireDate(subject._id, new Date('08/11/2017')).then(nextNotesInfo => {
+    const nextNotes = nextNotesInfo.notes;
+    t.equal(nextNotes.length, 10);
   }));
 
 after('after scheduler testing', () => db.close());

@@ -4,7 +4,7 @@ import { log, logErr, logState } from '~/logger';
 import pipeAddSession from '~/controller/pipe_add_session';
 import pipeRecord from '~/controller/pipe_record';
 import pipeEval from '~/controller/pipe_eval';
-import pipeAdvanceState from '~/controller/pipe_advance_state';
+import pipeAdvanceStateDated from '~/controller/pipe_advance_state_dated';
 import pipeSaveSession from '~/controller/pipe_save_session';
 import pipeStudentModel from '~/controller/pipe_student_model';
 import pipeAdjustQueue from '~/controller/pipe_adjust_queue';
@@ -13,6 +13,10 @@ import pipeAddPaths from '~/controller/pipe_add_paths';
 export default class NotificationController {
   constructor(adapter) {
     this.adapter = adapter;
+  }
+  sendResponse(state) {
+    // return state;
+    return this.adapter.sendResponse(state);
   }
 
   /*
@@ -29,22 +33,20 @@ export default class NotificationController {
   */
   send(sendInfo) {
     const appState = sendInfo;
-    return pipeAddSession(appState).then(state => {
-      console.log(state);
-      return state;
-    });
-    // at this point should have session information
-    // // advance session state
-    // .then(state => pipeAdvanceState(state))
-    // .then(state => pipeAddPaths(state))
-    // // record new session state
-    // .then(state => pipeSaveSession(state))
-    // .then(state => this.logCurrentState(state))
-    // .then(state => {
-    //   // don't include this in return chain because this final update
-    //   // can happen asynchronously
-    //   pipeStudentModel(state);
-    //   return this.sendResponse(state);
-    // })
+    return (
+      pipeAddSession(appState, [])
+        // at this point should have session information
+        // advance session state
+        .then(state => pipeAdvanceStateDated(state))
+        .then(state => pipeAddPaths(state))
+        // record new session state
+        .then(state => pipeSaveSession(state))
+        // .then(state => this.logCurrentState(state))
+        .then(state => this.sendResponse(state))
+      // don't include this in return chain because this final update
+      // can happen asynchronously
+      // pipeStudentModel(state);
+      // state
+    );
   }
 }

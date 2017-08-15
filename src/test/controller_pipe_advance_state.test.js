@@ -107,7 +107,6 @@ before('before controller advance state testing', () =>
 test('test transition from state INIT', t => {
   const appState = getAppState(getSession(0, SessionState.INIT), successEval(Answer.ok));
   const nextAppState = pipeStateTransition(appState);
-  console.log('halloooooooooooooo');
   t.equal(nextAppState.session.state, SessionState.INFO);
   t.equal(nextAppState.session.queueIndex, 0);
   t.end();

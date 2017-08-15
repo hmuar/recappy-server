@@ -110,6 +110,47 @@ export function getNewMaterial(subjectID, numNotes, globalIndex = 0, prevNotes =
   });
 }
 
+export function getNewMaterialWithExpireDate(subjectID, expireDate, minGlobalIndex = 0) {
+  if (!subjectID) {
+    return Promise.resolve({
+      notes: [],
+      globalIndex: minGlobalIndex,
+      nextGlobalIndex: minGlobalIndex,
+    });
+  }
+
+  return Category.findOne({
+    ctype: 'concept',
+    subjectParent: subjectID,
+    globalIndex: { $gte: minGlobalIndex, },
+    expireDate: { $gte: expireDate, },
+  })
+    .sort({ globalIndex: 1, })
+    .then(nextConcept => {
+      if (!nextConcept) {
+        log(`Could not find next concept with min index ${minGlobalIndex}, returning 0 new notes`);
+        return Promise.resolve({
+          notes: [],
+          globalIndex: minGlobalIndex,
+          nextGlobalIndex: minGlobalIndex,
+        });
+      }
+      return Note.find({ directParent: nextConcept._id, }).sort('order').then(notes => {
+        const taggedNotes = notes.map(note => {
+          note.queueStatus = 'new'; // eslint-disable-line no-param-reassign
+          return note;
+        });
+        return Promise.resolve({
+          notes: taggedNotes,
+          // successfully added all new notes from concept associated
+          // with current global index, so increment globalIndex
+          globalIndex: nextConcept.globalIndex,
+          nextGlobalIndex: nextConcept.globalIndex + 1,
+        });
+      });
+    });
+}
+
 // Get combination of old and new notes
 // return {
 //   notes:[oldNotes, newNotes],
