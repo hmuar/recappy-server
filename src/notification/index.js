@@ -4,7 +4,6 @@ import AdapterFB from '~/adapter/fbmessenger/fbmessenger';
 import Database from '~/db/db';
 
 function sendNotifications() {
-  console.log('running notify function....');
   const subject = {
     _id: ObjectID('e8af4a4963a400483bb70593'),
   };
@@ -18,7 +17,7 @@ function sendNotifications() {
     subjectID: subject._id,
     senderID: user.senderID,
     userID: user._id,
-    expireDate: new Date('08/29/2017'),
+    expireDate: new Date('08/24/2017'),
   };
 
   const controller = new NotificationController(AdapterFB);

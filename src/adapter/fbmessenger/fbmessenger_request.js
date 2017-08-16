@@ -23,6 +23,7 @@ function getReqTextBody(text) {
     text,
   };
 }
+
 function getReqPayloadBody(text, buttons) {
   const btnData = buttons.map(btn => ({
     type: 'postback',

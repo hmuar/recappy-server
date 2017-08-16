@@ -17,6 +17,7 @@ let subject = null;
 let testUser = null;
 
 const controller = new NotificationController(AdapterFB);
+controller.sendResponse = state => state;
 
 before('before notifications testing', () =>
   db

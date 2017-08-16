@@ -78,6 +78,7 @@ const defaultTopic = {
   weight: 1,
 };
 
+// 22 notes have this concept as parent
 const defaultConcept = {
   _id: ObjectID('7980227254feb46736ca47fd'),
   createdAt: new Date(),
@@ -95,6 +96,7 @@ const defaultConcept = {
   expireDate: new Date('08/10/2017'),
 };
 
+// 10 notes have this concept as parent
 const defaultConcept2 = {
   _id: ObjectID('2980227254feb46732ca491e'),
   createdAt: new Date(),

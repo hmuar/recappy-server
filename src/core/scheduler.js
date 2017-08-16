@@ -62,7 +62,14 @@ export function getOldMaterial(userID, subjectID, numNotes, dueDate) {
 //   notes: [],
 //   nextGlobalIndex,
 // }
-export function getNewMaterial(subjectID, numNotes, globalIndex = 0, prevNotes = []) {
+export function getNewMaterial(
+  subjectID,
+  numNotes,
+  globalIndex = 0,
+  prevNotes = [],
+  // expiration date for concepts (especially for news subject)
+  expireDate = null
+) {
   if (!subjectID || numNotes <= 0) {
     return Promise.resolve({
       notes: [],
@@ -71,11 +78,22 @@ export function getNewMaterial(subjectID, numNotes, globalIndex = 0, prevNotes =
     });
   }
 
-  return Category.findOne({
-    ctype: 'concept',
-    globalIndex,
-    subjectParent: subjectID,
-  }).then(nextConcept => {
+  const conceptQuery = expireDate
+    ? {
+      ctype: 'concept',
+      subjectParent: subjectID,
+      globalIndex: { $gte: globalIndex, },
+        // pull concepts that don't have expire dates.
+        // if concept has expire date field, check against given expire date
+      $or: [{ expireDate: { $gte: expireDate, }, }, { expireDate: { $exists: false, }, }],
+    }
+    : {
+      ctype: 'concept',
+      subjectParent: subjectID,
+      globalIndex: { $gte: globalIndex, },
+    };
+
+  return Category.findOne(conceptQuery).sort({ globalIndex: 1, }).then(nextConcept => {
     if (!nextConcept) {
       log(`Could not find next concept with index ${globalIndex}, returning 0 new notes`);
       return Promise.resolve({
@@ -84,6 +102,9 @@ export function getNewMaterial(subjectID, numNotes, globalIndex = 0, prevNotes =
         nextGlobalIndex: globalIndex,
       });
     }
+
+    const curGlobalIndex = nextConcept.globalIndex;
+
     // XXX: during dev, skip info notes
     return Note.find({ directParent: nextConcept._id, }).sort('order').then(notes => {
       const taggedNotes = notes.map(note => {
@@ -99,57 +120,57 @@ export function getNewMaterial(subjectID, numNotes, globalIndex = 0, prevNotes =
           notes: mergedNotes,
           // successfully added all new notes from concept associated
           // with current global index, so increment globalIndex
-          globalIndex,
-          nextGlobalIndex: globalIndex + 1,
+          globalIndex: curGlobalIndex,
+          nextGlobalIndex: curGlobalIndex + 1,
         });
       }
 
       // recursively get more new material
-      return getNewMaterial(subjectID, numNotes, globalIndex + 1, mergedNotes);
+      return getNewMaterial(subjectID, numNotes, curGlobalIndex + 1, mergedNotes);
     });
   });
 }
 
-export function getNewMaterialWithExpireDate(subjectID, expireDate, minGlobalIndex = 0) {
-  if (!subjectID) {
-    return Promise.resolve({
-      notes: [],
-      globalIndex: minGlobalIndex,
-      nextGlobalIndex: minGlobalIndex,
-    });
-  }
-
-  return Category.findOne({
-    ctype: 'concept',
-    subjectParent: subjectID,
-    globalIndex: { $gte: minGlobalIndex, },
-    expireDate: { $gte: expireDate, },
-  })
-    .sort({ globalIndex: 1, })
-    .then(nextConcept => {
-      if (!nextConcept) {
-        log(`Could not find next concept with min index ${minGlobalIndex}, returning 0 new notes`);
-        return Promise.resolve({
-          notes: [],
-          globalIndex: minGlobalIndex,
-          nextGlobalIndex: minGlobalIndex,
-        });
-      }
-      return Note.find({ directParent: nextConcept._id, }).sort('order').then(notes => {
-        const taggedNotes = notes.map(note => {
-          note.queueStatus = 'new'; // eslint-disable-line no-param-reassign
-          return note;
-        });
-        return Promise.resolve({
-          notes: taggedNotes,
-          // successfully added all new notes from concept associated
-          // with current global index, so increment globalIndex
-          globalIndex: nextConcept.globalIndex,
-          nextGlobalIndex: nextConcept.globalIndex + 1,
-        });
-      });
-    });
-}
+// export function getNewMaterialWithExpireDate(subjectID, expireDate, minGlobalIndex = 0) {
+//   if (!subjectID) {
+//     return Promise.resolve({
+//       notes: [],
+//       globalIndex: minGlobalIndex,
+//       nextGlobalIndex: minGlobalIndex,
+//     });
+//   }
+//
+//   return Category.findOne({
+//     ctype: 'concept',
+//     subjectParent: subjectID,
+//     globalIndex: { $gte: minGlobalIndex, },
+//     expireDate: { $gte: expireDate, },
+//   })
+//     .sort({ globalIndex: 1, })
+//     .then(nextConcept => {
+//       if (!nextConcept) {
+//         log(`Could not find next concept with min index ${minGlobalIndex}, returning 0 new notes`);
+//         return Promise.resolve({
+//           notes: [],
+//           globalIndex: minGlobalIndex,
+//           nextGlobalIndex: minGlobalIndex,
+//         });
+//       }
+//       return Note.find({ directParent: nextConcept._id, }).sort('order').then(notes => {
+//         const taggedNotes = notes.map(note => {
+//           note.queueStatus = 'new'; // eslint-disable-line no-param-reassign
+//           return note;
+//         });
+//         return Promise.resolve({
+//           notes: taggedNotes,
+//           // successfully added all new notes from concept associated
+//           // with current global index, so increment globalIndex
+//           globalIndex: nextConcept.globalIndex,
+//           nextGlobalIndex: nextConcept.globalIndex + 1,
+//         });
+//       });
+//     });
+// }
 
 // Get combination of old and new notes
 // return {
@@ -193,6 +214,6 @@ export function getNextNotes(
     });
 }
 
-export function getStartingNotes(subjectID, numNotes) {
-  return getNewMaterial(subjectID, numNotes);
+export function getStartingNotes(subjectID, numNotes, expireDate = null) {
+  return getNewMaterial(subjectID, numNotes, 0, [], expireDate);
 }

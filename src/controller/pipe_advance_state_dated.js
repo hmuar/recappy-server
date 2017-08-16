@@ -1,19 +1,13 @@
-import { SessionState, getEntryStateForNoteType } from '~/core/session_state';
-import { getNewMaterialWithExpireDate, TARGET_NUM_NOTES_IN_SESSION } from '~/core/scheduler';
-import { EvalStatus, isFailResponse, hasWaitedMinHours } from '~/core/eval';
+import { getEntryStateForNoteType } from '~/core/session_state';
+import { getNewMaterial } from '~/core/scheduler';
 
-function advanceToNextDatedConcept(appState, _expireDate) {
-  const expireDate = _expireDate || new Date();
-  const { userID, subjectID, session, } = appState;
+function advanceToNextDatedConcept(appState) {
+  const expireDate = appState.expireDate || new Date();
+  const { subjectID, session, } = appState;
   const { noteQueue, } = session;
   const targetGlobalIndex = appState.session.nextGlobalIndex;
 
-  return getNewMaterialWithExpireDate(
-    // userID,
-    subjectID,
-    expireDate,
-    targetGlobalIndex
-  ).then(notesInfo => {
+  return getNewMaterial(subjectID, 1, targetGlobalIndex, [], expireDate).then(notesInfo => {
     const nextNotes = notesInfo.notes;
     if (nextNotes && nextNotes.length > 0) {
       // MUTATE session's noteQueue by inserting new notes into location
@@ -54,8 +48,7 @@ function advanceToNextDatedConcept(appState, _expireDate) {
   });
 }
 
-export default function pipe(appState, _expireDate) {
-  const expireDate = _expireDate || appState.expireDate || new Date();
-  const nextAppState = advanceToNextDatedConcept(appState, expireDate);
+export default function pipe(appState) {
+  const nextAppState = advanceToNextDatedConcept(appState);
   return nextAppState;
 }

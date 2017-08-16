@@ -1,19 +1,14 @@
 // Controller for notifications
-import DBAssist from '~/db/category_assistant';
-import { log, logErr, logState } from '~/logger';
 import pipeAddSession from '~/controller/pipe_add_session';
-import pipeRecord from '~/controller/pipe_record';
-import pipeEval from '~/controller/pipe_eval';
 import pipeAdvanceStateDated from '~/controller/pipe_advance_state_dated';
 import pipeSaveSession from '~/controller/pipe_save_session';
-import pipeStudentModel from '~/controller/pipe_student_model';
-import pipeAdjustQueue from '~/controller/pipe_adjust_queue';
 import pipeAddPaths from '~/controller/pipe_add_paths';
 
 export default class NotificationController {
   constructor(adapter) {
     this.adapter = adapter;
   }
+
   sendResponse(state) {
     // return state;
     return this.adapter.sendResponse(state);
@@ -34,7 +29,7 @@ export default class NotificationController {
   send(sendInfo) {
     const appState = sendInfo;
     return (
-      pipeAddSession(appState, [])
+      pipeAddSession(appState)
         // at this point should have session information
         // advance session state
         .then(state => pipeAdvanceStateDated(state))

@@ -89,6 +89,8 @@ export default class Controller {
           const appState = {
             ...msg,
             subjectID: subject._id,
+            // TODO: find different way to merge in an expire date
+            expireDate: msg.subjectName === 'news' ? new Date() : null,
           };
           // convert adapter specific sender id into app user
           return (

@@ -49,13 +49,14 @@ test('schedule combined old and new notes', t =>
   }));
 
 test('schedule new notes based on expireDate early', t =>
-  getNewMaterialWithExpireDate(subject._id, new Date('08/10/2017')).then(nextNotesInfo => {
+  getNewMaterial(subject._id, 20, 0, [], new Date('08/10/2017')).then(nextNotesInfo => {
     const nextNotes = nextNotesInfo.notes;
+    console.log(nextNotesInfo.notes.map(n => n.directParent));
     t.equal(nextNotes.length, 22);
   }));
 
 test('schedule new notes based on expireDate late', t =>
-  getNewMaterialWithExpireDate(subject._id, new Date('08/11/2017')).then(nextNotesInfo => {
+  getNewMaterial(subject._id, 20, 0, [], new Date('08/11/2017')).then(nextNotesInfo => {
     const nextNotes = nextNotesInfo.notes;
     t.equal(nextNotes.length, 10);
   }));
