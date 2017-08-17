@@ -63,11 +63,24 @@ export default function pipe(appState) {
               remainingNotes = queue.slice(session.queueIndex + 1, queue.length);
               newBaseQueueLength = session.baseQueueLength + notes.length;
             }
+            /*
+            originSubjectParent is needed to track the subject
+            parent of the original note. This is because paths can be added
+            with notes from entirely different subjects. We need to know
+            what the original subject is so that note records can properly
+            refer to this, and so the proper old review notes can be queried
+            if user is studying original subject, as opposed to whatever subject
+            these path notes came from.
+            */
+            const originSubjectParent = curNote.originSubjectParent
+              ? curNote.originSubjectParent
+              : curNote.subjectParent;
             const adjustedNoteQueue = [
               ...queue.slice(0, session.queueIndex + 1),
               ...notes.map(n => ({
                 ...n,
                 addedFromPath: path.catId,
+                originSubjectParent,
               })),
               ...remainingNotes
             ];

@@ -313,7 +313,7 @@ export function sendFeedbackResp(state, withSuccessMedia = false) {
     case SessionState.INTRO: {
       const toID = state.senderID;
       // const msg = "Hey! 🤗 Have you ever tried to learn something and then realize later you forgot everything? Learning the right way can be tough on your own. That's why I'm here! Every day we chat we'll learn something new together. Most importantly, we'll always spend some of our time reviewing what we've already learned so we won't forget. Let's go, it's learnin time wooo! 😄";
-      const msg = "Hey! 🤗 I'm here to help you explore the news we can really get to the bottom of what is going on. We'll always spend some of our time reviewing what we've already learned in previous days so we won't forget. K let's do it! 😄";
+      const msg = "Hey! 🤗 I'm here to help you explore the news and really try to understand the important stuff beneath it all. And we'll always review previously learned concepts so we don't forget. K let's do it! 😄";
       return sendText(toID, msg).then(() => state);
     }
     case SessionState.RECALL_RESPONSE:

@@ -1,5 +1,5 @@
 import SpacedRep from '~/core/spaced_repetition';
-import { SessionState } from '~/core/session_state';
+import { SessionState, getCurrentNote } from '~/core/session_state';
 import { NoteRecord } from '~/db/collection';
 import { EvalStatus } from '~/core/eval';
 import { log } from '~/logger';
@@ -129,12 +129,12 @@ function pipePathHistory(recordCtx, record, evalCtx) {
   return recordCtx;
 }
 
-function createNewRecord(userID, note, recordCtx) {
+function createNewRecord(userID, note, recordCtx, subjectParent) {
   const recData = {
     userID,
     noteID: note._id,
     noteType: note.type,
-    subjectParent: note.parent[0],
+    subjectParent,
   };
   const newRecord = {
     ...recordCtx,
@@ -176,7 +176,7 @@ export default function pipe(appState) {
     return appState;
   }
 
-  const note = noteQueue[queueIndex];
+  const note = getCurrentNote(session);
   const evalCtx = appState.evalCtx;
 
   return NoteRecord.findOne({
@@ -199,8 +199,12 @@ export default function pipe(appState) {
         recordCtx,
       }));
     }
+
+    // originSubjectParent helps resolve differences if note was added from
+    // a path from an entirely different subject than original subject
+    const subjectParent = note.originSubjectParent ? note.originSubjectParent : note.subjectParent;
     // need to create new record
-    return createNewRecord(appState.userID, note, recordCtx).then(() => ({
+    return createNewRecord(appState.userID, note, recordCtx, subjectParent).then(() => ({
       ...appState,
       recordCtx,
     }));

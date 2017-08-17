@@ -75,6 +75,7 @@ const noteSchema = new mongoose.Schema({
   displayRaw: String,
   globalIndex: Number,
   subjectParent: mongoose.Schema.Types.ObjectId,
+  originSubjectParent: mongoose.Schema.Types.ObjectId,
   directParent: mongoose.Schema.Types.ObjectId,
   // queueStatus is used by scheduler to tag notes in session
   // as 'old' or 'new'

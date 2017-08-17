@@ -26,12 +26,13 @@ export function getOldMaterial(userID, subjectID, numNotes, dueDate) {
   })
     .select({ _id: 0, noteID: 1, due: 1, })
     .limit(numNotes)
-    .then(dueNotes => dueNotes.map(item => {
+    .then(dueNotes =>
+      dueNotes.map(item => {
         // create map of noteID to due date so it can be ordered later
-      dueMap[item.noteID.toString()] = item.due;
+        dueMap[item.noteID.toString()] = item.due;
         // map each note to its noteID
-      return item.noteID;
-    }))
+        return item.noteID;
+      }))
     .then(noteIDs => Note.find({ _id: { $in: noteIDs, }, }))
     .then(notes =>
       notes.map(note => {
@@ -113,19 +114,19 @@ export function getNewMaterial(
       const mergedNotes = [...prevNotes, ...taggedNotes];
       // terminate and return results
       // if (mergedNotes.length >= numNotes || globalIndex >= MAX_GLOBAL_INDEX) {
-      if (mergedNotes.length >= numNotes) {
-        // log(`Got enough notes, returning ${mergedNotes.length} notes`);
-        return Promise.resolve({
-          notes: mergedNotes,
-          // successfully added all new notes from concept associated
-          // with current global index, so increment globalIndex
-          globalIndex: curGlobalIndex,
-          nextGlobalIndex: curGlobalIndex + 1,
-        });
-      }
+      // if (mergedNotes.length >= numNotes) {
+      // log(`Got enough notes, returning ${mergedNotes.length} notes`);
+      return Promise.resolve({
+        notes: mergedNotes,
+        // successfully added all new notes from concept associated
+        // with current global index, so increment globalIndex
+        globalIndex: curGlobalIndex,
+        nextGlobalIndex: curGlobalIndex + 1,
+      });
+      // }
 
       // recursively get more new material
-      return getNewMaterial(subjectID, numNotes, curGlobalIndex + 1, mergedNotes);
+      // return getNewMaterial(subjectID, numNotes, curGlobalIndex + 1, mergedNotes);
     });
   });
 }
