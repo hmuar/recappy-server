@@ -39,11 +39,19 @@ export default class NotificationController {
       pipeAddSession(appState)
         // at this point should have session information
         // advance session state
+        .then(state => {
+          console.log(state);
+          return state;
+        })
         .then(state => pipeAdvanceStateDated(state))
         .then(state => pipeAddPaths(state))
         // record new session state
         .then(state => pipeSaveSession(state))
         // .then(state => this.logCurrentState(state))
+        .then(state => {
+          console.log(state);
+          return state;
+        })
         .then(state => this.sendResponse(state))
     );
   }

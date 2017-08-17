@@ -96,6 +96,10 @@ export default class Controller {
           return (
             this.pipeUser(appState)
               // at this point should have app user information
+              .then(state => {
+                console.log(state);
+                return state;
+              })
               .then(state => pipeAddSession(state))
               // at this point should have session information
               // need to evaluate msg in context of current state

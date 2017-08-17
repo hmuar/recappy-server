@@ -9,15 +9,14 @@ function sendNotifications() {
   };
 
   const user = {
-    _id: ObjectID('590f4c9e67583966e494cc15'),
-    senderID: '1555878001098324',
+    _id: ObjectID('590269208b70a3809d95deb5'),
+    senderID: '1028279607252642',
   };
 
   const sendInfo = {
     subjectID: subject._id,
     senderID: user.senderID,
     userID: user._id,
-    // expireDate: new Date('08/24/2017'),
     expireDate: new Date(),
   };
 
