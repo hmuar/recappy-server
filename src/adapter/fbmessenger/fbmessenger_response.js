@@ -7,6 +7,7 @@ import { NoteType, isPromptNote } from '~/core/note';
 import {
   generateQuestion,
   backToOriginalTopic,
+  reviewTime,
   positiveEncourage,
   negativeEncourage,
   triggerFollowup,
@@ -21,7 +22,6 @@ import {
 import Answer from '~/core/answer';
 import { logErr } from '~/logger';
 import { Media } from '~/db/collection';
-import CategoryAssistant from '~/db/category_assistant';
 import { sendText, sendImage, sendQuickReply, sendButtons } from './fbmessenger_request';
 
 function sendImageWithUrl(senderID, imgUrl) {
@@ -43,19 +43,25 @@ export function sendPossibleImage(senderID, note) {
 // prepend a message stating "Ok back to ......" if the user had
 // jumped down a path and is not coming back to main topic
 function prependPendingMessages(appState, msg) {
-  // if (appState.transitionFromPathToMain) {
-  //   const curNote = getCurrentNote(appState.session);
-  //   const curNoteParent = curNote.directParent;
-  //   return CategoryAssistant.getCategoryById(curNoteParent).then(
-  //     parent => `${backToOriginalTopic(parent.ckey)} ${msg}`
-  //   );
-  // }
+  const { transition, } = appState;
+  if (transition) {
+    const { parentDescription, } = transition;
+    if (parentDescription) {
+      if (transition.queueStatus && transition.queueStatus.newToOld) {
+        return `${reviewTime(parentDescription)} ${msg}`;
+      }
+      if (transition.depth && transition.depth.backToParentDepth) {
+        return `${backToOriginalTopic(parentDescription)} ${msg}`;
+      }
+    }
+  }
   return Promise.resolve(msg);
 }
 
 function sendResponseInContext(state) {
   const fbUserID = state.senderID;
-  const session = state.session;
+  const { session, } = state;
+
   const note = session.noteQueue[session.queueIndex];
   switch (session.state) {
     // case SessionState.INIT:

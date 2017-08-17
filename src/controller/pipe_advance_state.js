@@ -1,6 +1,7 @@
-import { SessionState, getEntryStateForNoteType } from '~/core/session_state';
+import { SessionState, getEntryStateForNoteType, QueueStatus } from '~/core/session_state';
 import { getNextNotes, TARGET_NUM_NOTES_IN_SESSION } from '~/core/scheduler';
 import { EvalStatus, isFailResponse, hasWaitedMinHours } from '~/core/eval';
+import CategoryAssistant from '~/db/category_assistant';
 
 // Given current info in app state, determine next study state for user.
 // Only need to look at current session state to determine next state.
@@ -164,7 +165,9 @@ function advanceState(appState) {
       let nextSessionState = appState.postEvalState;
       let nextQueueIndex = queueIndex;
 
-      let transitionFromPathToMain = false;
+      // let transitionFromBranchToMain = false;
+      let transitionBackToParentDepth = false;
+      let transitionNewToOld = false;
 
       if (noteQueue && queueIndex != null) {
         // only advance queue if waiting for next in queue
@@ -173,13 +176,24 @@ function advanceState(appState) {
           nextQueueIndex = queueIndex + 1;
         }
         if (nextQueueIndex < noteQueue.length) {
+          const curNote = noteQueue[queueIndex];
           const nextNote = noteQueue[nextQueueIndex];
-          nextSessionState = getEntryStateForNoteType(nextNote.type);
-          const curAddFromPath = noteQueue[queueIndex].addedFromPath;
-          const nextAddFromPath = noteQueue[nextQueueIndex].addedFromPath;
-          if (curAddFromPath && nextAddFromPath && curAddFromPath !== nextAddFromPath) {
-            transitionFromPathToMain = true;
+          const curBranchDepth = curNote.branchDepth || 0;
+          const nextBranchDepth = nextNote.branchDepth || 0;
+          // const curAddFromBranch = noteQueue[queueIndex].addedFromBranch;
+          // const nextAddFromBranch = noteQueue[nextQueueIndex].addedFromBranch;
+          // if (curAddFromBranch && !nextAddFromBranch) {
+          //   transitionFromBranchToMain = true;
+          // }
+          // check for depth transition
+          if (curBranchDepth > nextBranchDepth) {
+            transitionBackToParentDepth = true;
           }
+          // check for queueStatus transition
+          if (curNote.queueStatus === QueueStatus.NEW && nextNote.queueStatus === QueueStatus.OLD) {
+            transitionNewToOld = true;
+          }
+          nextSessionState = getEntryStateForNoteType(nextNote.type);
         } else {
           const { startSessionTime, } = appState.session;
           // if user has already waited minimum amount of hours, dont allow
@@ -190,9 +204,7 @@ function advanceState(appState) {
           // us prematurely ending their day after just a few notes just because
           // they have reached the end of current concept.
 
-          const { success: sessionWaitTimeReached, waitedHours, } = hasWaitedMinHours(
-            startSessionTime
-          );
+          const { success: sessionWaitTimeReached, } = hasWaitedMinHours(startSessionTime);
 
           if (startSessionTime && sessionWaitTimeReached) {
             return advanceToNextConcept(appState, new Date());
@@ -202,9 +214,25 @@ function advanceState(appState) {
         }
       }
 
-      return {
+      const markedTransition = transitionBackToParentDepth || transitionNewToOld;
+      // if we detected a transition, need to grab ckey of new parent concept
+      let extraFetch = Promise.resolve(null);
+      if (markedTransition) {
+        const nextNote = noteQueue[nextQueueIndex];
+        extraFetch = CategoryAssistant.getCategoryById(nextNote.directParent);
+      }
+
+      return extraFetch.then(parentInfo => ({
         ...appState,
-        transitionFromPathToMain,
+        transition: {
+          depth: {
+            backToParentDepth: transitionBackToParentDepth,
+          },
+          queueStatus: {
+            newToOld: transitionNewToOld,
+          },
+          parentDescription: parentInfo ? parentInfo.ckey : null,
+        },
         session: {
           ...appState.session,
           queueIndex: nextQueueIndex,
@@ -213,7 +241,7 @@ function advanceState(appState) {
             ? new Date()
             : appState.session.lastCompleted,
         },
-      };
+      }));
     }
 
     if (appState.postEvalState) {

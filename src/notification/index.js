@@ -22,7 +22,7 @@ function sendNotifications() {
   };
 
   const controller = new NotificationController(AdapterFB);
-  return controller.send(sendInfo).then(state => {});
+  return controller.send(sendInfo);
 }
 
 function notify() {

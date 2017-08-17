@@ -30,7 +30,7 @@ function createNewSimRecord(appState) {
   // update seenNotes count
   const { session, } = appState;
   const { simulator, } = session;
-  // const newNotes = noteQueue.slice(0, baseQueueLength).filter(n => n.queueStatus === 'new');
+  // const newNotes = noteQueue.slice(0, baseQueueLength).filter(n => n.queueStatus === QueueStatus.NEW);
   // const oldNotesSeen = simulator.notesSeen ? simulator.notesSeen : 0;
   // const notesSeen = oldNotesSeen + newNotes.length;
 

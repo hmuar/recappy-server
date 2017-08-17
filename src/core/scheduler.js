@@ -1,4 +1,5 @@
 import { targetNumNotesInSession, maxNotesInQueue } from '~/core/hyperparam';
+import { QueueStatus } from '~/core/session_state';
 import { NoteRecord, Category, Note } from '~/db/collection';
 import { log } from '~/logger';
 import _ from 'lodash';
@@ -38,7 +39,7 @@ export function getOldMaterial(userID, subjectID, numNotes, dueDate) {
       notes.map(note => {
         const noteIDString = note._id.toString();
         note.dueDate = dueMap[noteIDString]; // eslint-disable-line no-param-reassign
-        note.queueStatus = 'old'; // eslint-disable-line no-param-reassign
+        note.queueStatus = QueueStatus.OLD; // eslint-disable-line no-param-reassign
         return note;
       }))
     .then(notes =>
@@ -108,7 +109,7 @@ export function getNewMaterial(
     // XXX: during dev, skip info notes
     return Note.find({ directParent: nextConcept._id, }).sort('order').then(notes => {
       const taggedNotes = notes.map(note => {
-        note.queueStatus = 'new'; // eslint-disable-line no-param-reassign
+        note.queueStatus = QueueStatus.NEW; // eslint-disable-line no-param-reassign
         return note;
       });
       const mergedNotes = [...prevNotes, ...taggedNotes];
@@ -158,7 +159,7 @@ export function getNewMaterial(
 //       }
 //       return Note.find({ directParent: nextConcept._id, }).sort('order').then(notes => {
 //         const taggedNotes = notes.map(note => {
-//           note.queueStatus = 'new'; // eslint-disable-line no-param-reassign
+//           note.queueStatus = QueueStatus.NEW; // eslint-disable-line no-param-reassign
 //           return note;
 //         });
 //         return Promise.resolve({

@@ -20,6 +20,15 @@ export function backToOriginalTopic(topic) {
   return `${randomChoice(ORIGINAL_TOPIC_PHRASES)} ${topic}.`;
 }
 
+const REVIEW_PHRASES = [
+  "Let's do a little review of past topics, starting with",
+  "Review time! Let's start with"
+];
+
+export function reviewTime(topic) {
+  return `${randomChoice(REVIEW_PHRASES)} ${topic}.`;
+}
+
 const POS_ENCOURAGE_PHRASES = [
   'great job!',
   'nice!',
@@ -55,7 +64,7 @@ const WRONG_ANSWER_PHRASE = [
 ];
 
 export function wrongAnswer(correctAnswer) {
-  return `${randomChoice(WRONG_ANSWER_PHRASE)} ${correctAnswer}`;
+  return `${randomChoice(WRONG_ANSWER_PHRASE)} '${correctAnswer}'`;
 }
 
 const TRIGGER_FOLLOWUP_PHRASE = ['The actual answer is', 'So the answer is actually'];

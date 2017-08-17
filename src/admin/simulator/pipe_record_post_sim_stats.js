@@ -5,6 +5,7 @@
 **/
 
 import { Simulation, NoteRecord } from '~/db/collection';
+import { QueueStatus } from '~/core/session_state';
 
 function getAllNoteRecords(userID, subjectID) {
   // dont query info notes
@@ -35,7 +36,9 @@ function updateSimRecord(appState, skipDay) {
     const simStep = simulator.step;
     const simRec = simRecords[simStep];
 
-    const newNotes = noteQueue.slice(0, baseQueueLength).filter(n => n.queueStatus === 'new');
+    const newNotes = noteQueue
+      .slice(0, baseQueueLength)
+      .filter(n => n.queueStatus === QueueStatus.NEW);
     const oldNotesSeen = simulator.notesSeen ? simulator.notesSeen : 0;
     const notesSeen = skipDay ? oldNotesSeen : oldNotesSeen + newNotes.length;
 

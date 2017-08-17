@@ -1,5 +1,5 @@
 import { isFailResponse, EvalStatus } from '~/core/eval';
-import { SessionState, getCurrentNote } from '~/core/session_state';
+import { SessionState, getCurrentNote, QueueStatus } from '~/core/session_state';
 import Input from '~/core/input';
 import CategoryAssistant from '~/db/category_assistant';
 import { log } from '~/logger';
@@ -54,13 +54,16 @@ export default function pipe(appState) {
             // if this is a prompt note, we want to clear out rest of queue
             // else, just add back the rest of the queue after slicing
             // the new path notes into the middle
-            let remainingNotes = [];
+            let remainingNotes = queue.slice(session.queueIndex + 1, queue.length);
             let newBaseQueueLength = 0;
             if (isPrompt) {
-              remainingNotes = [];
-              newBaseQueueLength = session.queueIndex + 1 + notes.length;
+              const newRemainingNotes = remainingNotes.filter(
+                n => n.queueStatus !== QueueStatus.NEW
+              );
+              const numNotesRemoved = remainingNotes.length - newRemainingNotes.length;
+              remainingNotes = newRemainingNotes;
+              newBaseQueueLength = session.baseQueueLength - numNotesRemoved + notes.length;
             } else {
-              remainingNotes = queue.slice(session.queueIndex + 1, queue.length);
               newBaseQueueLength = session.baseQueueLength + notes.length;
             }
             /*
@@ -79,8 +82,10 @@ export default function pipe(appState) {
               ...queue.slice(0, session.queueIndex + 1),
               ...notes.map(n => ({
                 ...n,
-                addedFromPath: path.catId,
+                // addedFromBranch: path.catId,
+                branchDepth: (curNote.branchDepth || 0) + 1,
                 originSubjectParent,
+                queueStatus: QueueStatus.NEW,
               })),
               ...remainingNotes
             ];

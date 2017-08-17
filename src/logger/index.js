@@ -63,7 +63,6 @@ export function logState(appState) {
     paths,
     preEvalState,
     postEvalState,
-    transitionFromPathToMain,
   } = appState;
   const { queueIndex, state, globalIndex, } = session;
   let noteType = 'None';
@@ -80,12 +79,11 @@ export function logState(appState) {
     paths,
     state: `${preEvalState} --> ${postEvalState} --> ${state}`,
     globalIndex,
-    transitionFromPathToMain,
     queue: session.noteQueue.map((note, i) => ({
       i,
       display: note.displayRaw.slice(0, 10),
       type: note.type,
-      addedFromPath: note.addedFromPath,
+      // addedFromBranch: note.addedFromBranch,
     })),
   };
   fileLogger.log('info', '-------------------------------------------------');

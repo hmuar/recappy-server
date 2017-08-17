@@ -1,3 +1,8 @@
+export const QueueStatus = {
+  NEW: 'new',
+  OLD: 'old',
+};
+
 // SessionState represents the state of user study session
 // in the context of notes. All states have something to do with
 // what note user is currently on, waiting for note, waiting to start
