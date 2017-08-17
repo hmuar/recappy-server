@@ -202,7 +202,8 @@ export function getNextNotes(
       return getNewMaterial(subjectID, newNotesNum, globalIndex);
     })
     .then(newNotesInfo => {
-      result = [...result, ...newNotesInfo.notes];
+      // add new notes first, then old notes
+      result = [...newNotesInfo.notes, ...result];
       // remove duplicate notes that were in both old and new lists
       const uniqResult = _.uniqBy(result, elem => elem._id.toString());
       return {
