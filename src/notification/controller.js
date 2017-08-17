@@ -3,6 +3,7 @@ import pipeAddSession from '~/controller/pipe_add_session';
 import pipeAdvanceStateDated from '~/controller/pipe_advance_state_dated';
 import pipeSaveSession from '~/controller/pipe_save_session';
 import pipeAddPaths from '~/controller/pipe_add_paths';
+import { SessionState } from '~/core/session_state';
 
 export default class NotificationController {
   constructor(adapter) {
@@ -10,8 +11,14 @@ export default class NotificationController {
   }
 
   sendResponse(state) {
-    // return state;
-    return this.adapter.sendResponse(state);
+    const session = state.session;
+    // only send response if session has notes and is not done
+    if (
+      session.noteQueue && session.noteQueue.length && session.state !== SessionState.DONE_QUEUE
+    ) {
+      return this.adapter.sendResponse(state);
+    }
+    return state;
   }
 
   /*
@@ -38,10 +45,6 @@ export default class NotificationController {
         .then(state => pipeSaveSession(state))
         // .then(state => this.logCurrentState(state))
         .then(state => this.sendResponse(state))
-      // don't include this in return chain because this final update
-      // can happen asynchronously
-      // pipeStudentModel(state);
-      // state
     );
   }
 }

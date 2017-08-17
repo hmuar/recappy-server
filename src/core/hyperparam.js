@@ -1,7 +1,7 @@
 import { isProduction } from '~/core/production';
 
 const prodTargetNumNotesInSession = 15;
-const devTargetNumNotesInSession = 1;
+const devTargetNumNotesInSession = 10;
 
 export const targetNumNotesInSession = isProduction()
   ? prodTargetNumNotesInSession

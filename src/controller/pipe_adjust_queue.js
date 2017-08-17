@@ -3,6 +3,7 @@ import { SessionState, getCurrentNote } from '~/core/session_state';
 import Input from '~/core/input';
 import CategoryAssistant from '~/db/category_assistant';
 import { log } from '~/logger';
+import { isPromptNote } from '~/core/note';
 
 const adjustableStates = [
   SessionState.INFO,
@@ -45,20 +46,36 @@ export default function pipe(appState) {
       // and probably just wanted to advance current queue
       if (path != null) {
         return CategoryAssistant.getAllChildNotes(path.catId, true).then(notes => {
+          const curNote = getCurrentNote(session);
+          const isPrompt = isPromptNote(curNote);
+
           if (notes && notes.length) {
             const queue = session.noteQueue;
+            // if this is a prompt note, we want to clear out rest of queue
+            // else, just add back the rest of the queue after slicing
+            // the new path notes into the middle
+            let remainingNotes = [];
+            let newBaseQueueLength = 0;
+            if (isPrompt) {
+              remainingNotes = [];
+              newBaseQueueLength = session.queueIndex + 1 + notes.length;
+            } else {
+              remainingNotes = queue.slice(session.queueIndex + 1, queue.length);
+              newBaseQueueLength = session.baseQueueLength + notes.length;
+            }
             const adjustedNoteQueue = [
               ...queue.slice(0, session.queueIndex + 1),
               ...notes.map(n => ({
                 ...n,
                 addedFromPath: path.catId,
               })),
-              ...queue.slice(session.queueIndex + 1, queue.length)
+              ...remainingNotes
             ];
+
             const adjustedSession = {
               ...session,
               noteQueue: adjustedNoteQueue,
-              baseQueueLength: session.baseQueueLength + notes.length,
+              baseQueueLength: newBaseQueueLength,
             };
             return {
               ...appState,

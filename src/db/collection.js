@@ -70,6 +70,7 @@ const noteSchema = new mongoose.Schema({
   parent: [mongoose.Schema.Types.ObjectId],
   phrase: Object,
   paths: [],
+  label: [],
   ckey: String,
   displayRaw: String,
   globalIndex: Number,

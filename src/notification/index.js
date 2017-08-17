@@ -17,7 +17,8 @@ function sendNotifications() {
     subjectID: subject._id,
     senderID: user.senderID,
     userID: user._id,
-    expireDate: new Date('08/24/2017'),
+    // expireDate: new Date('08/24/2017'),
+    expireDate: new Date(),
   };
 
   const controller = new NotificationController(AdapterFB);

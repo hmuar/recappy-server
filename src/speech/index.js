@@ -94,17 +94,16 @@ export function doneSession() {
   return randomChoice(SESSION_DONE_PHRASE);
 }
 
-const CONTINUE_PHRASE = [
-  'got it, keep going',
-  "what's next?",
-  'keep going',
-  'got it',
-  'ok',
-  'alright'
-];
+const CONTINUE_PHRASE = ['got it, keep going', "what's next?", 'got it', 'ok', 'alright'];
 
 export function keepGoing() {
   return randomChoice(CONTINUE_PHRASE);
+}
+
+const SKIP_PHRASE = ['what else is there?', 'skip this', "i'm not interested"];
+
+export function skipThis() {
+  return randomChoice(SKIP_PHRASE);
 }
 
 const GET_IT_RIGHT_QUESTION_PHRASE = [

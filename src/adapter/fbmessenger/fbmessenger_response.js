@@ -2,6 +2,7 @@ import { SessionState, getCurrentNote } from '~/core/session_state';
 import Input, { getChoiceInput, getPathInput } from '~/core/input';
 import { isValidEval, isFailResponse } from '~/core/eval';
 import { divideLongText } from '~/core/text_utils';
+import { NoteType, isPromptNote } from '~/core/note';
 
 import {
   generateQuestion,
@@ -13,19 +14,15 @@ import {
   welcomeBack,
   doneSession,
   keepGoing,
+  skipThis,
   isThatWhatYouThought,
   theAnswerWas
 } from '~/speech';
 import Answer from '~/core/answer';
 import { logErr } from '~/logger';
 import { Media } from '~/db/collection';
-import { NoteType } from '~/core/note';
 import CategoryAssistant from '~/db/category_assistant';
 import { sendText, sendImage, sendQuickReply, sendButtons } from './fbmessenger_request';
-
-function continuePhrase() {
-  return keepGoing();
-}
 
 function sendImageWithUrl(senderID, imgUrl) {
   if (!imgUrl) {
@@ -78,10 +75,17 @@ function sendResponseInContext(state) {
         ];
       }
 
-      quickReplyData.push({
-        title: continuePhrase(),
-        action: Input.Type.ACCEPT,
-      });
+      if (isPromptNote(note)) {
+        quickReplyData.push({
+          title: skipThis(),
+          action: Input.Type.ACCEPT,
+        });
+      } else {
+        quickReplyData.push({
+          title: keepGoing(),
+          action: Input.Type.ACCEPT,
+        });
+      }
 
       return sendPossibleImage(fbUserID, note)
         .then(() => prependPendingMessages(state, displayText))
@@ -168,7 +172,7 @@ function sendResponseInContext(state) {
           action: getPathInput(path.index),
         })),
         {
-          title: continuePhrase(),
+          title: keepGoing(),
           action: Input.Type.ACCEPT,
         }
       ];
@@ -309,7 +313,7 @@ export function sendFeedbackResp(state, withSuccessMedia = false) {
     case SessionState.INTRO: {
       const toID = state.senderID;
       // const msg = "Hey! 🤗 Have you ever tried to learn something and then realize later you forgot everything? Learning the right way can be tough on your own. That's why I'm here! Every day we chat we'll learn something new together. Most importantly, we'll always spend some of our time reviewing what we've already learned so we won't forget. Let's go, it's learnin time wooo! 😄";
-      const msg = "Hey! 🤗 The news isn't always easy to understand. I'm here to help you explore so we can really get to the bottom of what is going on. Most importantly, we'll always spend some of our time reviewing what we've already learned in previous days so we won't forget. Let's go, it's exploring time wooo! 😄";
+      const msg = "Hey! 🤗 I'm here to help you explore the news we can really get to the bottom of what is going on. We'll always spend some of our time reviewing what we've already learned in previous days so we won't forget. K let's do it! 😄";
       return sendText(toID, msg).then(() => state);
     }
     case SessionState.RECALL_RESPONSE:

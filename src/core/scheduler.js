@@ -26,13 +26,12 @@ export function getOldMaterial(userID, subjectID, numNotes, dueDate) {
   })
     .select({ _id: 0, noteID: 1, due: 1, })
     .limit(numNotes)
-    .then(dueNotes =>
-      dueNotes.map(item => {
+    .then(dueNotes => dueNotes.map(item => {
         // create map of noteID to due date so it can be ordered later
-        dueMap[item.noteID.toString()] = item.due;
+      dueMap[item.noteID.toString()] = item.due;
         // map each note to its noteID
-        return item.noteID;
-      }))
+      return item.noteID;
+    }))
     .then(noteIDs => Note.find({ _id: { $in: noteIDs, }, }))
     .then(notes =>
       notes.map(note => {
@@ -184,10 +183,9 @@ export function getNextNotes(
   userID,
   subjectID,
   globalIndex = 0,
-  num = TARGET_NUM_NOTES_IN_SESSION,
+  numNotes = TARGET_NUM_NOTES_IN_SESSION,
   dueDate = null
 ) {
-  const numNotes = num == null ? TARGET_NUM_NOTES_IN_SESSION : num;
   if (numNotes <= 0) {
     return Promise.resolve({ notes: [], globalIndex, nextGlobalIndex: globalIndex, });
   }
