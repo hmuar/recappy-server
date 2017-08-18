@@ -1,5 +1,5 @@
 // ----- INIT APP
-curl -ik -X POST "https://graph.facebook.com/v2.6/me/subscribed_apps?access_token=EAALQvUFfW48BAORZCiRFxYMjRCEkTR09UHwX9iSMvmwGrZBqnZCzMujMxwZBk6BJhqiKbRwI5bObj5iM7DMrOYteqOxr1KuXPWpVKip4ZAbeXlY2XqX0A5l8XZBYodotQ9CSlNIhkte9xwZCAglCW0azhWZB4SK0PnEkDcp9rIoRWAZDZD"
+curl -ik -X POST "https://graph.facebook.com/v2.6/me/subscribed_apps?access_token=EAAIkwPmW9ZB4BANa7znQfuhmZCGNdlHWsjpGRdcu3rhpuqJlFrj8miw3YAso8E5g45LdsGG4dZBvqQXCYpZCC6qpmkZCXGydyhzYtZAqfLZB3MPxyhREcCi411Ka6pIXQ9xxZAZCrtGa1j9bN2AiZCMazJ4B19qTj2PlI7fHvAN9hR5wZDZD"
 
 
 // ----- GET STARTED BUTTON:
@@ -11,7 +11,7 @@ curl -X POST -H "Content-Type: application/json" -d '{
 
 
 // ----- GET USER DETAILS
-curl -X GET "https://graph.facebook.com/v2.6/1028279607252642?fields=first_name,last_name,locale,timezone,gender&access_token=EAALQvUFfW48BAORZCiRFxYMjRCEkTR09UHwX9iSMvmwGrZBqnZCzMujMxwZBk6BJhqiKbRwI5bObj5iM7DMrOYteqOxr1KuXPWpVKip4ZAbeXlY2XqX0A5l8XZBYodotQ9CSlNIhkte9xwZCAglCW0azhWZB4SK0PnEkDcp9rIoRWAZDZD"
+curl -X GET "https://graph.facebook.com/v2.6/1028279607252642?fields=first_name,last_name,locale,timezone,gender&access_token=EAAIkwPmW9ZB4BANa7znQfuhmZCGNdlHWsjpGRdcu3rhpuqJlFrj8miw3YAso8E5g45LdsGG4dZBvqQXCYpZCC6qpmkZCXGydyhzYtZAqfLZB3MPxyhREcCi411Ka6pIXQ9xxZAZCrtGa1j9bN2AiZCMazJ4B19qTj2PlI7fHvAN9hR5wZDZD"
 
 // ----- TYPING INDICATOR
 curl -X POST -H "Content-Type: application/json" -d '{
@@ -19,4 +19,4 @@ curl -X POST -H "Content-Type: application/json" -d '{
   	"id":"USER_ID"
   },
   "sender_action":"typing_on"
-}' "https://graph.facebook.com/v2.6/me/messages?access_token=EAAIkwPmW9ZB4BAMAHw6RVbqST0UO9TKvfRNS9s4uU2IPkzmrphUgehvRiy9yksf5PrpHKN16tuFTieI63haZBfBL94S55fIdszO5ZBC2AVpfdd5omurFx9Hwj9wr1FqZBZAZAG8qfZAw1ck33okB1yMQQzSWZAKD6pReCFvLJZC2pMAZDZD"
+}' "https://graph.facebook.com/v2.6/me/messages?access_token=EAAIkwPmW9ZB4BANa7znQfuhmZCGNdlHWsjpGRdcu3rhpuqJlFrj8miw3YAso8E5g45LdsGG4dZBvqQXCYpZCC6qpmkZCXGydyhzYtZAqfLZB3MPxyhREcCi411Ka6pIXQ9xxZAZCrtGa1j9bN2AiZCMazJ4B19qTj2PlI7fHvAN9hR5wZDZD"

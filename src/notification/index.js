@@ -9,8 +9,8 @@ function sendNotifications() {
   };
 
   const user = {
-    _id: ObjectID('590269208b70a3809d95deb5'),
-    senderID: '1028279607252642',
+    _id: ObjectID('5996ee1a62421a9b5e1def1f'),
+    senderID: '1555878001098324',
   };
 
   const sendInfo = {

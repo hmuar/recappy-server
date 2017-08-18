@@ -7,15 +7,21 @@ const BaseConfig = {
 
 const ProdConfig = {
   ...BaseConfig,
-  FBToken: 'EAAIkwPmW9ZB4BAAfckvuI9tJklZCO382lc5OVlcWbbUi3Dj1FtQi8Mke3ZBeiKxTZBN8htaDZA40PI6xfY11ZCuKVUPXR1GvpnRPNS7yXTON2SzO5fjfpGFH02NltjUK9rhkYPZB0wgdvF7XxgOWOP7lLomU9OF10MPE7Qu5QilZCwZDZD', //eslint-disable-line
+  FBToken: 'EAAIkwPmW9ZB4BANa7znQfuhmZCGNdlHWsjpGRdcu3rhpuqJlFrj8miw3YAso8E5g45LdsGG4dZBvqQXCYpZCC6qpmkZCXGydyhzYtZAqfLZB3MPxyhREcCi411Ka6pIXQ9xxZAZCrtGa1j9bN2AiZCMazJ4B19qTj2PlI7fHvAN9hR5wZDZD', //eslint-disable-line
   PAGE_ID: '214304282285452',
 };
 
 const DevConfig = {
   ...BaseConfig,
-  FBToken: 'EAALQvUFfW48BAHrpI7UwU1kjIUgPohW8TaGddz124ZBVirX9gJWzcWXgo8vIOIXp1QlQKWEjR2KDH2FHzPaLKNGSD2TJizyDWqGWaLFds4AZAGiDZCibdkCyiSsZCeRUN0tZBfYJ98vXmB8ZCFeeHWiGsPo9mRQ9mhAjzDpA8hhQZDZD', //eslint-disable-line
+  FBToken: 'EAALQvUFfW48BANZCmSoYTB9XytaZC3ZALanY0usM7byZC0iSzfAyCsX7Vcb3BCE2FenQUbb1XoHlYzpscXA885wcUyFOA5pVnETEIGhk3sqm3piDlIZCznAUZCgPxeEeSjvJ4AOmutDv486obaZALtHv3FyRIJ933VQ5M6mhnMtJQZDZD', //eslint-disable-line
   PAGE_ID: '263306640744019',
 };
+
+// const NotifyConfig = {
+//   ...BaseConfig,
+//   FBToken: 'EAAIkwPmW9ZB4BANa7znQfuhmZCGNdlHWsjpGRdcu3rhpuqJlFrj8miw3YAso8E5g45LdsGG4dZBvqQXCYpZCC6qpmkZCXGydyhzYtZAqfLZB3MPxyhREcCi411Ka6pIXQ9xxZAZCrtGa1j9bN2AiZCMazJ4B19qTj2PlI7fHvAN9hR5wZDZD', //eslint-disable-line
+//   PAGE_ID: '214304282285452',
+// };
 
 // https://synapse-chat.herokuapp.com/api/v1/fbmessage
 

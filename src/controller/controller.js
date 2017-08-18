@@ -38,16 +38,17 @@ export default class Controller {
       .then(newState => {
         // create a new user if user could not be found
         if (!newState.userID) {
-          return this.adapter.createUser(newState);
+          return this.adapter.createUser(newState).then(state => ({
+            ...state,
+            newUser: true,
+          }));
         }
         return newState;
       })
       .then(state => {
         // check if initializing user. if so, grab user details
-        if (state.input.type === Input.Type.INITIALIZE_NEW_USER) {
-          this.adapter
-            .getUserDetails(appState.senderID)
-            .then(userDetails => updateFacebookUserDetails(appState.senderID, userDetails));
+        if (state.newUser) {
+          this.adapter.getUserDetails(appState.senderID).then(userDetails => updateFacebookUserDetails(appState.senderID, userDetails));
         }
         return state;
       });
