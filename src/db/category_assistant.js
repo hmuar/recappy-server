@@ -83,9 +83,9 @@ function getAllChildNotes(catID, readOnly = false) {
     }
     const childNotesQuery = { ctype: 'note', parent: { $all: noteParents, }, };
     if (readOnly) {
-      return Note.find(childNotesQuery).sort('globalIndex').lean();
+      return Note.find(childNotesQuery).sort('order').lean();
     }
-    return Note.find(childNotesQuery).sort('globalIndex');
+    return Note.find(childNotesQuery).sort('order');
   });
 }
 

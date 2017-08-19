@@ -5,6 +5,10 @@ function getUserByFacebookMsgID(fbMsgID) {
   return User.findOne({ facebookMessageID: fbMsgID, });
 }
 
+function getUsersForFacebookNotification() {
+  return User.find({ facebookMessageID: { $exists: true, }, });
+}
+
 // Find user with a MongoDB ObjectID and get associated
 // string used by facebook for user id.
 function getFacebookMsgID(userID) {
@@ -41,6 +45,11 @@ function createUserWithFacebookMsgID(fbMsgID) {
     name: '',
     email: '',
     facebookMessageID: fbMsgID,
+    notification: {
+      facebook: {
+        on: true,
+      },
+    },
   });
   return user.save().then(savedUser => savedUser);
 }
@@ -49,6 +58,7 @@ const Account = {
   getUserByFacebookMsgID,
   getFacebookMsgID,
   createUserWithFacebookMsgID,
+  getUsersForFacebookNotification,
 };
 
 export default Account;
