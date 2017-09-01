@@ -44,3 +44,4 @@ dev_notes/init.txt
 dev_notes/curl_cmd.txt
 
 setup_env.sh
+.vscode*

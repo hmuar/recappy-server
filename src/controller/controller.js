@@ -108,7 +108,7 @@ export default class Controller {
               // at this point should have app user information
               .then(state => pipeAddSession(state))
               // at this point should have session information
-              // .then(state => this.transformInput(state))
+              .then(state => this.transformInput(state))
               // need to evaluate msg in context of current state
               .then(state => pipeEval(state))
               .then(state => this.sendFeedbackResponse(state))

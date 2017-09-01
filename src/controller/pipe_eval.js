@@ -4,7 +4,6 @@ import Answer from '~/core/answer';
 import { EvalStatus, evalNoteWithRawInput, evalWithYesNo, hasWaitedMinHours } from '~/core/eval';
 import { minSessionWaitHours } from '~/core/hyperparam';
 import { isProduction } from '~/core/production';
-import { isPromptNote } from '~/core/note';
 
 // Evaluate user input in the context of user's current session state.
 // Add a `evalCtx` object to message data.
@@ -52,29 +51,14 @@ function InitContext(appState) {
 // Look for ACCEPT input type and then advance state
 // Otherwise return original state.
 function InfoContext(appState) {
-  let input = appState.input;
+  const input = appState.input;
   if (!input) {
     return appState;
   }
 
   const note = getCurrentNote(appState.session);
-  const isPrompt = isPromptNote(note);
   // response was for an explore path
-  if (
-    (input.type === Input.Type.PATH && !isNaN(input.payload)) ||
-    // XXX: this seems like a hack, need to restructure response flow
-    // so that we don't need to account for isPrompt note and handle with diff behavior
-    (isPrompt && input.type === Input.Type.CUSTOM)
-  ) {
-    // XXX: THIS IS A HACK
-    if (isPrompt) {
-      input = {
-        ...input,
-        type: Input.Type.PATH,
-        payload: '0',
-      };
-      appState.input = input;
-    }
+  if (input.type === Input.Type.PATH && !isNaN(input.payload)) {
     const dataAsNum = parseInt(input.payload, 10);
     const validPayload = dataAsNum != null && note.paths && dataAsNum < note.paths.length;
     if (validPayload) {

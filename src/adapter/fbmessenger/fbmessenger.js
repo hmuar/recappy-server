@@ -1,5 +1,7 @@
 import Account from '~/account';
 import Input from '~/core/input';
+import { isPromptNote } from '~/core/note';
+import { getCurrentNote } from '~/core/session_state';
 // import { EvalStatus } from '~/core/eval';
 // import { log, logErr } from '~/logger';
 import MessageType from './fbmessage_type';
@@ -194,8 +196,27 @@ export function sendFeedbackResponse(state) {
   return sendFeedbackResp(state);
 }
 
-export function transformInput(state) {
-  return state;
+export function transformInput(appState) {
+  let input = appState.input;
+  if (!input) {
+    return appState;
+  }
+  const note = getCurrentNote(appState.session);
+
+  // if prompt note, convert any custom input into a path input
+  // XXX: this seems like a hack, need to restructure response flow
+  // so that we don't need to account for isPrompt note and handle with diff behavior
+  const isPrompt = isPromptNote(note);
+  if (isPrompt && input.type === Input.Type.CUSTOM) {
+    // XXX: THIS IS A HACK
+    input = {
+      ...input,
+      type: Input.Type.PATH,
+      payload: '0',
+    };
+    appState.input = input;
+  }
+  return appState;
 }
 
 const AdapterFBMessenger = {
