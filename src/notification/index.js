@@ -14,7 +14,7 @@ function notifyUser(user, subjectID) {
     userID: user._id,
     expireDate: new Date(),
   };
-  console.log(`notifying user ${user}`);
+  // return Promise.resolve(0);
   return controller.send(sendInfo);
 }
 
@@ -37,7 +37,7 @@ function sendForOneUser() {
       },
     },
   };
-  return notifyUser(oneUserDev, hardcodedSubjectID);
+  return notifyUser(oneUser, hardcodedSubjectID);
 }
 
 function sendNotifications() {

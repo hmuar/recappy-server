@@ -1,7 +1,7 @@
 import Account from '~/account';
 import Input from '~/core/input';
-import { EvalStatus } from '~/core/eval';
-import { log, logErr } from '~/logger';
+// import { EvalStatus } from '~/core/eval';
+// import { log, logErr } from '~/logger';
 import MessageType from './fbmessage_type';
 import sendResp, { sendFeedbackResp } from './fbmessenger_response';
 import { sendUserDetailsRequest } from './fbmessenger_request';
@@ -194,6 +194,10 @@ export function sendFeedbackResponse(state) {
   return sendFeedbackResp(state);
 }
 
+export function transformInput(state) {
+  return state;
+}
+
 const AdapterFBMessenger = {
   senderToUser,
   createUser,
@@ -201,6 +205,7 @@ const AdapterFBMessenger = {
   sendResponse,
   sendFeedbackResponse,
   getUserDetails,
+  transformInput,
 };
 
 export default AdapterFBMessenger;

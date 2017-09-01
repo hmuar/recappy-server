@@ -129,7 +129,7 @@ function advanceToNextConcept(appState, _cutoffDate) {
 
 function advanceState(appState) {
   if (!appState) {
-    return appState;
+    return Promise.resolve(appState);
   }
 
   // if necessary, advance queueIndex
@@ -245,22 +245,21 @@ function advanceState(appState) {
     }
 
     if (appState.postEvalState) {
-      return {
+      return Promise.resolve({
         ...appState,
         session: {
           ...appState.session,
           state: appState.postEvalState,
         },
-      };
+      });
     }
   }
 
-  return appState;
+  return Promise.resolve(appState);
 }
 
 export default function pipe(appState) {
   let nextAppState = setPreEvalState(appState);
   nextAppState = setPostEvalState(nextAppState);
-  nextAppState = advanceState(nextAppState);
-  return nextAppState;
+  return advanceState(nextAppState);
 }

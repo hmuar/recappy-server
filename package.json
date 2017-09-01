@@ -4,23 +4,22 @@
   "description": "",
   "main": "index.js",
   "engines": {
-    "node": "6.2.2",
-    "npm": "3.9.5"
+    "node": "8.4.0",
+    "npm": "5.3.0"
   },
   "scripts": {
     "lint": "esw -w src",
     "test-watch": "watch 'npm run test' src",
     "test": "blue-tape -r babel-register src/test/*.test.js | faucet",
-    "testc": "clear && blue-tape -r babel-register src/test/scheduler.test.js",
-    "testo": "clear && blue-tape -r babel-register src/test/controller_pipe_advance_state_dated.test.js",
-    "tests": "clear && blue-tape -r babel-register src/test/controller_pipe_add_session.test.js",
+    "testo": "clear && blue-tape -r babel-register src/test/controller_pipe_advance_state.test.js",
+    "test-debug-brk": "clear && node --inspect-brk $(npm bin)/blue-tape -r babel-register src/test/controller_pipe_advance_state.test.js",
+    "test-debug": "clear && node --inspect $(npm bin)/blue-tape -r babel-register src/test/controller_pipe_advance_state.test.js",
     "docs": "watch 'rm -rf docs && docco src/**/**.js && rm -rf docs/*.test.html' src",
     "sim": "node_modules/.bin/babel-node simulate.js",
     "notify": "NODE_ENV=production node_modules/.bin/babel-node notify.js",
     "notify-dev": "NODE_ENV=dev node_modules/.bin/babel-node notify.js",
     "start": "node register.js",
-    "start-local": "node register.js",
-    "start-dev": "source setup_env.sh; nodemon register.js",
+    "start-dev": "source setup_env.sh; nodemon --inspect register.js",
     "start-clean-dev": "npm run clean-logs && npm run start-dev",
     "clean-logs": "rm -rf logs/*.log",
     "sand": "node_modules/.bin/babel-node src/sandbox.js"

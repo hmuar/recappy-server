@@ -48,10 +48,19 @@ export default class Controller {
       .then(state => {
         // check if initializing user. if so, grab user details
         if (state.newUser) {
-          this.adapter.getUserDetails(appState.senderID).then(userDetails => updateFacebookUserDetails(appState.senderID, userDetails));
+          this.adapter
+            .getUserDetails(appState.senderID)
+            .then(userDetails => updateFacebookUserDetails(appState.senderID, userDetails));
         }
         return state;
       });
+  }
+
+  transformInput(appState) {
+    if (this.adapter.transformInput) {
+      return this.adapter.transformInput(appState);
+    }
+    return appState;
   }
 
   debugDBAssist(msg) {
@@ -97,12 +106,9 @@ export default class Controller {
           return (
             this.pipeUser(appState)
               // at this point should have app user information
-              .then(state => {
-                console.log(state);
-                return state;
-              })
               .then(state => pipeAddSession(state))
               // at this point should have session information
+              // .then(state => this.transformInput(state))
               // need to evaluate msg in context of current state
               .then(state => pipeEval(state))
               .then(state => this.sendFeedbackResponse(state))
