@@ -80,7 +80,6 @@ export default class Controller {
   }
 
   sendFeedbackResponse(state) {
-    // return state;
     const withSuccessMedia = Math.random() < gifSuccessProb;
     return this.adapter.sendFeedbackResponse(state, withSuccessMedia);
   }

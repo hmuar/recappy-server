@@ -214,8 +214,11 @@ function sendResponseInContext(state) {
   }
 }
 
-function posFeedback(correctMsg) {
+function posFeedback(state, correctMsg) {
   const positiveEncourageMsg = positiveEncourage();
+  if (state.session.state === SessionState.RECALL_RESPONSE) {
+    return positiveEncourage();
+  }
   const answerWasPhrase = theAnswerWas();
   return `${positiveEncourageMsg} ${answerWasPhrase} '${correctMsg}'`;
 }
@@ -254,7 +257,7 @@ function sendFeedbackText(state, withTriggerResponse = false, withSuccessMedia =
   const isPositive = !isFailResponse(state.evalCtx.answerQuality);
   const correctMsg = state.evalCtx.correctAnswer;
 
-  let msg = isPositive ? posFeedback(correctMsg) : negFeedback(state, correctMsg);
+  let msg = isPositive ? posFeedback(state, correctMsg) : negFeedback(state, correctMsg);
   // check for possible trigger response based on incorrect answer
   // trigger responses are custom responses crafted for specific incorrect
   // answers that we anticipate the user to give
