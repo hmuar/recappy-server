@@ -55,15 +55,6 @@ function tokenizeAnswer(input) {
   return { tokens, size: length, };
 }
 
-function createInputMatchSet(input) {
-  return createMatchSet(tokenizeInput(input).map(t => cleanToken(t)));
-}
-
-function createAnswerMatchSet(answer) {
-  const { tokens, size, } = tokenizeAnswer(answer);
-  return createMatchSet(tokens.map(t => cleanToken(t)), size);
-}
-
 function createMatchSet(tokens, size = null) {
   const tokenSet = new Set(tokens);
   const uniqueTokens = [...tokenSet];
@@ -73,6 +64,29 @@ function createMatchSet(tokens, size = null) {
     elems,
     size: size || elems.length,
   };
+}
+
+function createInputMatchSet(input) {
+  return createMatchSet(tokenizeInput(input).map(t => cleanToken(t)));
+}
+
+function createAnswerMatchSet(answer) {
+  const { tokens, size, } = tokenizeAnswer(answer);
+  return createMatchSet(tokens.map(t => cleanToken(t)), size);
+}
+
+function createExactAnswerTokens(answer) {
+  const { tokens, size, } = tokenizeAnswer(answer);
+  return tokens;
+}
+
+function checkExactMatch(input, answerTokens) {
+  for (let i = 0; i < answerTokens.length; i++) {
+    if (answerTokens[i] === input) {
+      return true;
+    }
+  }
+  return false;
 }
 
 // matchElemA and matchElemB should be
@@ -134,6 +148,14 @@ export function checkInputAgainstAnswer(input, answer) {
   if (input == null || answer == null) {
     return false;
   }
+
+  // check for quoted answer. If so, need exact match
+  if (answer.startsWith('"') && answer.endsWith('"')) {
+    const cleanAnswer = preProcess(answer.replace(/"/g, ''));
+    const answerTokens = createExactAnswerTokens(cleanAnswer);
+    return checkExactMatch(input, answerTokens);
+  }
+
   // step 1 - clean, tokenize, and stem
   const inputSet = createInputMatchSet(preProcess(input));
   const answerSet = createAnswerMatchSet(preProcess(answer));

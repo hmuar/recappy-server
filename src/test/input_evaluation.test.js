@@ -76,3 +76,22 @@ test('Input evaluation with symbols', t => {
   t.equal(evalNoteWithRawInput('no', note), false);
   t.end();
 });
+
+// quoted answers need to be exactly matched
+test('Input evaluation with exact quoted answer', t => {
+  let note = { answer: '"nonce"', };
+  // let successResp = ['three??', 'Three', '3 maybe', 'trheee'];
+  t.equal(evalNoteWithRawInput('nonce', note), true);
+  t.equal(evalNoteWithRawInput('non', note), false);
+  t.equal(evalNoteWithRawInput('nonc', note), false);
+  t.equal(evalNoteWithRawInput('nocne', note), false);
+  t.equal(evalNoteWithRawInput('nonces', note), false);
+  note = { answer: '"nonce" || "jelly"', };
+  t.equal(evalNoteWithRawInput('nonce', note), true);
+  t.equal(evalNoteWithRawInput('nonc', note), false);
+  t.equal(evalNoteWithRawInput('jelly', note), true);
+  t.equal(evalNoteWithRawInput('jely', note), false);
+  t.equal(evalNoteWithRawInput('jel', note), false);
+  t.equal(evalNoteWithRawInput('je', note), false);
+  t.end();
+});

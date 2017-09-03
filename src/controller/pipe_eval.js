@@ -33,7 +33,8 @@ export function insertEval(state, evalCtx) {
 // properly format compound answers, e.g. those that contain
 // multiple acceptable answers
 function formatAnswer(answer) {
-  const answers = answer.split('||');
+  // strip out quotation marks
+  const answers = answer.split('||').map(text => text.replace(/"/g, ''));
   if (!answers || answer.length === 0) {
     throw new Error('Could not format note answer.');
   }

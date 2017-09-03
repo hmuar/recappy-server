@@ -109,7 +109,7 @@ export function keepGoing() {
   return randomChoice(CONTINUE_PHRASE);
 }
 
-const SKIP_PHRASE = ['what else is there?', 'skip this', "i'm not interested"];
+const SKIP_PHRASE = ['skip this', "i'm not interested", 'got other news?', 'boring...😴'];
 
 export function skipThis() {
   return randomChoice(SKIP_PHRASE);
