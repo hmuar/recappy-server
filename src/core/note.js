@@ -10,5 +10,6 @@ const NoteLabel = {
 };
 
 export function isPromptNote(note) {
+  if (!note) return false;
   return note.label && note.label.length && note.label.includes(NoteLabel.PROMPT);
 }

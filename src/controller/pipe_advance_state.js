@@ -2,6 +2,7 @@ import { SessionState, getEntryStateForNoteType, QueueStatus } from '~/core/sess
 import { getNextNotes, TARGET_NUM_NOTES_IN_SESSION } from '~/core/scheduler';
 import { EvalStatus, isFailResponse, hasWaitedMinHours } from '~/core/eval';
 import CategoryAssistant from '~/db/category_assistant';
+import { isPromptNote } from '~/core/note';
 
 // Given current info in app state, determine next study state for user.
 // Only need to look at current session state to determine next state.
@@ -78,7 +79,7 @@ function setPostEvalState(appState) {
   };
 }
 
-function advanceToNextConcept(appState, _cutoffDate) {
+function advanceToNextConcept(appState, _cutoffDate, expireDate = null) {
   const cutoffDate = _cutoffDate || new Date();
   const { userID, subjectID, } = appState;
   const nextGlobalIndex = appState.session.nextGlobalIndex;
@@ -88,7 +89,8 @@ function advanceToNextConcept(appState, _cutoffDate) {
     subjectID,
     nextGlobalIndex,
     TARGET_NUM_NOTES_IN_SESSION,
-    cutoffDate
+    cutoffDate,
+    expireDate
   ).then(notesInfo => {
     const nextNotes = notesInfo.notes;
     if (nextNotes && nextNotes.length > 0) {
@@ -127,6 +129,39 @@ function advanceToNextConcept(appState, _cutoffDate) {
   });
 }
 
+// function advanceToNextDatedConcept(appState) {
+//   const expireDate = appState.expireDate || new Date();
+//   const { subjectID, session, } = appState;
+//   const { noteQueue, } = session;
+//   const targetGlobalIndex = appState.session.nextGlobalIndex;
+//
+//   return getNewMaterial(subjectID, 1, targetGlobalIndex, [], expireDate).then(notesInfo => {
+//     const nextNotes = notesInfo.notes;
+//     if (nextNotes && nextNotes.length > 0) {
+//       // MUTATE session's noteQueue by inserting new notes into location
+//       // of current queueIndex so that if user were to continue session,
+//       // queueIndex now points to the new notes that have been spliced in
+//       // at that location.
+//       noteQueue.splice(session.queueIndex, 0, ...nextNotes);
+//       return {
+//         ...appState,
+//         // postEvalState: null,
+//         session: {
+//           ...session,
+//           // noteQueue: newQueue,
+//           // queueIndex: 0,
+//           globalIndex: notesInfo.globalIndex,
+//           nextGlobalIndex: notesInfo.nextGlobalIndex,
+//           baseQueueLength: noteQueue.length,
+//           state: getEntryStateForNoteType(noteQueue[session.queueIndex].type),
+//           startSessionTime: new Date(),
+//         },
+//       };
+//     }
+//     return appState;
+//   });
+// }
+
 function advanceState(appState) {
   if (!appState) {
     return Promise.resolve(appState);
@@ -154,7 +189,7 @@ function advanceState(appState) {
 
       const { evalCtx, } = appState;
       const { cutoffDate, } = evalCtx.correctAnswer;
-      return advanceToNextConcept(appState, cutoffDate);
+      return advanceToNextConcept(appState, cutoffDate, new Date());
     }
 
     if (
@@ -207,7 +242,17 @@ function advanceState(appState) {
           const { success: sessionWaitTimeReached, } = hasWaitedMinHours(startSessionTime);
 
           if (startSessionTime && sessionWaitTimeReached) {
-            return advanceToNextConcept(appState, new Date());
+            const nowDate = new Date();
+            return advanceToNextConcept(appState, nowDate, nowDate);
+          }
+          // if question is prompt and user skips, try to find next available prompt
+          const curNote = noteQueue[queueIndex];
+          if (isPromptNote(curNote)) {
+            const skipPrompt = !isFailResponse(appState.evalCtx.answerQuality);
+            if (skipPrompt) {
+              const nowDate = new Date();
+              return advanceToNextConcept(appState, nowDate, nowDate);
+            }
           }
 
           nextSessionState = SessionState.DONE_QUEUE;

@@ -120,7 +120,7 @@ export default class Controller {
               .then(state => pipeAddPaths(state))
               // record new session state
               .then(state => pipeSaveSession(state))
-              .then(state => this.logCurrentState(state))
+              // .then(state => this.logCurrentState(state))
               .then(state => {
                 // don't include this in return chain because this final update
                 // can happen asynchronously

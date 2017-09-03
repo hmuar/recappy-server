@@ -6,7 +6,7 @@ import _ from 'lodash';
 
 export const TARGET_NUM_NOTES_IN_SESSION = targetNumNotesInSession;
 export const MAX_NOTES_IN_QUEUE = maxNotesInQueue;
-export const MAX_GLOBAL_INDEX = 5000;
+export const MAX_GLOBAL_INDEX = 1000000;
 
 // Grab old notes user has already seen that are now
 // due according to note's due date.
@@ -106,7 +106,6 @@ export function getNewMaterial(
 
     const curGlobalIndex = nextConcept.globalIndex;
 
-    // XXX: during dev, skip info notes
     return Note.find({ directParent: nextConcept._id, }).sort('order').then(notes => {
       const taggedNotes = notes.map(note => {
         note.queueStatus = QueueStatus.NEW; // eslint-disable-line no-param-reassign
@@ -132,61 +131,13 @@ export function getNewMaterial(
   });
 }
 
-// export function getNewMaterialWithExpireDate(subjectID, expireDate, minGlobalIndex = 0) {
-//   if (!subjectID) {
-//     return Promise.resolve({
-//       notes: [],
-//       globalIndex: minGlobalIndex,
-//       nextGlobalIndex: minGlobalIndex,
-//     });
-//   }
-//
-//   return Category.findOne({
-//     ctype: 'concept',
-//     subjectParent: subjectID,
-//     globalIndex: { $gte: minGlobalIndex, },
-//     expireDate: { $gte: expireDate, },
-//   })
-//     .sort({ globalIndex: 1, })
-//     .then(nextConcept => {
-//       if (!nextConcept) {
-//         log(`Could not find next concept with min index ${minGlobalIndex}, returning 0 new notes`);
-//         return Promise.resolve({
-//           notes: [],
-//           globalIndex: minGlobalIndex,
-//           nextGlobalIndex: minGlobalIndex,
-//         });
-//       }
-//       return Note.find({ directParent: nextConcept._id, }).sort('order').then(notes => {
-//         const taggedNotes = notes.map(note => {
-//           note.queueStatus = QueueStatus.NEW; // eslint-disable-line no-param-reassign
-//           return note;
-//         });
-//         return Promise.resolve({
-//           notes: taggedNotes,
-//           // successfully added all new notes from concept associated
-//           // with current global index, so increment globalIndex
-//           globalIndex: nextConcept.globalIndex,
-//           nextGlobalIndex: nextConcept.globalIndex + 1,
-//         });
-//       });
-//     });
-// }
-
-// Get combination of old and new notes
-// return {
-//   notes:[oldNotes, newNotes],
-//   globalIndex,
-//   nextGlobalIndex,
-// }
-// TODO: Detect if two questions have same c-key and only ask one
-// TODO: factor in weighting of concepts
 export function getNextNotes(
   userID,
   subjectID,
   globalIndex = 0,
   numNotes = TARGET_NUM_NOTES_IN_SESSION,
-  dueDate = null
+  dueDate = null,
+  expireDate = null
 ) {
   if (numNotes <= 0) {
     return Promise.resolve({ notes: [], globalIndex, nextGlobalIndex: globalIndex, });
@@ -198,12 +149,10 @@ export function getNextNotes(
   return getOldMaterial(userID, subjectID, oldNotesNum, dueDate)
     .then(oldNotes => {
       result = [...result, ...oldNotes];
-      // result = [...result, ...oldNotes];
       const newNotesNum = numNotes - oldNotes.length;
-      return getNewMaterial(subjectID, newNotesNum, globalIndex);
+      return getNewMaterial(subjectID, newNotesNum, globalIndex, [], expireDate);
     })
     .then(newNotesInfo => {
-      // add new notes first, then old notes
       result = [...newNotesInfo.notes, ...result];
       // remove duplicate notes that were in both old and new lists
       const uniqResult = _.uniqBy(result, elem => elem._id.toString());

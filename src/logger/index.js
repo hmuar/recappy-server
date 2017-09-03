@@ -44,7 +44,7 @@ export function log(msg) {
 }
 
 export function logErr(msg) {
-  winston.log('error', msg);
+  // winston.log('error', msg);
   return msg;
 }
 
