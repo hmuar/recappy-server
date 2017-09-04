@@ -191,9 +191,13 @@ function sendResponseInContext(state) {
         state.postEvalState === SessionState.DONE_QUEUE
       ) {
         const waitedHours = session.remainingWaitHours;
-        let respMessage = "Whew I'm tired! 😓 We already learned a lot today, don't ya think? Let's take a break! An important part of learning is resting and letting the new stuff sink in.";
+        // let respMessage = "Whew I'm tired! 😓 We already learned a lot today, don't ya think? Let's take a break! An important part of learning is resting and letting the new stuff sink in.";
+        let respMessage = "Whew I'm tired! 😓 No more for today.";
         if (waitedHours) {
-          const hoursMsg = waitedHours > 1 ? `${waitedHours}ish hours` : 'about an hour or two';
+          const flooredHours = parseInt(waitedHours, 10);
+          const hoursMsg = flooredHours > 1
+            ? `about ${flooredHours} hours`
+            : 'about an hour or two';
           respMessage = `${respMessage} Why don't we chat again in ${hoursMsg}? Nap time for me. 😴`;
         }
         return sendText(fbUserID, respMessage);

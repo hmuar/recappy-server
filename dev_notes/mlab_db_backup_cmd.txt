@@ -1,0 +1,2 @@
+mongo ds133291.mlab.com:33291/synapse -u <user> -p <password>
+mongodump -h ds133291.mlab.com:33291 -d synapse -u <user> -p <password> -o db_dump

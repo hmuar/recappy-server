@@ -2,13 +2,19 @@
 // if text longer than maxlength
 export function divideLongText(text, maxLength) {
   if (text.length > maxLength) {
-    const result = text.match(/[^\.!\?]+[\.!\?]+/g).map(t => t.trim());
-    if (result.length > 1) {
-      const splitIndex = Math.floor(result.length / 2);
-      return [
-        result.slice(0, splitIndex).join(' '),
-        result.slice(splitIndex, result.length).join(' ')
-      ];
+    // const result = text.match(/[.!?]+ /g).map(t => t.trim());
+
+    // find all indexes where sentences end
+    const re = /[.!?] /g;
+    let match = '';
+    const matchIndexes = [];
+    while ((match = re.exec(text)) != null) {
+      matchIndexes.push(match.index);
+    }
+
+    if (matchIndexes.length > 1) {
+      const splitIndex = matchIndexes[Math.floor(matchIndexes.length / 2)];
+      return [text.slice(0, splitIndex + 1).trim(), text.slice(splitIndex + 2).trim()];
     }
   }
   return [text];

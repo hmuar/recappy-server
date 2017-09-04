@@ -12,3 +12,11 @@ test('Divide long message', t => {
 
   t.end();
 });
+
+test('Divide long message with http link', t => {
+  const longMsg = 'Think of a big stadium like a football field or https://www.youtube.com/watch?v=bBC-nXj3Ng4 field. Pretend this is our atom. Take two red marbles. Stick them together to form a little ball. Put this in the center of the big arena. We call the marbles protons and neutrons. The ball they make at the center of an atom is called the nucleus.';
+  const result = divideLongText(longMsg, 150);
+  t.equal(result.length, 2);
+
+  t.end();
+});
