@@ -7,13 +7,13 @@ const BaseConfig = {
 
 const ProdConfig = {
   ...BaseConfig,
-  FBToken: 'EAAIkwPmW9ZB4BANa7znQfuhmZCGNdlHWsjpGRdcu3rhpuqJlFrj8miw3YAso8E5g45LdsGG4dZBvqQXCYpZCC6qpmkZCXGydyhzYtZAqfLZB3MPxyhREcCi411Ka6pIXQ9xxZAZCrtGa1j9bN2AiZCMazJ4B19qTj2PlI7fHvAN9hR5wZDZD', //eslint-disable-line
+  FBToken: 'EAAIkwPmW9ZB4BAOLfY8Wv6n2POpYZBcZBfuAWnnyJPOqV2GTLzpSHqHcntml9HZBvug3z9FinIXbYjlRAKhJmsy037zxd1P4T4NTkP7GRHRnCEuXymqDRONazPaxEbSJlb7tnMbBIm3YkdOZCifZBHnQxOVH2siELPEaa6llwaHQZDZD', //eslint-disable-line
   PAGE_ID: '214304282285452',
 };
 
 const DevConfig = {
   ...BaseConfig,
-  FBToken: 'EAALQvUFfW48BANZCmSoYTB9XytaZC3ZALanY0usM7byZC0iSzfAyCsX7Vcb3BCE2FenQUbb1XoHlYzpscXA885wcUyFOA5pVnETEIGhk3sqm3piDlIZCznAUZCgPxeEeSjvJ4AOmutDv486obaZALtHv3FyRIJ933VQ5M6mhnMtJQZDZD', //eslint-disable-line
+  FBToken: 'EAALQvUFfW48BAMJtc0J3vnvkZANt4ZAhUpB79UCOUMcogitMzezN9D99HWSOjZCsPolRiqQiZAeRTLnOok129ShOQ3vaOYtsJBbOuIaoChvv3JnXc2XTj5J73iZC1ZA3q8B85lCmdDMfNZAKp8iRv5dppVQ37KPj20If2vbOjFgQQZDZD', //eslint-disable-line
   PAGE_ID: '263306640744019',
 };
 
