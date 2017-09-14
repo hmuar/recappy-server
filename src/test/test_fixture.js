@@ -136,12 +136,14 @@ const noteA = {
   type: 'info',
   weight: 1,
   level: 1,
-  display: '<p>Carbon has 6 protons and 6 neutrons in its nucleus. This makes it a relatively small, flexible atom so it is very useful. This helps make carbon fundamental to life. Without carbon all human, plant, and animal life would not be possible. We are all <strong>carbon-based</strong> lifeforms.</p>',
+  display:
+    '<p>Carbon has 6 protons and 6 neutrons in its nucleus. This makes it a relatively small, flexible atom so it is very useful. This helps make carbon fundamental to life. Without carbon all human, plant, and animal life would not be possible. We are all <strong>carbon-based</strong> lifeforms.</p>',
   extra: '',
   extra_media: '',
   parent: noteParent,
   ckey: 'proton-neutron-electron',
-  displayRaw: 'Carbon has 6 protons and 6 neutrons in its nucleus. This makes it a relatively small, flexible atom so it is very useful. This helps make carbon fundamental to life. Without carbon all human, plant, and animal life would not be possible. We are all carbon-based lifeforms.',
+  displayRaw:
+    'Carbon has 6 protons and 6 neutrons in its nucleus. This makes it a relatively small, flexible atom so it is very useful. This helps make carbon fundamental to life. Without carbon all human, plant, and animal life would not be possible. We are all carbon-based lifeforms.',
   globalIndex: 0,
   directParent: noteParent[noteParent.length - 1],
   paths: [
@@ -245,8 +247,11 @@ const noteTemplateB = {
 };
 
 // ******************** StudentSession ******************
+const curSessionDate = new Date();
 const sessionTemplate = {
   userID: ObjectID('5716893a8c8aff3221812148'),
+  createdAt: curSessionDate,
+  updatedAt: curSessionDate,
   subjects: {
     f64c57184a4ef7f0357f9cd6: {
       noteID: noteA._id,
@@ -254,6 +259,8 @@ const sessionTemplate = {
       noteQueue: [noteA, noteB],
       state: SessionState.RECALL,
       globalIndex: 0,
+      createdAt: curSessionDate,
+      updatedAt: curSessionDate,
     },
   },
 };
@@ -281,6 +288,7 @@ const defaultNoteRecord = {
   count: 1,
   subjectParent: noteTemplateA.parent[0],
   pathHistory: [ObjectID('2980227254feb46732ca491e')],
+  createdAt: new Date(),
 };
 
 const defaultNoteRecord2 = {
@@ -293,6 +301,7 @@ const defaultNoteRecord2 = {
   interval: SRCore.defaultInterval,
   count: 1,
   subjectParent: noteTemplateB.parent[0],
+  createdAt: new Date(),
 };
 
 const defaultNoteRecord3 = {
@@ -306,6 +315,7 @@ const defaultNoteRecord3 = {
   count: 1,
   subjectParent: noteTemplateB.parent[0],
   pathHistory: [ObjectID('2980227254feb46732ca491e'), ObjectID('7980227254feb46736ca47fd')],
+  createdAt: new Date(),
 };
 
 function addUsers() {
@@ -317,7 +327,9 @@ function addUsers() {
 }
 
 function cloneNote(noteData, num) {
-  return Array(num).fill().map(() => new Note(noteData));
+  return Array(num)
+    .fill()
+    .map(() => new Note(noteData));
 }
 
 // return two lists of ids of cloned notes
@@ -379,7 +391,10 @@ function addNoteRecords(defNoteIds) {
   const defRec2 = new NoteRecord(defaultNoteRecord2);
   const defRec3 = new NoteRecord(defaultNoteRecord3);
 
-  let pChain = defRec.save().then(() => defRec2.save()).then(() => defRec3.save());
+  let pChain = defRec
+    .save()
+    .then(() => defRec2.save())
+    .then(() => defRec3.save());
 
   const noteTemplateAIds = defNoteIds[0];
 

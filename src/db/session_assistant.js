@@ -48,7 +48,9 @@ export function updateSessionForUser(
     const subjects = session.subjects;
 
     const subject = subjects[subjectIDString];
-    const { startSessionTime, } = subject;
+    const { startSessionTime, createdAt, } = subject;
+
+    const curDate = new Date();
 
     subjects[subjectIDString] = {
       queueIndex,
@@ -57,12 +59,14 @@ export function updateSessionForUser(
       globalIndex,
       nextGlobalIndex,
       baseQueueLength,
+      createdAt,
+      updatedAt: curDate,
       lastCompleted: lastCompleted || null,
       startSessionTime: newStartSessionTime || (startSessionTime || new Date()),
     };
 
     return StudentSession.findByIdAndUpdate(session._id, {
-      $set: { subjects, },
+      $set: { subjects, updatedAt: curDate, },
     });
   });
 }
@@ -81,6 +85,7 @@ export function createSession(
 
     let subjects = {};
     if (!session) {
+      const curDate = new Date();
       subjects = {
         [subjectIDString]: {
           queueIndex: 0,
@@ -91,11 +96,15 @@ export function createSession(
           baseQueueLength,
           lastCompleted: null,
           startSessionTime: new Date(),
+          createdAt: curDate,
+          updatedAt: curDate,
         },
       };
       const newSession = {
         userID,
         subjects,
+        createdAt: curDate,
+        updatedAt: curDate,
       };
       return StudentSession.create(newSession).then(() => subjects[subjectIDString]);
     }

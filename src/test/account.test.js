@@ -7,7 +7,11 @@ const after = test;
 const db = new TestDatabase();
 
 before('before account testing', () =>
-  db.setup().then(() => db.clean()).then(() => db.loadUserFixtures()));
+  db
+    .setup()
+    .then(() => db.clean())
+    .then(() => db.loadUserFixtures())
+);
 
 test('Get user using FacebookID', t => {
   const fbID = '1028279607252619';
@@ -29,6 +33,8 @@ test('Create new user with FacebookID', t => {
   return Account.createUserWithFacebookMsgID(fbID).then(user => {
     t.ok(user);
     t.equal(user.facebookMessageID, fbID);
+    t.ok(user.createdAt);
+    t.ok(user.updatedAt);
   });
 });
 

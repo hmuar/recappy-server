@@ -41,6 +41,7 @@ export function updateFacebookUserDetails(fbMsgID, userDetails) {
 
 // Create new user and associate Facebook string ID.
 function createUserWithFacebookMsgID(fbMsgID) {
+  const curDate = new Date();
   const user = new User({
     name: '',
     email: '',
@@ -50,6 +51,8 @@ function createUserWithFacebookMsgID(fbMsgID) {
         on: true,
       },
     },
+    createdAt: curDate,
+    updatedAt: curDate,
   });
   return user.save().then(savedUser => savedUser);
 }

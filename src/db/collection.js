@@ -13,6 +13,8 @@ const userSchema = new mongoose.Schema({
   email: String,
   facebookMessageID: String,
   notification: {},
+  createdAt: Date,
+  updatedAt: Date,
 });
 
 export const User = mongoose.model('User', userSchema, 'user');
@@ -24,6 +26,8 @@ export const User = mongoose.model('User', userSchema, 'user');
 const sessionSchema = new mongoose.Schema({
   userID: mongoose.Schema.Types.ObjectId,
   subjects: {},
+  createdAt: Date,
+  updatedAt: Date,
 });
 
 export const StudentSession = mongoose.model('StudentSession', sessionSchema, 'studentsession');
@@ -106,6 +110,8 @@ const noteRecordSchema = new mongoose.Schema({
   intervalHistory: [Number],
   dueHistory: [Date],
   lastDoneHistory: [Date],
+  createdAt: Date,
+  updatedAt: Date,
 });
 
 export const NoteRecord = mongoose.model('NoteRecord', noteRecordSchema, 'noterecord');

@@ -7,6 +7,7 @@ import { SessionState } from '~/core/session_state';
 import DBAssist from '~/db/category_assistant';
 import { getSessionForUserAndSubject } from '~/db/session_assistant';
 import { EvalStatus } from '~/core/eval';
+import { StudentSession } from '~/db/collection';
 import TestDatabase from './test_database';
 import TestConst from './test_const';
 
@@ -72,7 +73,8 @@ before('before controller pipe save session testing', () =>
     })
     .then(user => {
       testUser = user;
-    }));
+    })
+);
 
 test('test pipe save session', t => {
   const appState = getAppState(getSession(0, SessionState.MULT_CHOICE), {
@@ -91,8 +93,29 @@ test('test pipe save session', t => {
         t.notDeepEqual(session, oldSession);
         t.equal(session.state, SessionState.MULT_CHOICE);
         t.equal(session.noteQueue.length, 4);
+        t.ok(session.createdAt.getTime() === oldSession.createdAt.getTime());
+        t.ok(session.updatedAt.getTime() !== oldSession.updatedAt.getTime());
       });
     });
+});
+
+test('test pipe save session update dates', t => {
+  const appState = getAppState(getSession(0, SessionState.MULT_CHOICE), {
+    answerQuality: Answer.ok,
+    status: EvalStatus.SUCCESS,
+  });
+  let oldSession = null;
+  return StudentSession.findOne({ userID: appState.userID, })
+    .then(session => {
+      oldSession = session;
+      return pipeSaveSession(appState);
+    })
+    .then(savedSession =>
+      StudentSession.findOne({ userID: appState.userID, }).then(newSession => {
+        t.ok(newSession.createdAt.getTime() === oldSession.createdAt.getTime());
+        t.ok(newSession.updatedAt.getTime() !== oldSession.updatedAt.getTime());
+      })
+    );
 });
 
 after('after controller pipe save session testing', () => db.close());

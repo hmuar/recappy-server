@@ -99,7 +99,8 @@ function sendResponseInContext(state) {
           const shortenedMsgs = divideLongText(finalMsg, 100);
           if (shortenedMsgs.length > 1) {
             return sendText(fbUserID, shortenedMsgs[0]).then(() =>
-              sendQuickReply(fbUserID, shortenedMsgs[1], quickReplyData));
+              sendQuickReply(fbUserID, shortenedMsgs[1], quickReplyData)
+            );
           }
           return sendQuickReply(fbUserID, finalMsg, quickReplyData);
         });
@@ -120,7 +121,8 @@ function sendResponseInContext(state) {
             fbUserID,
             `${finalMsg} Think about it to yourself and we'll look at the answer together.`,
             quickReplyData
-          ));
+          )
+        );
     }
 
     case SessionState.RECALL_RESPONSE: {
@@ -134,7 +136,8 @@ function sendResponseInContext(state) {
         action: Input.Type.REJECT,
       });
       return sendText(fbUserID, note.hidden).then(() =>
-        sendQuickReply(fbUserID, isThatWhatYouThought(), quickReplyData));
+        sendQuickReply(fbUserID, isThatWhatYouThought(), quickReplyData)
+      );
     }
 
     case SessionState.INPUT: {
@@ -195,9 +198,8 @@ function sendResponseInContext(state) {
         let respMessage = "Whew I'm tired! 😓 No more for today.";
         if (waitedHours) {
           const flooredHours = parseInt(waitedHours, 10);
-          const hoursMsg = flooredHours > 1
-            ? `about ${flooredHours} hours`
-            : 'about an hour or two';
+          const hoursMsg =
+            flooredHours > 1 ? `about ${flooredHours} hours` : 'about an hour or two';
           respMessage = `${respMessage} Why don't we chat again in ${hoursMsg}? Nap time for me. 😴`;
         }
         return sendText(fbUserID, respMessage);
@@ -326,7 +328,8 @@ export function sendFeedbackResp(state, withSuccessMedia = false) {
     case SessionState.INTRO: {
       const toID = state.senderID;
       // const msg = "Hey! 🤗 Have you ever tried to learn something and then realize later you forgot everything? Learning the right way can be tough on your own. That's why I'm here! Every day we chat we'll learn something new together. Most importantly, we'll always spend some of our time reviewing what we've already learned so we won't forget. Let's go, it's learnin time wooo! 😄";
-      const msg = "Hey! 🤗 I'm here to help you explore the news and really try to understand the important stuff beneath it all. And we'll always review previously learned concepts so we don't forget. K let's do it! 😄";
+      const msg =
+        "Hey! 🤗 I'm here to help you explore the news and really try to understand the important stuff beneath it all. You can explore and learn more about the core concepts that make up a news story, but only what interests you. I'll help test you on and review previously learned concepts that you decided to explore so that we can push that stuff into your long term memory. It's a bit more work, but it's worth it if it means we will REALLY learn this stuff. What's the point of learning if you just forget it all later right? K let's do it! 😄";
       return sendText(toID, msg).then(() => state);
     }
     case SessionState.RECALL_RESPONSE:
@@ -344,12 +347,14 @@ export function sendFeedbackResp(state, withSuccessMedia = false) {
 }
 
 export default function sendResponse(state) {
-  return sendResponseInContext(state).then(() => state).catch(err => {
-    if (state.session) {
-      logErr(`Error sending response from ${state.session.state} state`);
-    } else {
-      logErr('Error sending response');
-    }
-    logErr(err);
-  });
+  return sendResponseInContext(state)
+    .then(() => state)
+    .catch(err => {
+      if (state.session) {
+        logErr(`Error sending response from ${state.session.state} state`);
+      } else {
+        logErr('Error sending response');
+      }
+      logErr(err);
+    });
 }

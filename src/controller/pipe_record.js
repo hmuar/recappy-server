@@ -11,7 +11,7 @@ const recordableStates = [
   SessionState.RECALL_RESPONSE,
   SessionState.INPUT,
   SessionState.MULT_CHOICE,
-  SessionState.INFO,
+  // SessionState.INFO,
   SessionState.SHOW_PATHS
 ];
 
@@ -129,6 +129,18 @@ function pipePathHistory(recordCtx, record, evalCtx) {
   return recordCtx;
 }
 
+function pipeDateUpdate(recordCtx, record) {
+  if (!recordCtx) {
+    return recordCtx;
+  }
+  const curDate = new Date();
+  return {
+    ...recordCtx,
+    createdAt: record && record.createdAt ? record.createdAt : curDate,
+    updatedAt: curDate,
+  };
+}
+
 function createNewRecord(userID, note, recordCtx, subjectParent) {
   const recData = {
     userID,
@@ -191,6 +203,7 @@ export default function pipe(appState) {
       recordCtx = pipeDates(recordCtx, record);
       recordCtx = pipeResponseHistory(recordCtx, record, evalCtx);
       recordCtx = pipeHealth(recordCtx, record, evalCtx);
+      recordCtx = pipeDateUpdate(recordCtx, record);
     }
 
     if (record) {

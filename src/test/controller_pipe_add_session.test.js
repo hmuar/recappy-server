@@ -21,14 +21,22 @@ function getAppState(userID, senderID) {
 }
 
 before('before controller pipe add session testing', () =>
-  db.setup().then(() => db.clean()).then(() => db.loadAllFixtures()));
+  db
+    .setup()
+    .then(() => db.clean())
+    .then(() => db.loadAllFixtures())
+);
 
 test('test add session when user already has existing session', t => {
   const existingSenderID = '1028279607252642';
   return pipeAddSession(
     getAppState(db.createObjectID('5716893a8c8aff3221812148'), existingSenderID)
   ).then(state => {
-    t.ok(state.session);
+    const { session, } = state;
+    t.ok(session);
+    t.ok(session.createdAt);
+    t.ok(session.updatedAt);
+    t.ok(session.createdAt.getTime() === session.updatedAt.getTime());
   });
 });
 
@@ -42,8 +50,12 @@ test('test add session when user has no existing session', t => {
   return pipeAddSession(
     getAppState(db.createObjectID('7716893a8c8aff3221812149'), existingSenderID)
   ).then(state => {
-    t.equal(state.session.noteQueue.length, 22);
-    t.ok(state.session);
+    const { session, } = state;
+    t.equal(session.noteQueue.length, 22);
+    t.ok(session);
+    t.ok(session.createdAt);
+    t.ok(session.updatedAt);
+    t.ok(session.createdAt.getTime() === session.updatedAt.getTime());
   });
 });
 
@@ -53,8 +65,12 @@ test('test add session when user has no existing session with empty startingNote
     getAppState(db.createObjectID('8716893a8c8aff3221812149'), existingSenderID),
     []
   ).then(state => {
-    t.equal(state.session.noteQueue.length, 0);
-    t.ok(state.session);
+    const { session, } = state;
+    t.equal(session.noteQueue.length, 0);
+    t.ok(session);
+    t.ok(session.createdAt);
+    t.ok(session.updatedAt);
+    t.ok(session.createdAt.getTime() === session.updatedAt.getTime());
   });
 });
 
