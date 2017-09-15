@@ -41,7 +41,7 @@ jspm_packages
 docs
 
 dev_notes/init.txt
-dev_notes/curl_cmd.txt
+dev_notes/facebook_curl_cmd.txt
 
 setup_env.sh
 .vscode*

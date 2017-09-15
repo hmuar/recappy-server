@@ -37,7 +37,16 @@ function sendForOneUser() {
       },
     },
   };
-  return notifyUser(oneUser, hardcodedSubjectID);
+  const specificUser = {
+    _id: ObjectID('59bb05ef1df0f40052a9b8b3'),
+    facebookMessageID: '1976761172337884',
+    notification: {
+      facebook: {
+        on: true,
+      },
+    },
+  };
+  return notifyUser(specificUser, hardcodedSubjectID);
 }
 
 function sendNotifications() {
@@ -48,15 +57,19 @@ function sendNotifications() {
     );
     // notify each user
     const notificationPromises = targetUsers.map(targetUser =>
-      notifyUser(targetUser, hardcodedSubjectID));
+      notifyUser(targetUser, hardcodedSubjectID)
+    );
     return Promise.all(notificationPromises);
   });
 }
 
 function notify() {
   const db = new Database();
-  db.setup().then(() => sendNotifications()).then(() => process.exit(0));
-  // db.setup().then(() => sendForOneUser()).then(() => process.exit(0));
+  // db.setup().then(() => sendNotifications()).then(() => process.exit(0));
+  db
+    .setup()
+    .then(() => sendForOneUser())
+    .then(() => process.exit(0));
 }
 
 export default notify;

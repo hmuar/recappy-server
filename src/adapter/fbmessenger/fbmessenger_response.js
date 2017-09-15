@@ -61,7 +61,7 @@ function prependPendingMessages(appState, msg) {
 function sendResponseInContext(state) {
   const fbUserID = state.senderID;
 
-  if (state.input.type === Input.Type.SETTING) {
+  if (state.input && state.input.type === Input.Type.SETTING) {
     const { input, } = state;
     if (input.payload === 'DISABLE_NOTIFICATIONS') {
       return sendText(
