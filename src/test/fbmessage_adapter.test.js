@@ -8,7 +8,11 @@ const after = test;
 const db = new TestDatabase();
 
 before('before fb message adapter testing', () =>
-  db.setup().then(() => db.clean()).then(() => db.loadAllFixtures()));
+  db
+    .setup()
+    .then(() => db.clean())
+    .then(() => db.loadAllFixtures())
+);
 
 test('convert sender to user', t => {
   const messageData = {
@@ -178,6 +182,78 @@ test('parse choice payload request into message data', t => {
   t.ok({}.hasOwnProperty.call(mData, 'input'));
   t.equal(mData.input.type, Input.Type.CUSTOM);
   t.equal(mData.input.payload, 5);
+  t.end();
+});
+
+test('parse disable notification payload request into message data', t => {
+  const request = {
+    object: 'page',
+    entry: [
+      {
+        id: 'PAGE_ID',
+        time: 1460245674269,
+        messaging: [
+          {
+            sender: {
+              id: '1028279607252642',
+            },
+            recipient: {
+              id: 'PAGE_ID',
+            },
+            timestamp: 1460245672080,
+            postback: {
+              payload: 'DISABLE_NOTIFICATIONS',
+              title: 'Disable: DONT send me news',
+            },
+          }
+        ],
+      }
+    ],
+  };
+  const mData = AdapterFB.parse(request)[0];
+  t.ok({}.hasOwnProperty.call(mData, 'timestamp'));
+  t.equal(mData.timestamp, 1460245672080);
+  t.ok({}.hasOwnProperty.call(mData, 'senderID'));
+  t.equal(mData.senderID, '1028279607252642');
+  t.ok({}.hasOwnProperty.call(mData, 'input'));
+  t.equal(mData.input.type, Input.Type.SETTING);
+  t.equal(mData.input.payload, 'DISABLE_NOTIFICATIONS');
+  t.end();
+});
+
+test('parse enable notification payload request into message data', t => {
+  const request = {
+    object: 'page',
+    entry: [
+      {
+        id: 'PAGE_ID',
+        time: 1460245674269,
+        messaging: [
+          {
+            sender: {
+              id: '1028279607252642',
+            },
+            recipient: {
+              id: 'PAGE_ID',
+            },
+            timestamp: 1460245672080,
+            postback: {
+              payload: 'ENABLE_NOTIFICATIONS',
+              title: 'Disable: DONT send me news',
+            },
+          }
+        ],
+      }
+    ],
+  };
+  const mData = AdapterFB.parse(request)[0];
+  t.ok({}.hasOwnProperty.call(mData, 'timestamp'));
+  t.equal(mData.timestamp, 1460245672080);
+  t.ok({}.hasOwnProperty.call(mData, 'senderID'));
+  t.equal(mData.senderID, '1028279607252642');
+  t.ok({}.hasOwnProperty.call(mData, 'input'));
+  t.equal(mData.input.type, Input.Type.SETTING);
+  t.equal(mData.input.payload, 'ENABLE_NOTIFICATIONS');
   t.end();
 });
 

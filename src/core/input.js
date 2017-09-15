@@ -1,6 +1,7 @@
 const InputType = {
   ACCEPT: 'accept',
   REJECT: 'reject',
+  SETTING: 'setting',
   INITIALIZE_NEW_USER: 'initialize_new_user',
   CUSTOM: 'custom',
   PATH: 'path',

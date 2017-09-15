@@ -50,6 +50,7 @@ export default class Controller {
         if (state.newUser) {
           this.adapter
             .getUserDetails(appState.senderID)
+            // XXX: this code needs to be factored out into adapter specific
             .then(userDetails => updateFacebookUserDetails(appState.senderID, userDetails));
         }
         return state;
@@ -90,6 +91,13 @@ export default class Controller {
 
   // main entry method called by external adapters
   registerMsg(msg) {
+    // If input is just a request to change setting, don't go through
+    // normal controller flow.
+    if (msg.input && msg.input.type === Input.Type.SETTING) {
+      const appState = msg;
+      return this.adapter.changeSetting(appState).then(state => this.sendResponse(state));
+    }
+
     return DBAssist.getCategoryByName('subject', msg.subjectName)
       .then(subject => {
         if (!subject) {

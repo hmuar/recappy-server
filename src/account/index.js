@@ -57,11 +57,27 @@ function createUserWithFacebookMsgID(fbMsgID) {
   return user.save().then(savedUser => savedUser);
 }
 
+function updateFacebookNotificationSetting(fbMsgID, isOn) {
+  return User.findOne({ facebookMessageID: fbMsgID, }).then(user => {
+    if (user) {
+      user.notification = {
+        ...user.notification,
+        facebook: {
+          on: isOn,
+        },
+      };
+      return user.save();
+    }
+    return {};
+  });
+}
+
 const Account = {
   getUserByFacebookMsgID,
   getFacebookMsgID,
   createUserWithFacebookMsgID,
   getUsersForFacebookNotification,
+  updateFacebookNotificationSetting,
 };
 
 export default Account;

@@ -60,6 +60,22 @@ function prependPendingMessages(appState, msg) {
 
 function sendResponseInContext(state) {
   const fbUserID = state.senderID;
+
+  if (state.input.type === Input.Type.SETTING) {
+    const { input, } = state;
+    if (input.payload === 'DISABLE_NOTIFICATIONS') {
+      return sendText(
+        fbUserID,
+        "Got it! I disabled notifications. You won't hear from me directly again. I'll only tell you stuff if you come chat with me here 😁"
+      );
+    } else if (input.payload === 'ENABLE_NOTIFICATIONS') {
+      return sendText(
+        fbUserID,
+        "Ok! I enabled notifications. I'll message you whenever I have new stories to share. I won't bug you more than once a day or so though 🙃"
+      );
+    }
+  }
+
   const { session, } = state;
 
   const note = session.noteQueue[session.queueIndex];

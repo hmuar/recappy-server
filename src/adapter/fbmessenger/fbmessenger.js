@@ -102,6 +102,9 @@ function contentInjector(msgType) {
         mtype = Input.Type.REJECT;
       } else if (content === 'GET_STARTED_PAYLOAD') {
         mtype = Input.Type.INITIALIZE_NEW_USER;
+      } else if (content === 'DISABLE_NOTIFICATIONS' || content === 'ENABLE_NOTIFICATIONS') {
+        mtype = Input.Type.SETTING;
+        dataVal = content;
       } else if (~content.indexOf('choice-')) {
         mtype = Input.Type.CUSTOM;
         // if 'choice-' or 'path-' is in content, it was a payload representing
@@ -167,13 +170,10 @@ function parse(requestBody) {
     return [];
   }
   return requestBody.entry
-    .reduce(
-      (acc, entry) => {
-        const entryMsgs = parseEntry(entry);
-        return [...acc, ...entryMsgs];
-      },
-      []
-    )
+    .reduce((acc, entry) => {
+      const entryMsgs = parseEntry(entry);
+      return [...acc, ...entryMsgs];
+    }, [])
     .sort((a, b) => a.seq - b.seq);
 }
 
@@ -219,6 +219,12 @@ export function transformInput(appState) {
   return appState;
 }
 
+export function changeSetting(appState) {
+  const { senderID, input, } = appState;
+  const isOn = input.payload === 'ENABLE_NOTIFICATIONS';
+  return Account.updateFacebookNotificationSetting(senderID, isOn).then(() => appState);
+}
+
 const AdapterFBMessenger = {
   senderToUser,
   createUser,
@@ -227,6 +233,7 @@ const AdapterFBMessenger = {
   sendFeedbackResponse,
   getUserDetails,
   transformInput,
+  changeSetting,
 };
 
 export default AdapterFBMessenger;

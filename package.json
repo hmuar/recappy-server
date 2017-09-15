@@ -11,7 +11,7 @@
     "lint": "esw -w src",
     "test-watch": "watch 'npm run test' src",
     "test": "blue-tape -r babel-register src/test/*.test.js | faucet",
-    "testo": "clear && blue-tape -r babel-register src/test/controller_pipe_save_session.test.js",
+    "testo": "clear && blue-tape -r babel-register src/test/fbmessage_adapter.test.js",
     "test-dbg-brk":
       "clear && node --inspect-brk $(npm bin)/blue-tape -r babel-register src/test/input_evaluation.test.js",
     "test-dbg":

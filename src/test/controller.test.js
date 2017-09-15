@@ -18,7 +18,11 @@ controller.sendFeedbackResponse = state => state;
 controller.logCurrentState = state => state;
 
 before('before controller testing', () =>
-  db.setup().then(() => db.clean()).then(() => db.loadAllFixtures()));
+  db
+    .setup()
+    .then(() => db.clean())
+    .then(() => db.loadAllFixtures())
+);
 
 test('controller pipe user', t => {
   const mData = {
