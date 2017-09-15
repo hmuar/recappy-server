@@ -72,15 +72,6 @@ function sendResponseInContext(state) {
       const displayText = note.displayRaw;
       let quickReplyData = [];
 
-      if (state.paths) {
-        quickReplyData = [
-          ...state.paths.map(path => ({
-            title: path.display,
-            action: getPathInput(path.index),
-          }))
-        ];
-      }
-
       if (isPromptNote(note)) {
         quickReplyData.push({
           title: skipThis(),
@@ -91,6 +82,15 @@ function sendResponseInContext(state) {
           title: keepGoing(),
           action: Input.Type.ACCEPT,
         });
+      }
+      if (state.paths) {
+        quickReplyData = [
+          ...quickReplyData,
+          ...state.paths.map(path => ({
+            title: path.display,
+            action: getPathInput(path.index),
+          }))
+        ];
       }
 
       return sendPossibleImage(fbUserID, note)
