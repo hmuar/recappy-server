@@ -58,9 +58,9 @@ export default class Controller {
   }
 
   transformInput(appState) {
-    if (this.adapter.transformInput) {
-      return this.adapter.transformInput(appState);
-    }
+    // if (this.adapter.transformInput) {
+    //   return this.adapter.transformInput(appState);
+    // }
     return appState;
   }
 

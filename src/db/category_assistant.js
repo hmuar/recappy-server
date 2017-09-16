@@ -35,7 +35,8 @@ function getNotesByIds(ids) {
   return Note.find({ _id: { $in: ids, }, }).exec((err, docs) =>
     docs.sort(
       (a, b) => ids.findIndex(id => a._id.equals(id)) - ids.findIndex(id => b._id.equals(id))
-    ));
+    )
+  );
 }
 
 function getUnitsInOrder(subjectID) {
@@ -83,7 +84,9 @@ function getAllChildNotes(catID, readOnly = false) {
     }
     const childNotesQuery = { ctype: 'note', parent: { $all: noteParents, }, };
     if (readOnly) {
-      return Note.find(childNotesQuery).sort('order').lean();
+      return Note.find(childNotesQuery)
+        .sort('order')
+        .lean();
     }
     return Note.find(childNotesQuery).sort('order');
   });

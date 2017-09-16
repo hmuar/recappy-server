@@ -18,10 +18,11 @@ function advanceToNextDatedConcept(appState) {
       return {
         ...appState,
         // postEvalState: null,
+        newConceptFound: true,
         session: {
           ...session,
-          // noteQueue: newQueue,
-          // queueIndex: 0,
+          noteQueue: nextNotes,
+          queueIndex: 0,
           globalIndex: notesInfo.globalIndex,
           nextGlobalIndex: notesInfo.nextGlobalIndex,
           baseQueueLength: noteQueue.length,
@@ -30,6 +31,28 @@ function advanceToNextDatedConcept(appState) {
         },
       };
     }
+    // if (nextNotes && nextNotes.length > 0) {
+    //   // MUTATE session's noteQueue by inserting new notes into location
+    //   // of current queueIndex so that if user were to continue session,
+    //   // queueIndex now points to the new notes that have been spliced in
+    //   // at that location.
+    //   noteQueue.splice(session.queueIndex, 0, ...nextNotes);
+    //   return {
+    //     ...appState,
+    //     // postEvalState: null,
+    //     newConceptFound: true,
+    //     session: {
+    //       ...session,
+    //       // noteQueue: newQueue,
+    //       // queueIndex: 0,
+    //       globalIndex: notesInfo.globalIndex,
+    //       nextGlobalIndex: notesInfo.nextGlobalIndex,
+    //       baseQueueLength: noteQueue.length,
+    //       state: getEntryStateForNoteType(noteQueue[session.queueIndex].type),
+    //       startSessionTime: new Date(),
+    //     },
+    //   };
+    // }
     // return {
     //   ...appState,
     //   // postEvalState: null,
@@ -44,7 +67,10 @@ function advanceToNextDatedConcept(appState) {
     //     startSessionTime: new Date(),
     //   },
     // };
-    return appState;
+    return {
+      ...appState,
+      newConceptFound: false,
+    };
   });
 }
 

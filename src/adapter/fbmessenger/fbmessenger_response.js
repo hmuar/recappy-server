@@ -348,6 +348,15 @@ export function sendFeedbackResp(state, withSuccessMedia = false) {
         "Hey! 🤗 I'm here to help you explore the important stuff behind current events. Dig into and learn only what interests you. I'll also help test you on and review previously learned concepts that you explored to help push it into long term memory. It's a bit more work, but what's the point of learning if you just forget it all later right? K let's do it! 😄";
       return sendText(toID, msg).then(() => state);
     }
+    case SessionState.INFO: {
+      if (state.input && state.input.type === Input.Type.CUSTOM) {
+        return sendText(
+          state.senderID,
+          "I not smart enough to understand general commands yet 😞, but I'm trying to learn. I will be able to soon! For now can you please use the buttons to make it easier for me? Typing something is still ok 👍🏼 if I'm quizzing you and looking for answer because I know what to look for."
+        ).then(() => state);
+      }
+      break;
+    }
     case SessionState.RECALL_RESPONSE:
       return sendFeedbackText(state, false, withSuccessMedia).then(() => state);
     case SessionState.INPUT:

@@ -4,6 +4,7 @@ import Answer from '~/core/answer';
 import { EvalStatus, evalNoteWithRawInput, evalWithYesNo, hasWaitedMinHours } from '~/core/eval';
 import { minSessionWaitHours } from '~/core/hyperparam';
 import { isProduction } from '~/core/production';
+import { isPromptNote } from '~/core/note';
 
 // Evaluate user input in the context of user's current session state.
 // Add a `evalCtx` object to message data.
@@ -65,6 +66,10 @@ function InfoContext(appState) {
     if (validPayload) {
       return insertEval(appState, successEval(Answer.max, note.paths[dataAsNum]));
     }
+    return insertEval(appState, invalidEval());
+  }
+
+  if (isPromptNote(note) && input.type === Input.Type.CUSTOM) {
     return insertEval(appState, invalidEval());
   }
 

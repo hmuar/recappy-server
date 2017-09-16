@@ -33,9 +33,16 @@ export default class Database {
 
     return new Promise((resolve, reject) => {
       if (!this.loaded) {
-        const connection = mongoose.connect(
-          `mongodb://${dbUser}:${dbPass}@${dbUrl}/${dbName}`
-        ).connection;
+        const connection = mongoose.connect(`mongodb://${dbUser}:${dbPass}@${dbUrl}/${dbName}`)
+          .connection;
+        // const connection = mongoose.connect(`mongodb://${dbUser}:${dbPass}@${dbUrl}/${dbName}`, {
+        //   server: {
+        //     // sets how many times to try reconnecting
+        //     reconnectTries: Number.MAX_VALUE,
+        //     // sets the delay between every retry (milliseconds)
+        //     reconnectInterval: 5000,
+        //   },
+        // }).connection;
         connection.on('error', () => reject('Could not connect to database'));
         connection.on('open', () => {
           this.loaded = true;

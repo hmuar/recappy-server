@@ -12,6 +12,8 @@ function notifyUser(user, subjectID) {
     subjectID,
     senderID: user.facebookMessageID,
     userID: user._id,
+    firstName: user.firstName,
+    lastName: user.lastName,
     expireDate: new Date(),
   };
   // return Promise.resolve(0);
@@ -19,34 +21,39 @@ function notifyUser(user, subjectID) {
 }
 
 function sendForOneUser() {
-  const oneUser = {
-    _id: ObjectID('5996f879c793f3003d6dd2a6'),
+  const hemuUser = {
+    _id: ObjectID('59bad7921df0f40052a9b89f'),
     facebookMessageID: '1028279607252642',
+    firstName: 'Hemu',
+    lastName: 'Arum',
     notification: {
       facebook: {
         on: true,
       },
     },
   };
-  const oneUserDev = {
-    _id: ObjectID('5996ee1a62421a9b5e1def1f'),
-    facebookMessageID: '1555878001098324',
-    notification: {
-      facebook: {
-        on: true,
-      },
-    },
-  };
+  // const oneUserDev = {
+  //   _id: ObjectID('5996ee1a62421a9b5e1def1f'),
+  //   facebookMessageID: '1555878001098324',
+  //   notification: {
+  //     facebook: {
+  //       on: true,
+  //     },
+  //   },
+  // };
   const specificUser = {
     _id: ObjectID('59bb05ef1df0f40052a9b8b3'),
     facebookMessageID: '1976761172337884',
+    firstName: 'Derek',
+    lastName: 'Beard',
     notification: {
       facebook: {
         on: true,
       },
     },
   };
-  return notifyUser(specificUser, hardcodedSubjectID);
+  // return notifyUser(specificUser, hardcodedSubjectID);
+  return notifyUser(hemuUser, hardcodedSubjectID);
 }
 
 function sendNotifications() {

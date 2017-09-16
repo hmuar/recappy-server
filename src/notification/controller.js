@@ -14,7 +14,9 @@ export default class NotificationController {
     const session = state.session;
     // only send response if session has notes and is not done
     if (
-      session.noteQueue && session.noteQueue.length && session.state !== SessionState.DONE_QUEUE
+      session.noteQueue &&
+      session.noteQueue.length &&
+      session.state !== SessionState.DONE_QUEUE
     ) {
       return this.adapter.sendResponse(state);
     }
@@ -44,7 +46,14 @@ export default class NotificationController {
         // record new session state
         .then(state => pipeSaveSession(state))
         // .then(state => this.logCurrentState(state))
-        .then(state => this.sendResponse(state))
+        .then(state => {
+          if (state.newConceptFound) {
+            console.log(`[Notify] user ${sendInfo.firstName} ${sendInfo.lastName}`);
+            return this.sendResponse(state);
+          }
+          console.log(`---[SKIP] user ${sendInfo.firstName} ${sendInfo.lastName}`);
+          return state;
+        })
     );
   }
 }
