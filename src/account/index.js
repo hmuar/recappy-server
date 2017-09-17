@@ -1,12 +1,12 @@
-import { User } from '~/db/collection';
+import { User, ObjectID } from '~/db/collection';
 
 // `fbMsgID` is string used by Facebook to identify users
 function getUserByFacebookMsgID(fbMsgID) {
   return User.findOne({ facebookMessageID: fbMsgID, });
 }
 
-function getUsersForFacebookNotification() {
-  return User.find({ facebookMessageID: { $exists: true, }, });
+function getUserByID(userID) {
+  return User.findOne({ _id: ObjectID(userID), });
 }
 
 // Find user with a MongoDB ObjectID and get associated
@@ -75,8 +75,8 @@ function updateFacebookNotificationSetting(fbMsgID, isOn) {
 const Account = {
   getUserByFacebookMsgID,
   getFacebookMsgID,
+  getUserByID,
   createUserWithFacebookMsgID,
-  getUsersForFacebookNotification,
   updateFacebookNotificationSetting,
 };
 

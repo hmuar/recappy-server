@@ -14,7 +14,7 @@ function advanceToNextDatedConcept(appState) {
       // of current queueIndex so that if user were to continue session,
       // queueIndex now points to the new notes that have been spliced in
       // at that location.
-      noteQueue.splice(session.queueIndex, 0, ...nextNotes);
+      // noteQueue.splice(session.queueIndex, 0, ...nextNotes);
       return {
         ...appState,
         // postEvalState: null,
@@ -26,7 +26,7 @@ function advanceToNextDatedConcept(appState) {
           globalIndex: notesInfo.globalIndex,
           nextGlobalIndex: notesInfo.nextGlobalIndex,
           baseQueueLength: noteQueue.length,
-          state: getEntryStateForNoteType(noteQueue[session.queueIndex].type),
+          state: getEntryStateForNoteType(nextNotes[0].type),
           startSessionTime: new Date(),
         },
       };

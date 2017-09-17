@@ -42,9 +42,9 @@ export default class NotificationController {
         // at this point should have session information
         // advance session state
         .then(state => pipeAdvanceStateDated(state))
-        .then(state => pipeAddPaths(state))
+        .then(state => (state.newConceptFound ? pipeAddPaths(state) : state))
         // record new session state
-        .then(state => pipeSaveSession(state))
+        .then(state => (state.newConceptFound ? pipeSaveSession(state) : state))
         // .then(state => this.logCurrentState(state))
         .then(state => {
           if (state.newConceptFound) {

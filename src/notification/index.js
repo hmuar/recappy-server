@@ -3,9 +3,13 @@ import NotificationController from '~/notification/controller';
 import AdapterFB from '~/adapter/fbmessenger/fbmessenger';
 import Database from '~/db/db';
 import Account from '~/account';
+import { getUsersForFacebookNotification } from '~/notification/notify_assistant';
 
 const hardcodedSubjectID = ObjectID('e8af4a4963a400483bb70593');
 const controller = new NotificationController(AdapterFB);
+
+const DEV_USER_ID = ObjectID('59bad7921df0f40052a9b89f');
+const IDLE_HOURS_THRESHOLD = 1;
 
 function notifyUser(user, subjectID) {
   const sendInfo = {
@@ -16,67 +20,55 @@ function notifyUser(user, subjectID) {
     lastName: user.lastName,
     expireDate: new Date(),
   };
-  // return Promise.resolve(0);
   return controller.send(sendInfo);
 }
 
-function sendForOneUser() {
-  const hemuUser = {
-    _id: ObjectID('59bad7921df0f40052a9b89f'),
-    facebookMessageID: '1028279607252642',
-    firstName: 'Hemu',
-    lastName: 'Arum',
-    notification: {
-      facebook: {
-        on: true,
-      },
-    },
-  };
-  // const oneUserDev = {
-  //   _id: ObjectID('5996ee1a62421a9b5e1def1f'),
-  //   facebookMessageID: '1555878001098324',
-  //   notification: {
-  //     facebook: {
-  //       on: true,
-  //     },
-  //   },
-  // };
-  const specificUser = {
-    _id: ObjectID('59bb05ef1df0f40052a9b8b3'),
-    facebookMessageID: '1976761172337884',
-    firstName: 'Derek',
-    lastName: 'Beard',
-    notification: {
-      facebook: {
-        on: true,
-      },
-    },
-  };
-  // return notifyUser(specificUser, hardcodedSubjectID);
-  return notifyUser(hemuUser, hardcodedSubjectID);
+function sendForUserID(userID) {
+  return Account.getUserByID(userID).then(user => notifyUser(user, hardcodedSubjectID));
 }
 
-function sendNotifications() {
-  return Account.getUsersForFacebookNotification().then(fbUsers => {
-    // pull only users that have facebook notifications pref on
-    const targetUsers = fbUsers.filter(
-      u => u.notification && u.notification.facebook && u.notification.facebook.on
+function sendForAllUsers() {
+  return getUsersForFacebookNotification(IDLE_HOURS_THRESHOLD).then(fbUsers => {
+    const notificationPromises = fbUsers.map(fbUser => notifyUser(fbUser, hardcodedSubjectID));
+    return Promise.all(notificationPromises).then(() =>
+      console.log(`Done with ${fbUsers.length} users.`)
     );
-    // notify each user
-    const notificationPromises = targetUsers.map(targetUser =>
-      notifyUser(targetUser, hardcodedSubjectID)
-    );
-    return Promise.all(notificationPromises);
   });
 }
 
-function notify() {
+function sendTest() {
+  // return Promise.resolve(0);
+  return getUsersForFacebookNotification(IDLE_HOURS_THRESHOLD).then(users => console.log(users));
+}
+
+export function notifyDevUser() {
   const db = new Database();
-  // db.setup().then(() => sendNotifications()).then(() => process.exit(0));
   db
     .setup()
-    .then(() => sendForOneUser())
+    .then(() => sendForUserID(DEV_USER_ID))
     .then(() => process.exit(0));
 }
 
-export default notify;
+export function notifyWithUserID(userID) {
+  const db = new Database();
+  db
+    .setup()
+    .then(() => sendForUserID(userID))
+    .then(() => process.exit(0));
+}
+
+export function notifyAllUsers() {
+  const db = new Database();
+  db
+    .setup()
+    .then(() => sendForAllUsers())
+    .then(() => process.exit(0));
+}
+
+export function notifyTest() {
+  const db = new Database();
+  db
+    .setup()
+    .then(() => sendTest())
+    .then(() => process.exit(0));
+}
