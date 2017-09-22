@@ -8,6 +8,8 @@ import {
   generateQuestion,
   backToOriginalTopic,
   reviewTime,
+  noNewButReview,
+  noNew,
   positiveEncourage,
   negativeEncourage,
   triggerFollowup,
@@ -48,6 +50,10 @@ function prependPendingMessages(appState, msg) {
     const { parentDescription, } = transition;
     if (parentDescription) {
       if (transition.queueStatus && transition.queueStatus.newToOld) {
+        // if there are only review items in queue
+        if (appState.session && appState.session.queueIndex === 0) {
+          return `${noNewButReview(parentDescription)} ${msg}`;
+        }
         return `${reviewTime(parentDescription)} ${msg}`;
       }
       if (transition.depth && transition.depth.backToParentDepth) {
@@ -58,7 +64,7 @@ function prependPendingMessages(appState, msg) {
   return Promise.resolve(msg);
 }
 
-function sendResponseInContext(state) {
+function sendResponseInContext(state, splitText) {
   const fbUserID = state.senderID;
 
   if (state.input && state.input.type === Input.Type.SETTING) {
@@ -71,7 +77,7 @@ function sendResponseInContext(state) {
     } else if (input.payload === 'ENABLE_NOTIFICATIONS') {
       return sendText(
         fbUserID,
-        "Ok! I enabled notifications. I'll message you whenever I have new stories to share. I won't bug you more than once a day or so though 🙃"
+        "Ok! I enabled notifications. I'll message you whenever I have new stories to share. I won't bug you more than a couple times a week or so though 🙃"
       );
     }
   }
@@ -91,7 +97,7 @@ function sendResponseInContext(state) {
       if (isPromptNote(note)) {
         quickReplyData.push({
           title: skipThis(),
-          action: Input.Type.ACCEPT,
+          action: Input.Type.REJECT,
         });
       } else {
         quickReplyData.push({
@@ -112,11 +118,14 @@ function sendResponseInContext(state) {
       return sendPossibleImage(fbUserID, note)
         .then(() => prependPendingMessages(state, displayText))
         .then(finalMsg => {
-          const shortenedMsgs = divideLongText(finalMsg, 100);
-          if (shortenedMsgs.length > 1) {
-            return sendText(fbUserID, shortenedMsgs[0]).then(() =>
-              sendQuickReply(fbUserID, shortenedMsgs[1], quickReplyData)
-            );
+          if (splitText) {
+            const shortenedMsgs = divideLongText(finalMsg, 100);
+            if (shortenedMsgs.length > 1) {
+              return sendText(fbUserID, shortenedMsgs[0]).then(() =>
+                sendQuickReply(fbUserID, shortenedMsgs[1], quickReplyData)
+              );
+            }
+            return sendQuickReply(fbUserID, finalMsg, quickReplyData);
           }
           return sendQuickReply(fbUserID, finalMsg, quickReplyData);
         });
@@ -209,6 +218,11 @@ function sendResponseInContext(state) {
         state.preEvalState === SessionState.DONE_QUEUE &&
         state.postEvalState === SessionState.DONE_QUEUE
       ) {
+        // no notes, so just say nothing new found
+        if (session && session.noteQueue && session.noteQueue.length === 0) {
+          return sendText(fbUserID, noNew());
+        }
+
         const waitedHours = session.remainingWaitHours;
         // let respMessage = "Whew I'm tired! 😓 We already learned a lot today, don't ya think? Let's take a break! An important part of learning is resting and letting the new stuff sink in.";
         let respMessage = "Whew I'm tired! 😓 No more for today.";
@@ -345,7 +359,7 @@ export function sendFeedbackResp(state, withSuccessMedia = false) {
       const toID = state.senderID;
       // const msg = "Hey! 🤗 Have you ever tried to learn something and then realize later you forgot everything? Learning the right way can be tough on your own. That's why I'm here! Every day we chat we'll learn something new together. Most importantly, we'll always spend some of our time reviewing what we've already learned so we won't forget. Let's go, it's learnin time wooo! 😄";
       const msg =
-        "Hey! 🤗 I'm here to help you explore the important stuff behind current events. Dig into and learn only what interests you. I'll also help test you on and review previously learned concepts that you explored to help push it into long term memory. It's a bit more work, but what's the point of learning if you just forget it all later right? K let's do it! 😄";
+        "Hey! 🤗 I'm here to help you explore the important stuff behind current events a few times a week. Dig into and learn only what interests you. I'll also help test you on and review previously learned concepts that you explored to help push it into long term memory. It's a bit more work, but what's the point of learning if you just forget it all later right? K let's do it! 😄";
       return sendText(toID, msg).then(() => state);
     }
     case SessionState.INFO: {
@@ -371,8 +385,8 @@ export function sendFeedbackResp(state, withSuccessMedia = false) {
   return state;
 }
 
-export default function sendResponse(state) {
-  return sendResponseInContext(state)
+export default function sendResponse(state, splitText = true) {
+  return sendResponseInContext(state, splitText)
     .then(() => state)
     .catch(err => {
       if (state.session) {

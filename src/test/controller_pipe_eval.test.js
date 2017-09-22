@@ -28,11 +28,13 @@ function getSession(queueIndex = 0, state) {
         type: 'info',
         weight: 1,
         level: 1,
-        display: '<p>Carbon has 6 protons and 6 neutrons in its nucleus. This makes it a relatively small, flexible atom so it is very useful. This helps make carbon fundamental to life. Without carbon all human, plant, and animal life would not be possible. We are all <strong>carbon-based</strong> lifeforms.</p>',
+        display:
+          '<p>Carbon has 6 protons and 6 neutrons in its nucleus. This makes it a relatively small, flexible atom so it is very useful. This helps make carbon fundamental to life. Without carbon all human, plant, and animal life would not be possible. We are all <strong>carbon-based</strong> lifeforms.</p>',
         extra: '',
         extra_media: '',
         ckey: 'proton-neutron-electron',
-        displayRaw: 'Carbon has 6 protons and 6 neutrons in its nucleus. This makes it a relatively small, flexible atom so it is very useful. This helps make carbon fundamental to life. Without carbon all human, plant, and animal life would not be possible. We are all carbon-based lifeforms.',
+        displayRaw:
+          'Carbon has 6 protons and 6 neutrons in its nucleus. This makes it a relatively small, flexible atom so it is very useful. This helps make carbon fundamental to life. Without carbon all human, plant, and animal life would not be possible. We are all carbon-based lifeforms.',
         globalIndex: 0,
         directParent: db.createObjectID('7980227254feb46736ca47fd'),
         __v: 0,
@@ -88,7 +90,8 @@ function getSession(queueIndex = 0, state) {
         choice4: 'no sharing of charges',
         choice5: 'sharing of neutrons between molecules',
         answer: 3,
-        hidden: 'Polar covalent bonds have unequal sharing of electrons, so some sides of molecules will be more negatively charged and some more positively charged.',
+        hidden:
+          'Polar covalent bonds have unequal sharing of electrons, so some sides of molecules will be more negatively charged and some more positively charged.',
         globalIndex: 65,
         subjectParent: db.createObjectID('f64c57184a4ef7f0357f9cd6'),
         directParent: db.createObjectID('f9e515b670e5b8de9210872e'),
@@ -112,7 +115,8 @@ function getSession(queueIndex = 0, state) {
         ckey: 'atomic-shell-valence',
         displayRaw: 'what the outermost filled electron shell is called?',
         answer: 'valence',
-        hidden: 'Remember that an atom likes to get together with other atoms just so it can share and exchange electrons with them and fill this valence shell.',
+        hidden:
+          'Remember that an atom likes to get together with other atoms just so it can share and exchange electrons with them and fill this valence shell.',
         phrase: {
           pre: ['Do you remember', 'Can you tell me'],
         },
@@ -317,7 +321,11 @@ function getAppState(session, input) {
 }
 
 before('before controller pipe evaluator testing', () =>
-  db.setup().then(() => db.clean()).then(() => db.loadAllFixtures()));
+  db
+    .setup()
+    .then(() => db.clean())
+    .then(() => db.loadAllFixtures())
+);
 
 test('eval with init state', t => {
   const appState = getAppState(getSession(0, SessionState.INIT), {
@@ -370,9 +378,9 @@ test('eval with INFO state and invalid input', t => {
   const mEvalState = pipeEval(appState);
   const evalCtx = mEvalState.evalCtx;
   t.equal(mEvalState.session.state, SessionState.INFO);
-  t.equal(evalCtx.answerQuality, null);
+  t.equal(evalCtx.answerQuality, Answer.min);
   t.equal(evalCtx.correctAnswer, null);
-  t.equal(evalCtx.status, EvalStatus.INVALID);
+  t.equal(evalCtx.status, EvalStatus.SUCCESS);
   t.end();
 });
 

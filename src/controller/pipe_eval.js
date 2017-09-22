@@ -75,7 +75,7 @@ function InfoContext(appState) {
 
   return insertEval(
     appState,
-    input.type !== Input.Type.REJECT ? successEval(Answer.ok) : invalidEval()
+    input.type !== Input.Type.REJECT ? successEval(Answer.ok) : successEval(Answer.min)
   );
 }
 

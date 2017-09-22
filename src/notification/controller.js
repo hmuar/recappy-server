@@ -18,7 +18,7 @@ export default class NotificationController {
       session.noteQueue.length &&
       session.state !== SessionState.DONE_QUEUE
     ) {
-      return this.adapter.sendResponse(state);
+      return this.adapter.sendNotificationResponse(state);
     }
     return state;
   }

@@ -87,7 +87,8 @@ before('before controller advance state testing', () =>
     })
     .then(user => {
       testUser = user;
-    }));
+    })
+);
 
 test('test state transition dated early date', t => {
   const appState = {
@@ -96,7 +97,7 @@ test('test state transition dated early date', t => {
   };
   return pipeStateTransitionDated(appState).then(ns => {
     t.equal(ns.session.state, SessionState.INFO);
-    t.equal(ns.session.noteQueue.length, 26);
+    t.equal(ns.session.noteQueue.length, 22);
   });
 });
 
@@ -108,7 +109,7 @@ test('test state transition dated late date', t => {
   // const nextAppState = pipeStateTransitionDated(appState, new Date('08/10/2017'));
   return pipeStateTransitionDated(appState).then(ns => {
     t.equal(ns.session.state, SessionState.RECALL);
-    t.equal(ns.session.noteQueue.length, 14);
+    t.equal(ns.session.noteQueue.length, 10);
   });
 });
 

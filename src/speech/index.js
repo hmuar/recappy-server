@@ -22,11 +22,29 @@ export function backToOriginalTopic(topic) {
 
 const REVIEW_PHRASES = [
   "Let's do a little review of past topics, starting with",
-  "Review time! Let's start with"
+  "Review time of past topics! Let's start with"
 ];
 
 export function reviewTime(topic) {
   return `${randomChoice(REVIEW_PHRASES)} ${topic}.`;
+}
+
+const NO_NEW_BUT_REVIEW = [
+  "No more new stuff yet, but let's look at some past info that is on our scheduled review for today. First,",
+  "No new stories, but let's do a quick quiz review of previous topics that we might be starting to forget. First,"
+];
+
+export function noNewButReview(topic) {
+  return `${randomChoice(NO_NEW_BUT_REVIEW)} ${topic}.`;
+}
+
+const NO_NEW = [
+  "No new stuff yet, I'm still reading up on current events. I'll have more in a day or two ⏰. If you haven't disabled notifications, I'll message you as soon as I have another story!",
+  "Nothing new quite yet, I'm still looking for good topics. I'll get ya something in a day or two ⏰"
+];
+
+export function noNew() {
+  return randomChoice(NO_NEW);
 }
 
 const POS_ENCOURAGE_PHRASES = [
@@ -94,9 +112,9 @@ export function welcomeBack() {
 // ];
 
 const SESSION_DONE_PHRASE = [
-  'no more news for today, all done! Great job! Check back in tomorrow 🙂',
-  "annd we're done! more tomorrow. See ya!",
-  "I'm all out of stuff for today, more tomorrow. see ya 🙃"
+  'no more news for today, all done! Check back in a few days 🙂',
+  "annd we're done! more stories in a few days. See ya!",
+  "I'm all out of stuff for today, more in a few days. see ya 🙃"
 ];
 
 export function doneSession() {

@@ -6,7 +6,7 @@ import { getCurrentNote } from '~/core/session_state';
 // import { log, logErr } from '~/logger';
 import MessageType from './fbmessage_type';
 import sendResp, { sendFeedbackResp } from './fbmessenger_response';
-import { sendUserDetailsRequest } from './fbmessenger_request';
+import { sendUserDetailsRequest, sendText } from './fbmessenger_request';
 
 const HARDCODED_SUBJ_NAME = 'news';
 
@@ -189,6 +189,15 @@ export function sendResponse(state) {
   return sendResp(state);
 }
 
+export function sendNotificationResponse(state) {
+  const fbUserID = state.senderID;
+  // return sendText(
+  //   fbUserID,
+  //   '(To stop receiving stories, turn off notifications using the menu)'
+  // ).then(() => sendResp(state));
+  return sendResp(state, false);
+}
+
 export function sendFeedbackResponse(state) {
   // if (!evalSuccess(state)) {
   //   return state;
@@ -231,6 +240,7 @@ const AdapterFBMessenger = {
   createUser,
   parse,
   sendResponse,
+  sendNotificationResponse,
   sendFeedbackResponse,
   getUserDetails,
   transformInput,

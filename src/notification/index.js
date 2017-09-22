@@ -8,7 +8,8 @@ import { getUsersForFacebookNotification } from '~/notification/notify_assistant
 const hardcodedSubjectID = ObjectID('e8af4a4963a400483bb70593');
 const controller = new NotificationController(AdapterFB);
 
-const DEV_USER_ID = ObjectID('59bad7921df0f40052a9b89f');
+// const DEV_USER_ID = ObjectID('59bad7921df0f40052a9b89f');
+const DEV_USER_ID = ObjectID('5996ee1a62421a9b5e1def1f');
 const IDLE_HOURS_THRESHOLD = 1;
 
 function notifyUser(user, subjectID) {

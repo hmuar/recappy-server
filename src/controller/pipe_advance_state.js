@@ -79,6 +79,25 @@ function setPostEvalState(appState) {
   };
 }
 
+function transitionInfo(transitionBackToParentDepth, transitionNewToOld, transitionToNote) {
+  let extraFetch = Promise.resolve({});
+  const markedTransition = transitionBackToParentDepth || transitionNewToOld;
+  if (markedTransition) {
+    extraFetch = CategoryAssistant.getCategoryById(
+      transitionToNote.directParent
+    ).then(parentInfo => ({
+      depth: {
+        backToParentDepth: transitionBackToParentDepth,
+      },
+      queueStatus: {
+        newToOld: transitionNewToOld,
+      },
+      parentDescription: parentInfo ? parentInfo.ckey : null,
+    }));
+  }
+  return extraFetch;
+}
+
 function advanceToNextConcept(appState, _cutoffDate, expireDate = null) {
   const cutoffDate = _cutoffDate || new Date();
   const { userID, subjectID, } = appState;
@@ -94,9 +113,11 @@ function advanceToNextConcept(appState, _cutoffDate, expireDate = null) {
   ).then(notesInfo => {
     const nextNotes = notesInfo.notes;
     if (nextNotes && nextNotes.length > 0) {
-      return {
+      const nextNote = nextNotes[0];
+      const transitionNewToOld = nextNote.queueStatus === QueueStatus.OLD;
+      return transitionInfo(false, transitionNewToOld, nextNote).then(transInfo => ({
         ...appState,
-        // postEvalState: null,
+        transition: transInfo,
         session: {
           ...appState.session,
           noteQueue: nextNotes,
@@ -107,7 +128,7 @@ function advanceToNextConcept(appState, _cutoffDate, expireDate = null) {
           state: getEntryStateForNoteType(nextNotes[0].type),
           startSessionTime: new Date(),
         },
-      };
+      }));
     }
     // no new notes exist in entire subject, user has finished EVERYTHING.
     // TODO: add a new session state to handle this situation
@@ -129,46 +150,11 @@ function advanceToNextConcept(appState, _cutoffDate, expireDate = null) {
   });
 }
 
-// function advanceToNextDatedConcept(appState) {
-//   const expireDate = appState.expireDate || new Date();
-//   const { subjectID, session, } = appState;
-//   const { noteQueue, } = session;
-//   const targetGlobalIndex = appState.session.nextGlobalIndex;
-//
-//   return getNewMaterial(subjectID, 1, targetGlobalIndex, [], expireDate).then(notesInfo => {
-//     const nextNotes = notesInfo.notes;
-//     if (nextNotes && nextNotes.length > 0) {
-//       // MUTATE session's noteQueue by inserting new notes into location
-//       // of current queueIndex so that if user were to continue session,
-//       // queueIndex now points to the new notes that have been spliced in
-//       // at that location.
-//       noteQueue.splice(session.queueIndex, 0, ...nextNotes);
-//       return {
-//         ...appState,
-//         // postEvalState: null,
-//         session: {
-//           ...session,
-//           // noteQueue: newQueue,
-//           // queueIndex: 0,
-//           globalIndex: notesInfo.globalIndex,
-//           nextGlobalIndex: notesInfo.nextGlobalIndex,
-//           baseQueueLength: noteQueue.length,
-//           state: getEntryStateForNoteType(noteQueue[session.queueIndex].type),
-//           startSessionTime: new Date(),
-//         },
-//       };
-//     }
-//     return appState;
-//   });
-// }
-
 function advanceState(appState) {
   if (!appState) {
     return Promise.resolve(appState);
   }
 
-  // if necessary, advance queueIndex
-  // set proper next state based on next note
   if (appState.session && appState.postEvalState) {
     if (appState.postEvalState === SessionState.DONE_QUEUE) {
       const { evalCtx, } = appState;
@@ -183,10 +169,6 @@ function advanceState(appState) {
     }
 
     if (appState.postEvalState === SessionState.START_NEW_SESSION) {
-      // update note queue
-      // update queueIndex
-      // update globalIndex
-
       const { evalCtx, } = appState;
       const { cutoffDate, } = evalCtx.correctAnswer;
       return advanceToNextConcept(appState, cutoffDate, new Date());
@@ -211,7 +193,16 @@ function advanceState(appState) {
           nextQueueIndex = queueIndex + 1;
         }
         if (nextQueueIndex < noteQueue.length) {
+          // if question is prompt and user skips, try to find next available prompt
           const curNote = noteQueue[queueIndex];
+          // XXX: Prompt note specific code
+          if (isPromptNote(curNote)) {
+            const skipPrompt = isFailResponse(appState.evalCtx.answerQuality);
+            if (skipPrompt) {
+              const nowDate = new Date();
+              return advanceToNextConcept(appState, nowDate, nowDate);
+            }
+          }
           const nextNote = noteQueue[nextQueueIndex];
           const curBranchDepth = curNote.branchDepth || 0;
           const nextBranchDepth = nextNote.branchDepth || 0;
@@ -245,46 +236,36 @@ function advanceState(appState) {
             const nowDate = new Date();
             return advanceToNextConcept(appState, nowDate, nowDate);
           }
+          // XXX: Prompt note specific code
           // if question is prompt and user skips, try to find next available prompt
           const curNote = noteQueue[queueIndex];
           if (isPromptNote(curNote)) {
-            const skipPrompt = !isFailResponse(appState.evalCtx.answerQuality);
+            const skipPrompt = isFailResponse(appState.evalCtx.answerQuality);
             if (skipPrompt) {
               const nowDate = new Date();
               return advanceToNextConcept(appState, nowDate, nowDate);
             }
           }
-
           nextSessionState = SessionState.DONE_QUEUE;
         }
       }
 
-      const markedTransition = transitionBackToParentDepth || transitionNewToOld;
-      // if we detected a transition, need to grab ckey of new parent concept
-      let extraFetch = Promise.resolve(null);
-      if (markedTransition) {
-        const nextNote = noteQueue[nextQueueIndex];
-        extraFetch = CategoryAssistant.getCategoryById(nextNote.directParent);
-      }
-
-      return extraFetch.then(parentInfo => ({
+      const nextNote = noteQueue[nextQueueIndex];
+      return transitionInfo(
+        transitionBackToParentDepth,
+        transitionNewToOld,
+        nextNote
+      ).then(transInfo => ({
         ...appState,
-        transition: {
-          depth: {
-            backToParentDepth: transitionBackToParentDepth,
-          },
-          queueStatus: {
-            newToOld: transitionNewToOld,
-          },
-          parentDescription: parentInfo ? parentInfo.ckey : null,
-        },
+        transition: transInfo,
         session: {
           ...appState.session,
           queueIndex: nextQueueIndex,
           state: nextSessionState,
-          lastCompleted: nextSessionState === SessionState.DONE_QUEUE
-            ? new Date()
-            : appState.session.lastCompleted,
+          lastCompleted:
+            nextSessionState === SessionState.DONE_QUEUE
+              ? new Date()
+              : appState.session.lastCompleted,
         },
       }));
     }
