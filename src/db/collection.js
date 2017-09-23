@@ -149,4 +149,13 @@ const mediaSchema = new mongoose.Schema({
 
 export const Media = mongoose.model('Media', simulationSchema, 'media');
 
+const messageQueueScheme = new mongoose.Schema({
+  userID: mongoose.Schema.Types.ObjectId,
+  subjectID: mongoose.Schema.Types.ObjectId,
+  queue: {},
+  pending: Boolean,
+});
+
+export const MessageQueue = mongoose.model('MessageQueue', messageQueueScheme, 'messagequeue');
+
 export const ObjectID = mongoose.Types.ObjectId;

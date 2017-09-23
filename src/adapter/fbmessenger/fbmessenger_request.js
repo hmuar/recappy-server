@@ -1,11 +1,13 @@
 import request from 'request-promise';
 import Config from '~/config/config';
 import { log } from '~/logger';
+import { updatePending } from '~/db/message_queue_assistant';
 import MessageType from './fbmessage_type';
 
 const FB_REQUEST_URL = `https://graph.facebook.com/v2.6/me/messages?access_token=${Config.FBToken}`;
 const MIN_TYPING_DELAY_MILLISECONDS = 1000;
-const MAX_TYPING_DELAY_MILLISECONDS = 3500;
+const MAX_TYPING_DELAY_MILLISECONDS = 3000;
+const IMAGE_TYPING_DELAY = 0;
 const AVG_WORDS_PER_SECOND = 12;
 const SECS_TO_MILLISECONDS = 1000;
 
@@ -145,37 +147,89 @@ function sendTypingIndicator(senderID) {
   return postBody;
 }
 
-export function sendText(senderID, text) {
-  log(`sending text: ${text}`);
+function delayWrapper(appState, delayDuration, applyFunc) {
+  const { senderID, } = appState;
+  if (delayDuration > 0) {
+    sendPostRequest(sendTypingIndicator(senderID));
+    return delay(delayDuration).then(() => applyFunc());
+  }
+  return applyFunc();
+  // const msg = {
+  //   timestamp,
+  // };
+  // return isLatestMsg(userID, subjectID, msg, true).then(isLatest => {
+  //   if (isLatest) {
+  //     return delay(delayDuration).then(() =>
+  //       isLatestMsg(userID, subjectID, msg, false).then(isStillLatest => {
+  //         if (isStillLatest) {
+  //           return applyFunc();
+  //         }
+  //         return false;
+  //       })
+  //     );
+  //   }
+  //   return false;
+  // });
+}
+
+function _sendText(appState, text, final) {
+  const { senderID, userID, subjectID, timestamp, } = appState;
   const bodyCreator = postBodyCreator(MessageType.TEXT);
+  return sendPostRequest(bodyCreator(senderID, text)).then(() => {
+    if (final) {
+      updatePending(userID, subjectID, timestamp, false);
+    }
+    return true;
+  });
+}
+
+export function sendText(appState, text, final = true) {
   const delayDuration = getTypingDelay(text);
-  sendPostRequest(sendTypingIndicator(senderID));
-  return delay(delayDuration).then(() => sendPostRequest(bodyCreator(senderID, text)));
+  return delayWrapper(appState, delayDuration, () => _sendText(appState, text, final));
+}
+
+function _sendQuickReply(appState, text, replies, final) {
+  const { senderID, userID, subjectID, timestamp, } = appState;
+  const bodyCreator = postBodyCreator(MessageType.QUICK_REPLY);
+  return sendPostRequest(bodyCreator(senderID, text, replies)).then(() => {
+    if (final) {
+      updatePending(userID, subjectID, timestamp, false);
+    }
+    return true;
+  });
 }
 
 // replies is list of {title, action}
-export function sendQuickReply(senderID, text, replies) {
-  log(`sending replies: ${text}`);
-  const bodyCreator = postBodyCreator(MessageType.QUICK_REPLY);
+export function sendQuickReply(appState, text, replies, final = true) {
   const delayDuration = getTypingDelay(text);
-  sendPostRequest(sendTypingIndicator(senderID));
-  return delay(delayDuration).then(() => sendPostRequest(bodyCreator(senderID, text, replies)));
+  return delayWrapper(appState, delayDuration, () =>
+    _sendQuickReply(appState, text, replies, final)
+  );
+}
+
+function _sendImage(appState, imgURL, final) {
+  const { senderID, userID, subjectID, timestamp, } = appState;
+  const bodyCreator = postBodyCreator(MessageType.IMAGE);
+  return sendPostRequest(bodyCreator(senderID, imgURL)).then(() => {
+    if (final) {
+      updatePending(userID, subjectID, timestamp, false);
+    }
+    return true;
+  });
+}
+
+export function sendImage(appState, imgURL, final = true) {
+  return delayWrapper(appState, IMAGE_TYPING_DELAY, () => _sendImage(appState, imgURL, final));
 }
 
 // buttons is list of {title, action}
-export function sendButtons(senderID, text, buttons) {
-  log(`sending buttons: ${text}`);
-  const bodyCreator = postBodyCreator(MessageType.POSTBACK);
-  const delayDuration = getTypingDelay(text);
-  sendPostRequest(sendTypingIndicator(senderID));
-  return delay(delayDuration).then(() => sendPostRequest(bodyCreator(senderID, text, buttons)));
-}
-
-export function sendImage(senderID, imgURL) {
-  log(`sending img: ${imgURL}`);
-  const bodyCreator = postBodyCreator(MessageType.IMAGE);
-  return sendPostRequest(bodyCreator(senderID, imgURL));
-}
+// export function sendButtons(senderID, text, buttons) {
+//   log(`sending buttons: ${text}`);
+//   const bodyCreator = postBodyCreator(MessageType.POSTBACK);
+//   const delayDuration = getTypingDelay(text);
+//   sendPostRequest(sendTypingIndicator(senderID));
+//   return delay(delayDuration).then(() => sendPostRequest(bodyCreator(senderID, text, buttons)));
+// }
 
 export function sendUserDetailsRequest(senderID) {
   const uri = `https://graph.facebook.com/v2.6/${senderID}?fields=first_name,last_name,locale,timezone,gender&access_token=${Config.FBToken}`;

@@ -3,6 +3,7 @@ import DBAssist from '~/db/category_assistant';
 import Input from '~/core/input';
 import { updateFacebookUserDetails } from '~/account';
 import { log, logErr, logState } from '~/logger';
+import { shouldHandleMsg } from '~/db/message_queue_assistant';
 import pipeAddSession from './pipe_add_session';
 import pipeRecord from './pipe_record';
 import pipeEval from './pipe_eval';
@@ -113,6 +114,19 @@ export default class Controller {
           return (
             this.pipeUser(appState)
               // at this point should have app user information
+              .then(state => {
+                // If previous msg is still pending, do NOT handle this message
+                // It means multiple messages were sent at once
+                const { userID, subjectID, timestamp, } = state;
+                return shouldHandleMsg(userID, subjectID, timestamp).then(shouldHandle => {
+                  if (shouldHandle) {
+                    return state;
+                  }
+                  return Promise.reject(
+                    'Previous pending message not finished sending, ignoring current user message.'
+                  );
+                });
+              })
               .then(state => pipeAddSession(state))
               // at this point should have session information
               .then(state => this.transformInput(state))
@@ -134,6 +148,9 @@ export default class Controller {
                 // can happen asynchronously
                 pipeStudentModel(state);
                 return this.sendResponse(state);
+              })
+              .catch(err => {
+                logErr(err);
               })
           );
         }

@@ -24,19 +24,19 @@ import {
 import Answer from '~/core/answer';
 import { logErr } from '~/logger';
 import { Media } from '~/db/collection';
-import { sendText, sendImage, sendQuickReply, sendButtons } from './fbmessenger_request';
+import { sendText, sendImage, sendQuickReply } from './fbmessenger_request';
 
-function sendImageWithUrl(senderID, imgUrl) {
+function sendImageWithUrl(appState, imgUrl, final) {
   if (!imgUrl) {
     return Promise.resolve(0);
   }
-  return sendImage(senderID, imgUrl);
+  return sendImage(appState, imgUrl, final);
 }
 
-export function sendPossibleImage(senderID, note) {
+export function sendPossibleImage(appState, note, final) {
   if ('imgUrl' in note) {
     if (note.imgUrl != null) {
-      return sendImageWithUrl(senderID, note.imgUrl);
+      return sendImageWithUrl(appState, note.imgUrl, final);
     }
   }
   return Promise.resolve(0);
@@ -71,13 +71,15 @@ function sendResponseInContext(state, splitText) {
     const { input, } = state;
     if (input.payload === 'DISABLE_NOTIFICATIONS') {
       return sendText(
-        fbUserID,
-        "Got it! I disabled notifications. You won't hear from me directly again. I'll only tell you stuff if you come chat with me here 😁"
+        state,
+        "Got it! I disabled notifications. You won't hear from me directly again. I'll only tell you stuff if you come chat with me here 😁",
+        true
       );
     } else if (input.payload === 'ENABLE_NOTIFICATIONS') {
       return sendText(
-        fbUserID,
-        "Ok! I enabled notifications. I'll message you whenever I have new stories to share. I won't bug you more than a couple times a week or so though 🙃"
+        state,
+        "Ok! I enabled notifications. I'll message you whenever I have new stories to share. I won't bug you more than a couple times a week or so though 🙃",
+        true
       );
     }
   }
@@ -86,9 +88,6 @@ function sendResponseInContext(state, splitText) {
 
   const note = session.noteQueue[session.queueIndex];
   switch (session.state) {
-    // case SessionState.INIT:
-    //   return sendText(fbUserID, "Let's get started!").then(() => state);
-
     case SessionState.INFO: {
       // split up displayRaw text into separate bubbles of text
       const displayText = note.displayRaw;
@@ -115,19 +114,19 @@ function sendResponseInContext(state, splitText) {
         ];
       }
 
-      return sendPossibleImage(fbUserID, note)
+      return sendPossibleImage(state, note)
         .then(() => prependPendingMessages(state, displayText))
         .then(finalMsg => {
           if (splitText) {
             const shortenedMsgs = divideLongText(finalMsg, 100);
             if (shortenedMsgs.length > 1) {
-              return sendText(fbUserID, shortenedMsgs[0]).then(() =>
-                sendQuickReply(fbUserID, shortenedMsgs[1], quickReplyData)
+              return sendText(state, shortenedMsgs[0], false).then(() =>
+                sendQuickReply(state, shortenedMsgs[1], quickReplyData, true)
               );
             }
-            return sendQuickReply(fbUserID, finalMsg, quickReplyData);
+            return sendQuickReply(state, finalMsg, quickReplyData, true);
           }
-          return sendQuickReply(fbUserID, finalMsg, quickReplyData);
+          return sendQuickReply(state, finalMsg, quickReplyData, true);
         });
     }
 
@@ -139,13 +138,14 @@ function sendResponseInContext(state, splitText) {
       });
       const questionText = generateQuestion(note);
 
-      return sendPossibleImage(fbUserID, note)
+      return sendPossibleImage(state, note)
         .then(() => prependPendingMessages(state, questionText))
         .then(finalMsg =>
           sendQuickReply(
-            fbUserID,
+            state,
             `${finalMsg} Think about it to yourself and we'll look at the answer together.`,
-            quickReplyData
+            quickReplyData,
+            true
           )
         );
     }
@@ -160,23 +160,23 @@ function sendResponseInContext(state, splitText) {
         title: 'Nope',
         action: Input.Type.REJECT,
       });
-      return sendText(fbUserID, note.hidden).then(() =>
-        sendQuickReply(fbUserID, isThatWhatYouThought(), quickReplyData)
+      return sendText(state, note.hidden, false).then(() =>
+        sendQuickReply(state, isThatWhatYouThought(), quickReplyData, true)
       );
     }
 
     case SessionState.INPUT: {
       const questionText = generateQuestion(note);
-      return sendPossibleImage(fbUserID, note)
+      return sendPossibleImage(state, note, false)
         .then(() => prependPendingMessages(state, questionText))
-        .then(finalMsg => sendText(fbUserID, finalMsg));
+        .then(finalMsg => sendText(state, finalMsg, true));
     }
 
     case SessionState.MULT_CHOICE: {
       const questionText = generateQuestion(note);
-      return sendPossibleImage(fbUserID, note)
+      return sendPossibleImage(state, note, false)
         .then(() => prependPendingMessages(state, questionText))
-        .then(finalMsg => sendText(fbUserID, finalMsg))
+        .then(finalMsg => sendText(state, finalMsg, false))
         .then(() => {
           let choicesText = '';
           choicesText += `(1) ${note.choice1}\n`;
@@ -188,7 +188,7 @@ function sendResponseInContext(state, splitText) {
             title: `${num}`,
             action: getChoiceInput(num),
           }));
-          return sendQuickReply(fbUserID, choicesText, quickReplyData);
+          return sendQuickReply(state, choicesText, quickReplyData, true);
         });
     }
 
@@ -210,7 +210,7 @@ function sendResponseInContext(state, splitText) {
           action: Input.Type.ACCEPT,
         }
       ];
-      return sendQuickReply(fbUserID, displayText, quickReplyData);
+      return sendQuickReply(state, displayText, quickReplyData, true);
     }
 
     case SessionState.DONE_QUEUE:
@@ -220,7 +220,7 @@ function sendResponseInContext(state, splitText) {
       ) {
         // no notes, so just say nothing new found
         if (session && session.noteQueue && session.noteQueue.length === 0) {
-          return sendText(fbUserID, noNew());
+          return sendText(state, noNew(), true);
         }
 
         const waitedHours = session.remainingWaitHours;
@@ -232,16 +232,18 @@ function sendResponseInContext(state, splitText) {
             flooredHours > 1 ? `about ${flooredHours} hours` : 'about an hour or two';
           respMessage = `${respMessage} Why don't we chat again in ${hoursMsg}? Nap time for me. 😴`;
         }
-        return sendText(fbUserID, respMessage);
+        return sendText(state, respMessage, true);
       }
 
       return Media.aggregate([{ $sample: { size: 1, }, }]).then(result => {
         let img = '';
         if (result && result.length) {
           img = result[0].url;
-          return sendImageWithUrl(fbUserID, img).then(() => sendText(fbUserID, doneSession()));
+          return sendImageWithUrl(state, img, false).then(() =>
+            sendText(state, doneSession(), true)
+          );
         }
-        return sendText(fbUserID, doneSession());
+        return sendText(state, doneSession(), true);
       });
 
     default:
@@ -285,8 +287,9 @@ function sendFeedbackText(state, withTriggerResponse = false, withSuccessMedia =
 
   if (!isValidEval(state.evalCtx)) {
     return sendText(
-      toID,
-      "I didn't understand your answer 😕 can you try to tell me in a different way? Let me repeat and let's try again."
+      state,
+      "I didn't understand your answer 😕 can you try to tell me in a different way? Let me repeat and let's try again.",
+      true
     );
   }
 
@@ -324,7 +327,7 @@ function sendFeedbackText(state, withTriggerResponse = false, withSuccessMedia =
     //
     // return sendQuickReply(toID, msg, quickReplyData);
     // return sendButtons(toID, msg, buttonData);
-    return sendText(toID, msg);
+    return sendText(state, msg, true);
   }
   // try to send a success GIF
   if (withSuccessMedia) {
@@ -332,23 +335,22 @@ function sendFeedbackText(state, withTriggerResponse = false, withSuccessMedia =
       let img = '';
       if (result && result.length) {
         img = result[0].url;
-        return sendImageWithUrl(toID, img).then(() => sendText(toID, msg));
+        return sendImageWithUrl(state, img, false).then(() => sendText(state, msg, true));
       }
-      return sendText(toID, msg);
+      return sendText(state, msg, true);
     });
   }
-  return sendText(toID, msg);
+  return sendText(state, msg, true);
 }
 
-function sendDoneQueueFeedback(appState) {
-  const { answerQuality, correctAnswer, } = appState.evalCtx;
+function sendDoneQueueFeedback(state) {
+  const { answerQuality, } = state.evalCtx;
   const isPositive = answerQuality === Answer.max;
 
   if (isPositive) {
-    const toID = appState.senderID;
-    return sendText(toID, welcomeBack());
+    return sendText(state, welcomeBack(), true);
   }
-  return Promise.resolve(appState);
+  return Promise.resolve(state);
 }
 
 // return state
@@ -356,17 +358,17 @@ export function sendFeedbackResp(state, withSuccessMedia = false) {
   const session = state.session;
   switch (session.state) {
     case SessionState.INTRO: {
-      const toID = state.senderID;
       // const msg = "Hey! 🤗 Have you ever tried to learn something and then realize later you forgot everything? Learning the right way can be tough on your own. That's why I'm here! Every day we chat we'll learn something new together. Most importantly, we'll always spend some of our time reviewing what we've already learned so we won't forget. Let's go, it's learnin time wooo! 😄";
       const msg =
         "Hey! 🤗 I'm here to help you explore the important stuff behind current events a few times a week. Dig into and learn only what interests you. I'll also help test you on and review previously learned concepts that you explored to help push it into long term memory. It's a bit more work, but what's the point of learning if you just forget it all later right? K let's do it! 😄";
-      return sendText(toID, msg).then(() => state);
+      return sendText(state, msg, true).then(() => state);
     }
     case SessionState.INFO: {
       if (state.input && state.input.type === Input.Type.CUSTOM) {
         return sendText(
-          state.senderID,
-          "I not smart enough to understand general commands yet 😞, but I'm trying to learn. I will be able to soon! For now can you please use the buttons to make it easier for me? Typing something is still ok 👍🏼 if I'm quizzing you and looking for answer because I know what to look for."
+          state,
+          "I not smart enough to understand general commands yet 😞, but I'm trying to learn. I will be able to soon! For now can you please use the buttons to make it easier for me? Typing something is still ok 👍🏼 if I'm quizzing you and looking for an answer because I know what to look for.",
+          true
         ).then(() => state);
       }
       break;

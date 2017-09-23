@@ -6,7 +6,7 @@ import { getCurrentNote } from '~/core/session_state';
 // import { log, logErr } from '~/logger';
 import MessageType from './fbmessage_type';
 import sendResp, { sendFeedbackResp } from './fbmessenger_response';
-import { sendUserDetailsRequest, sendText } from './fbmessenger_request';
+import { sendUserDetailsRequest } from './fbmessenger_request';
 
 const HARDCODED_SUBJ_NAME = 'news';
 
