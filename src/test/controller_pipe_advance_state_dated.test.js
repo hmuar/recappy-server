@@ -90,26 +90,50 @@ before('before controller advance state testing', () =>
     })
 );
 
-test('test state transition dated early date', t => {
+// test('test state transition dated early expire date', t => {
+//   const appState = {
+//     ...getAppState(getSession(0, SessionState.INIT, -1), successEval(Answer.ok)),
+//     expireDate: new Date('08/10/2017'),
+//   };
+//   return pipeStateTransitionDated(appState).then(ns => {
+//     t.equal(ns.session.state, SessionState.INFO);
+//     t.equal(ns.session.noteQueue.length, 22);
+//   });
+// });
+//
+// test('test state transition dated late expire date', t => {
+//   const appState = {
+//     ...getAppState(getSession(0, SessionState.INIT), successEval(Answer.ok)),
+//     expireDate: new Date('08/12/2017'),
+//   };
+//   // const nextAppState = pipeStateTransitionDated(appState, new Date('08/10/2017'));
+//   return pipeStateTransitionDated(appState).then(ns => {
+//     t.equal(ns.session.state, SessionState.RECALL);
+//     t.equal(ns.session.noteQueue.length, 10);
+//   });
+// });
+
+test('test state transition dated early publish date', t => {
   const appState = {
     ...getAppState(getSession(0, SessionState.INIT, -1), successEval(Answer.ok)),
-    expireDate: new Date('08/10/2017'),
+    expireDate: new Date('08/01/2017'),
+    publishDate: new Date('08/02/2017'),
+  };
+  return pipeStateTransitionDated(appState).then(ns => {
+    t.equal(ns.session.state, SessionState.RECALL);
+    t.equal(ns.session.noteQueue.length, 10);
+  });
+});
+
+test('test state transition dated late publish date', t => {
+  const appState = {
+    ...getAppState(getSession(0, SessionState.INIT, -1), successEval(Answer.ok)),
+    expireDate: new Date('08/01/2017'),
+    publishDate: new Date('08/21/2017'),
   };
   return pipeStateTransitionDated(appState).then(ns => {
     t.equal(ns.session.state, SessionState.INFO);
     t.equal(ns.session.noteQueue.length, 22);
-  });
-});
-
-test('test state transition dated late date', t => {
-  const appState = {
-    ...getAppState(getSession(0, SessionState.INIT), successEval(Answer.ok)),
-    expireDate: new Date('08/12/2017'),
-  };
-  // const nextAppState = pipeStateTransitionDated(appState, new Date('08/10/2017'));
-  return pipeStateTransitionDated(appState).then(ns => {
-    t.equal(ns.session.state, SessionState.RECALL);
-    t.equal(ns.session.noteQueue.length, 10);
   });
 });
 

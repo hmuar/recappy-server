@@ -11,9 +11,11 @@
     "lint": "esw -w src",
     "test-watch": "watch 'npm run test' src",
     "test": "blue-tape -r babel-register src/test/*.test.js | faucet",
-    "testo": "clear && blue-tape -r babel-register src/test/fbmessage_adapter.test.js",
-    "test-dbg-brk": "clear && node --inspect-brk $(npm bin)/blue-tape -r babel-register src/test/input_evaluation.test.js",
-    "test-dbg": "clear && node --inspect $(npm bin)/blue-tape -r babel-register src/test/input_evaluation.test.js",
+    "testo": "clear && blue-tape -r babel-register src/test/text_utils.test.js",
+    "test-dbg-brk":
+      "clear && node --inspect-brk $(npm bin)/blue-tape -r babel-register src/test/text_utils.test.js",
+    "test-dbg":
+      "clear && node --inspect $(npm bin)/blue-tape -r babel-register src/test/input_evaluation.test.js",
     "docs": "watch 'rm -rf docs && docco src/**/**.js && rm -rf docs/*.test.html' src",
     "sim": "node_modules/.bin/babel-node simulate.js",
     "notify": "NODE_ENV=production node_modules/.bin/babel-node notify.js",

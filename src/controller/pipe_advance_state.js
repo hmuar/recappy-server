@@ -98,7 +98,7 @@ function transitionInfo(transitionBackToParentDepth, transitionNewToOld, transit
   return extraFetch;
 }
 
-function advanceToNextConcept(appState, _cutoffDate, expireDate = null) {
+function advanceToNextConcept(appState, _cutoffDate, expireDate = null, publishDate = null) {
   const cutoffDate = _cutoffDate || new Date();
   const { userID, subjectID, } = appState;
   const nextGlobalIndex = appState.session.nextGlobalIndex;
@@ -109,7 +109,8 @@ function advanceToNextConcept(appState, _cutoffDate, expireDate = null) {
     nextGlobalIndex,
     TARGET_NUM_NOTES_IN_SESSION,
     cutoffDate,
-    expireDate
+    expireDate,
+    publishDate
   ).then(notesInfo => {
     const nextNotes = notesInfo.notes;
     if (nextNotes && nextNotes.length > 0) {
@@ -171,7 +172,8 @@ function advanceState(appState) {
     if (appState.postEvalState === SessionState.START_NEW_SESSION) {
       const { evalCtx, } = appState;
       const { cutoffDate, } = evalCtx.correctAnswer;
-      return advanceToNextConcept(appState, cutoffDate, new Date());
+      const curDate = new Date();
+      return advanceToNextConcept(appState, cutoffDate, curDate, curDate);
     }
 
     if (
@@ -200,7 +202,7 @@ function advanceState(appState) {
             const skipPrompt = isFailResponse(appState.evalCtx.answerQuality);
             if (skipPrompt) {
               const nowDate = new Date();
-              return advanceToNextConcept(appState, nowDate, nowDate);
+              return advanceToNextConcept(appState, nowDate, nowDate, nowDate);
             }
           }
           const nextNote = noteQueue[nextQueueIndex];
@@ -234,7 +236,7 @@ function advanceState(appState) {
 
           if (startSessionTime && sessionWaitTimeReached) {
             const nowDate = new Date();
-            return advanceToNextConcept(appState, nowDate, nowDate);
+            return advanceToNextConcept(appState, nowDate, nowDate, nowDate);
           }
           // XXX: Prompt note specific code
           // if question is prompt and user skips, try to find next available prompt
@@ -243,7 +245,7 @@ function advanceState(appState) {
             const skipPrompt = isFailResponse(appState.evalCtx.answerQuality);
             if (skipPrompt) {
               const nowDate = new Date();
-              return advanceToNextConcept(appState, nowDate, nowDate);
+              return advanceToNextConcept(appState, nowDate, nowDate, nowDate);
             }
           }
           nextSessionState = SessionState.DONE_QUEUE;

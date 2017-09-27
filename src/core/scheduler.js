@@ -33,7 +33,8 @@ export function getOldMaterial(userID, subjectID, numNotes, dueDate) {
         dueMap[item.noteID.toString()] = item.due;
         // map each note to its noteID
         return item.noteID;
-      }))
+      })
+    )
     .then(noteIDs => Note.find({ _id: { $in: noteIDs, }, }))
     .then(notes =>
       notes.map(note => {
@@ -41,7 +42,8 @@ export function getOldMaterial(userID, subjectID, numNotes, dueDate) {
         note.dueDate = dueMap[noteIDString]; // eslint-disable-line no-param-reassign
         note.queueStatus = QueueStatus.OLD; // eslint-disable-line no-param-reassign
         return note;
-      }))
+      })
+    )
     .then(notes =>
       _.sortBy(notes, note => {
         const noteIDString = note._id.toString();
@@ -49,7 +51,8 @@ export function getOldMaterial(userID, subjectID, numNotes, dueDate) {
           return dueMap[noteIDString];
         }
         return 0;
-      }));
+      })
+    );
 }
 
 // Grab new notes user has never seen that are next in line.
@@ -69,7 +72,8 @@ export function getNewMaterial(
   globalIndex = 0,
   prevNotes = [],
   // expiration date for concepts (especially for news subject)
-  expireDate = null
+  expireDate = null,
+  publishDate = null
 ) {
   if (!subjectID || numNotes <= 0) {
     return Promise.resolve({
@@ -79,56 +83,66 @@ export function getNewMaterial(
     });
   }
 
-  const conceptQuery = expireDate
-    ? {
-      ctype: 'concept',
-      subjectParent: subjectID,
-      globalIndex: { $gte: globalIndex, },
-        // pull concepts that don't have expire dates.
-        // if concept has expire date field, check against given expire date
+  let conceptQuery = {
+    ctype: 'concept',
+    subjectParent: subjectID,
+    globalIndex: { $gte: globalIndex, },
+  };
+  if (expireDate) {
+    conceptQuery = {
+      ...conceptQuery,
+      // pull concepts that don't have expire dates.
+      // if concept has expire date field, check against given expire date
       $or: [{ expireDate: { $gte: expireDate, }, }, { expireDate: { $exists: false, }, }],
-    }
-    : {
-      ctype: 'concept',
-      subjectParent: subjectID,
-      globalIndex: { $gte: globalIndex, },
     };
+  }
+  if (publishDate) {
+    conceptQuery = {
+      ...conceptQuery,
+      $or: [{ publishDate: { $lte: publishDate, }, }, { publishDate: { $exists: false, }, }],
+      // publishDate: { $lte: publishDate, },
+    };
+  }
 
-  return Category.findOne(conceptQuery).sort({ globalIndex: 1, }).then(nextConcept => {
-    if (!nextConcept) {
-      log(`Could not find next concept with index ${globalIndex}, returning 0 new notes`);
-      return Promise.resolve({
-        notes: prevNotes,
-        globalIndex,
-        nextGlobalIndex: globalIndex,
-      });
-    }
+  return Category.findOne(conceptQuery)
+    .sort({ globalIndex: 1, })
+    .then(nextConcept => {
+      if (!nextConcept) {
+        log(`Could not find next concept with index ${globalIndex}, returning 0 new notes`);
+        return Promise.resolve({
+          notes: prevNotes,
+          globalIndex,
+          nextGlobalIndex: globalIndex,
+        });
+      }
 
-    const curGlobalIndex = nextConcept.globalIndex;
+      const curGlobalIndex = nextConcept.globalIndex;
 
-    return Note.find({ directParent: nextConcept._id, }).sort('order').then(notes => {
-      const taggedNotes = notes.map(note => {
-        note.queueStatus = QueueStatus.NEW; // eslint-disable-line no-param-reassign
-        return note;
-      });
-      const mergedNotes = [...prevNotes, ...taggedNotes];
-      // terminate and return results
-      // if (mergedNotes.length >= numNotes || globalIndex >= MAX_GLOBAL_INDEX) {
-      // if (mergedNotes.length >= numNotes) {
-      // log(`Got enough notes, returning ${mergedNotes.length} notes`);
-      return Promise.resolve({
-        notes: mergedNotes,
-        // successfully added all new notes from concept associated
-        // with current global index, so increment globalIndex
-        globalIndex: curGlobalIndex,
-        nextGlobalIndex: curGlobalIndex + 1,
-      });
-      // }
+      return Note.find({ directParent: nextConcept._id, })
+        .sort('order')
+        .then(notes => {
+          const taggedNotes = notes.map(note => {
+            note.queueStatus = QueueStatus.NEW; // eslint-disable-line no-param-reassign
+            return note;
+          });
+          const mergedNotes = [...prevNotes, ...taggedNotes];
+          // terminate and return results
+          // if (mergedNotes.length >= numNotes || globalIndex >= MAX_GLOBAL_INDEX) {
+          // if (mergedNotes.length >= numNotes) {
+          // log(`Got enough notes, returning ${mergedNotes.length} notes`);
+          return Promise.resolve({
+            notes: mergedNotes,
+            // successfully added all new notes from concept associated
+            // with current global index, so increment globalIndex
+            globalIndex: curGlobalIndex,
+            nextGlobalIndex: curGlobalIndex + 1,
+          });
+          // }
 
-      // recursively get more new material
-      // return getNewMaterial(subjectID, numNotes, curGlobalIndex + 1, mergedNotes);
+          // recursively get more new material
+          // return getNewMaterial(subjectID, numNotes, curGlobalIndex + 1, mergedNotes);
+        });
     });
-  });
 }
 
 export function getNextNotes(
@@ -137,7 +151,8 @@ export function getNextNotes(
   globalIndex = 0,
   numNotes = TARGET_NUM_NOTES_IN_SESSION,
   dueDate = null,
-  expireDate = null
+  expireDate = null,
+  publishDate = null
 ) {
   if (numNotes <= 0) {
     return Promise.resolve({ notes: [], globalIndex, nextGlobalIndex: globalIndex, });
@@ -150,7 +165,7 @@ export function getNextNotes(
     .then(oldNotes => {
       result = [...result, ...oldNotes];
       const newNotesNum = numNotes - oldNotes.length;
-      return getNewMaterial(subjectID, newNotesNum, globalIndex, [], expireDate);
+      return getNewMaterial(subjectID, newNotesNum, globalIndex, [], expireDate, publishDate);
     })
     .then(newNotesInfo => {
       result = [...newNotesInfo.notes, ...result];
@@ -164,6 +179,6 @@ export function getNextNotes(
     });
 }
 
-export function getStartingNotes(subjectID, numNotes, expireDate = null) {
-  return getNewMaterial(subjectID, numNotes, 0, [], expireDate);
+export function getStartingNotes(subjectID, numNotes, expireDate = null, publishDate = null) {
+  return getNewMaterial(subjectID, numNotes, 0, [], expireDate, publishDate);
 }

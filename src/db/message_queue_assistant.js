@@ -68,13 +68,14 @@ export function shouldHandleMsg(userID, subjectID, timestamp) {
       return MessageQueue.create(newQueue).then(() => true);
     }
     const queueMsg = queueEntry.queue;
-    if (queueMsg && queueMsg.timestamp && queueMsg.timestamp <= timestamp) {
-      if (queueEntry.pending) {
+    // if (queueMsg && queueMsg.timestamp && queueMsg.timestamp <= timestamp) {
+    if (queueEntry.pending && timestamp - queueMsg.timestamp < 3000) {
+      if (queueEntry.pending && timestamp) {
         return false;
       }
     }
-    queueMsg.timestamp = timestamp;
+    queueEntry.queue = { timestamp, };
     queueEntry.pending = true;
-    return queueEntry.save().then(() => true);
+    return queueEntry.save().then(saved => true);
   });
 }

@@ -45,6 +45,7 @@ const catSchema = new mongoose.Schema({
   globalIndex: Number,
   exclude: Boolean,
   expireDate: Date,
+  publishDate: Date,
   subjectParent: mongoose.Schema.Types.ObjectId,
 });
 

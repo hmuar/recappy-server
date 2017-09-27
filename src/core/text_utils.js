@@ -1,6 +1,7 @@
 // breaks up text into 2 sentences based on end of sentence punctuation
 // if text longer than maxlength
-export function divideLongText(text, maxLength) {
+export function divideLongText(rawText, maxLength) {
+  const text = rawText.trim();
   if (text.length > maxLength) {
     // const result = text.match(/[.!?]+ /g).map(t => t.trim());
 
@@ -12,7 +13,7 @@ export function divideLongText(text, maxLength) {
       matchIndexes.push(match.index);
     }
 
-    if (matchIndexes.length > 1) {
+    if (matchIndexes.length > 0) {
       const splitIndex = matchIndexes[Math.floor(matchIndexes.length / 2)];
       return [text.slice(0, splitIndex + 1).trim(), text.slice(splitIndex + 2).trim()];
     }

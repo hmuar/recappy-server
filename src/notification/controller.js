@@ -26,7 +26,7 @@ export default class NotificationController {
   /*
   1. get next scheduled hook for given user
   - look for next concept with globalIndex greater than current index AND
-    expireDate less than current date
+    expireDate greater than current date and publish date is less than current date
   2. send hook to user
 
   sendInfo {

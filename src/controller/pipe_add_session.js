@@ -32,7 +32,12 @@ function addNewSession(appState, startNotes = null) {
   }
 
   // find notes dynamically to determine initial note queue
-  return getStartingNotes(subjectID, TARGET_NUM_NOTES_IN_SESSION, appState.expireDate)
+  return getStartingNotes(
+    subjectID,
+    TARGET_NUM_NOTES_IN_SESSION,
+    appState.expireDate,
+    appState.publishDate
+  )
     .then(notesInfo => {
       const noteQueue = notesInfo.notes;
       const startNoteIndex = 0;

@@ -94,6 +94,7 @@ const defaultConcept = {
   globalIndex: 0,
   subjectParent: defaultSubject._id,
   expireDate: new Date('08/10/2017'),
+  publishDate: new Date('08/20/2017'),
 };
 
 // 10 notes have this concept as parent
@@ -112,6 +113,7 @@ const defaultConcept2 = {
   globalIndex: 1,
   subjectParent: defaultSubject._id,
   expireDate: new Date('08/12/2017'),
+  publishDate: new Date('08/01/2017'),
 };
 
 const noteParent = [

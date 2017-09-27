@@ -12,7 +12,7 @@ const controller = new NotificationController(AdapterFB);
 const DEV_USER_ID = ObjectID('5996ee1a62421a9b5e1def1f');
 const IDLE_HOURS_THRESHOLD = 1;
 
-function notifyUser(user, subjectID) {
+function notifyUser(user, subjectID, isDev = false) {
   const sendInfo = {
     subjectID,
     senderID: user.facebookMessageID,
@@ -20,12 +20,13 @@ function notifyUser(user, subjectID) {
     firstName: user.firstName,
     lastName: user.lastName,
     expireDate: new Date(),
+    publishDate: isDev ? new Date('01/01/2020') : new Date(),
   };
   return controller.send(sendInfo);
 }
 
-function sendForUserID(userID) {
-  return Account.getUserByID(userID).then(user => notifyUser(user, hardcodedSubjectID));
+function sendForUserID(userID, isDev = false) {
+  return Account.getUserByID(userID).then(user => notifyUser(user, hardcodedSubjectID, isDev));
 }
 
 function sendForAllUsers() {
@@ -46,7 +47,7 @@ export function notifyDevUser() {
   const db = new Database();
   db
     .setup()
-    .then(() => sendForUserID(DEV_USER_ID))
+    .then(() => sendForUserID(DEV_USER_ID, true))
     .then(() => process.exit(0));
 }
 

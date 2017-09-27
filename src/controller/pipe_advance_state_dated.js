@@ -3,11 +3,18 @@ import { getNewMaterial } from '~/core/scheduler';
 
 function advanceToNextDatedConcept(appState) {
   const expireDate = appState.expireDate || new Date();
-  const { subjectID, session, } = appState;
+  const { subjectID, session, publishDate, } = appState;
   const { noteQueue, } = session;
   const targetGlobalIndex = appState.session.nextGlobalIndex;
 
-  return getNewMaterial(subjectID, 1, targetGlobalIndex, [], expireDate).then(notesInfo => {
+  return getNewMaterial(
+    subjectID,
+    1,
+    targetGlobalIndex,
+    [],
+    expireDate,
+    publishDate
+  ).then(notesInfo => {
     const nextNotes = notesInfo.notes;
     if (nextNotes && nextNotes.length > 0) {
       // MUTATE session's noteQueue by inserting new notes into location
