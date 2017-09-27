@@ -10,8 +10,12 @@ const questions = [
     message: 'Who do you want to notify?',
     choices: [
       {
-        name: '[Developer] Hemu',
+        name: '[Synapse Test A] Hemu',
         value: 'dev',
+      },
+      {
+        name: 'Hemu',
+        value: 'dev-live',
       },
       {
         name: 'Single User',
@@ -44,7 +48,9 @@ const questions = [
 
 inquirer.prompt(questions).then(answers => {
   if (answers.userType === 'dev') {
-    notifyDevUser();
+    notifyDevUser(true);
+  } else if (answers.userType === 'dev-live') {
+    notifyDevUser(false);
   } else if (answers.userType === 'all' && answers.sendAll) {
     notifyAllUsers();
   } else if (answers.userType === 'single') {

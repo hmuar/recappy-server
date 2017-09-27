@@ -175,12 +175,11 @@ function delayWrapper(appState, delayDuration, applyFunc) {
 function _sendText(appState, text, final) {
   const { senderID, userID, subjectID, timestamp, } = appState;
   const bodyCreator = postBodyCreator(MessageType.TEXT);
-  return sendPostRequest(bodyCreator(senderID, text)).then(() => {
-    if (final) {
-      updatePending(userID, subjectID, timestamp, false);
-    }
-    return true;
-  });
+  return sendPostRequest(bodyCreator(senderID, text)).then(() =>
+    // if (final) {
+    //   updatePending(userID, subjectID, timestamp, false);
+    // }
+     true);
 }
 
 export function sendText(appState, text, final = true) {
@@ -191,12 +190,11 @@ export function sendText(appState, text, final = true) {
 function _sendQuickReply(appState, text, replies, final) {
   const { senderID, userID, subjectID, timestamp, } = appState;
   const bodyCreator = postBodyCreator(MessageType.QUICK_REPLY);
-  return sendPostRequest(bodyCreator(senderID, text, replies)).then(() => {
-    if (final) {
-      updatePending(userID, subjectID, timestamp, false);
-    }
-    return true;
-  });
+  return sendPostRequest(bodyCreator(senderID, text, replies)).then(() =>
+    // if (final) {
+    //   updatePending(userID, subjectID, timestamp, false);
+    // }
+     true);
 }
 
 // replies is list of {title, action}
@@ -210,12 +208,11 @@ export function sendQuickReply(appState, text, replies, final = true) {
 function _sendImage(appState, imgURL, final) {
   const { senderID, userID, subjectID, timestamp, } = appState;
   const bodyCreator = postBodyCreator(MessageType.IMAGE);
-  return sendPostRequest(bodyCreator(senderID, imgURL)).then(() => {
-    if (final) {
-      updatePending(userID, subjectID, timestamp, false);
-    }
-    return true;
-  });
+  return sendPostRequest(bodyCreator(senderID, imgURL)).then(() =>
+    // if (final) {
+    //   updatePending(userID, subjectID, timestamp, false);
+    // }
+     true);
 }
 
 export function sendImage(appState, imgURL, final = true) {

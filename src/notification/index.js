@@ -10,6 +10,8 @@ const controller = new NotificationController(AdapterFB);
 
 // const DEV_USER_ID = ObjectID('59bad7921df0f40052a9b89f');
 const DEV_USER_ID = ObjectID('5996ee1a62421a9b5e1def1f');
+const LIVE_USER_ID = ObjectID('59bad7921df0f40052a9b89f');
+
 const IDLE_HOURS_THRESHOLD = 1;
 
 function notifyUser(user, subjectID, isDev = false) {
@@ -43,11 +45,11 @@ function sendTest() {
   return getUsersForFacebookNotification(IDLE_HOURS_THRESHOLD).then(users => console.log(users));
 }
 
-export function notifyDevUser() {
+export function notifyDevUser(devSite) {
   const db = new Database();
   db
     .setup()
-    .then(() => sendForUserID(DEV_USER_ID, true))
+    .then(() => sendForUserID(devSite ? DEV_USER_ID : LIVE_USER_ID, true))
     .then(() => process.exit(0));
 }
 
