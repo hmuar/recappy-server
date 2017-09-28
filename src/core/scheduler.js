@@ -164,7 +164,8 @@ export function getNextNotes(
   return getOldMaterial(userID, subjectID, oldNotesNum, dueDate)
     .then(oldNotes => {
       result = [...result, ...oldNotes];
-      const newNotesNum = numNotes - oldNotes.length;
+      // const newNotesNum = numNotes - oldNotes.length;
+      const newNotesNum = Math.max(numNotes - oldNotes.length, 1);
       return getNewMaterial(subjectID, newNotesNum, globalIndex, [], expireDate, publishDate);
     })
     .then(newNotesInfo => {
@@ -175,6 +176,7 @@ export function getNextNotes(
         notes: uniqResult,
         globalIndex,
         nextGlobalIndex: newNotesInfo.nextGlobalIndex,
+        numNewNotes: newNotesInfo.notes.length,
       };
     });
 }

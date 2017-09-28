@@ -125,7 +125,7 @@ function advanceToNextConcept(appState, _cutoffDate, expireDate = null, publishD
           queueIndex: 0,
           globalIndex: notesInfo.globalIndex,
           nextGlobalIndex: notesInfo.nextGlobalIndex,
-          baseQueueLength: nextNotes.length,
+          baseQueueLength: notesInfo.numNewNotes,
           state: getEntryStateForNoteType(nextNotes[0].type),
           startSessionTime: new Date(),
         },

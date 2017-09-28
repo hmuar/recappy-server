@@ -144,9 +144,12 @@ export default function pipe(appState) {
     //   return appState;
     // }
     const adjustedNoteQueue = [...noteQueue];
-    const minIndex = session.queueIndex < session.baseQueueLength
-      ? session.baseQueueLength
-      : session.queueIndex;
+    const minIndex = Math.max(
+      session.queueIndex < session.baseQueueLength
+        ? session.baseQueueLength - 1
+        : session.queueIndex,
+      0
+    );
     const adjustNoteIndex = getRandomInt(minIndex, noteQueue.length);
 
     adjustedNoteQueue.splice(adjustNoteIndex, 0, getCurrentNote(session));

@@ -1,21 +1,31 @@
 import { getEntryStateForNoteType } from '~/core/session_state';
-import { getNewMaterial } from '~/core/scheduler';
+import { getNextNotes, TARGET_NUM_NOTES_IN_SESSION } from '~/core/scheduler';
 
 function advanceToNextDatedConcept(appState) {
-  const expireDate = appState.expireDate || new Date();
-  const { subjectID, session, publishDate, } = appState;
-  const { noteQueue, } = session;
+  const curDate = new Date();
+  const expireDate = appState.expireDate || curDate;
+  const { subjectID, session, publishDate, userID, } = appState;
   const targetGlobalIndex = appState.session.nextGlobalIndex;
 
-  return getNewMaterial(
+  return getNextNotes(
+    userID,
     subjectID,
-    1,
     targetGlobalIndex,
-    [],
+    TARGET_NUM_NOTES_IN_SESSION,
+    curDate,
     expireDate,
     publishDate
   ).then(notesInfo => {
+    // return getNewMaterial(
+    //   subjectID,
+    //   1,
+    //   targetGlobalIndex,
+    //   [],
+    //   expireDate,
+    //   publishDate
+    // ).then(notesInfo => {
     const nextNotes = notesInfo.notes;
+    const { numNewNotes, } = notesInfo;
     if (nextNotes && nextNotes.length > 0) {
       // MUTATE session's noteQueue by inserting new notes into location
       // of current queueIndex so that if user were to continue session,
@@ -25,14 +35,14 @@ function advanceToNextDatedConcept(appState) {
       return {
         ...appState,
         // postEvalState: null,
-        newConceptFound: true,
+        newConceptFound: numNewNotes > 0,
         session: {
           ...session,
           noteQueue: nextNotes,
           queueIndex: 0,
           globalIndex: notesInfo.globalIndex,
           nextGlobalIndex: notesInfo.nextGlobalIndex,
-          baseQueueLength: noteQueue.length,
+          baseQueueLength: numNewNotes,
           state: getEntryStateForNoteType(nextNotes[0].type),
           startSessionTime: new Date(),
         },
