@@ -24,7 +24,7 @@ export default class TestDatabase {
   initialize() {
     return new Promise((resolve, reject) => {
       if (!this.loaded) {
-        const connection = mongoose.connect('mongodb://127.0.0.1:3001/test').connection;
+        const connection = mongoose.connect('mongodb://127.0.0.1:3031/test').connection;
         connection.on('error', () => reject('Could not connect to test database'));
         connection.on('open', () => {
           this.loaded = true;
@@ -50,7 +50,8 @@ export default class TestDatabase {
         .then(() => {})
         .then(() => Category.remove({}))
         .then(() => NoteRecord.remove({}))
-        .then(() => StudentModel.remove({})));
+        .then(() => StudentModel.remove({}))
+    );
   }
 
   close() {

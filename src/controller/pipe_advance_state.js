@@ -79,7 +79,17 @@ function setPostEvalState(appState) {
   };
 }
 
-function transitionInfo(transitionBackToParentDepth, transitionNewToOld, transitionToNote) {
+function transitionInfo(
+  transitionBackToParentDepth,
+  transitionNewToOld,
+  transitionToNewPrompt,
+  transitionToNote
+) {
+  if (transitionToNewPrompt) {
+    return Promise.resolve({
+      toNewPrompt: true,
+    });
+  }
   let extraFetch = Promise.resolve({});
   const markedTransition = transitionBackToParentDepth || transitionNewToOld;
   if (markedTransition) {
@@ -116,7 +126,13 @@ function advanceToNextConcept(appState, _cutoffDate, expireDate = null, publishD
     if (nextNotes && nextNotes.length > 0) {
       const nextNote = nextNotes[0];
       const transitionNewToOld = nextNote.queueStatus === QueueStatus.OLD;
-      return transitionInfo(false, transitionNewToOld, nextNote).then(transInfo => ({
+      const transitionToNewPrompt = notesInfo.numNewNotes > 0 && isPromptNote(nextNote);
+      return transitionInfo(
+        false,
+        transitionNewToOld,
+        transitionToNewPrompt,
+        nextNote
+      ).then(transInfo => ({
         ...appState,
         transition: transInfo,
         session: {
@@ -187,6 +203,7 @@ function advanceState(appState) {
       // let transitionFromBranchToMain = false;
       let transitionBackToParentDepth = false;
       let transitionNewToOld = false;
+      const transitionToNewPrompt = false;
 
       if (noteQueue && queueIndex != null) {
         // only advance queue if waiting for next in queue
@@ -223,7 +240,7 @@ function advanceState(appState) {
           }
           nextSessionState = getEntryStateForNoteType(nextNote.type);
         } else {
-          const { startSessionTime, } = appState.session;
+          // const { startSessionTime, } = appState.session;
           // if user has already waited minimum amount of hours, dont allow
           // session to end. Just continue on with next concept. This is needed
           // to account for times when user leaves in middle of a session
@@ -232,12 +249,12 @@ function advanceState(appState) {
           // us prematurely ending their day after just a few notes just because
           // they have reached the end of current concept.
 
-          const { success: sessionWaitTimeReached, } = hasWaitedMinHours(startSessionTime);
+          // const { success: sessionWaitTimeReached, } = hasWaitedMinHours(startSessionTime);
 
-          if (startSessionTime && sessionWaitTimeReached) {
-            const nowDate = new Date();
-            return advanceToNextConcept(appState, nowDate, nowDate, nowDate);
-          }
+          // if (startSessionTime && sessionWaitTimeReached) {
+          //   const nowDate = new Date();
+          //   return advanceToNextConcept(appState, nowDate, nowDate, nowDate);
+          // }
           // XXX: Prompt note specific code
           // if question is prompt and user skips, try to find next available prompt
           const curNote = noteQueue[queueIndex];
@@ -248,7 +265,9 @@ function advanceState(appState) {
               return advanceToNextConcept(appState, nowDate, nowDate, nowDate);
             }
           }
-          nextSessionState = SessionState.DONE_QUEUE;
+          const nowDate = new Date();
+          return advanceToNextConcept(appState, nowDate, nowDate, nowDate);
+          // nextSessionState = SessionState.DONE_QUEUE;
         }
       }
 
@@ -256,6 +275,7 @@ function advanceState(appState) {
       return transitionInfo(
         transitionBackToParentDepth,
         transitionNewToOld,
+        transitionToNewPrompt,
         nextNote
       ).then(transInfo => ({
         ...appState,

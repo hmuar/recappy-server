@@ -14,6 +14,18 @@ export function generateQuestion(note) {
   return capitalizeFirstLetter(note.displayRaw);
 }
 
+const NEXT_PROMPT = [
+  'K, onto the next story!',
+  'Next story --',
+  "Ok here's another story for ya.",
+  'Got another story for you.',
+  'I found another story!'
+];
+
+export function nextPrompt() {
+  return `${randomChoice(NEXT_PROMPT)}`;
+}
+
 const ORIGINAL_TOPIC_PHRASES = ["K let's get back to", 'Alright back to'];
 
 export function backToOriginalTopic(topic) {

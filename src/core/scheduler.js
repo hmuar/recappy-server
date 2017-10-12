@@ -83,26 +83,34 @@ export function getNewMaterial(
     });
   }
 
-  let conceptQuery = {
+  let dateQuery = {};
+  if (expireDate && publishDate) {
+    dateQuery = {
+      $and: [
+        { $or: [{ expireDate: { $gte: expireDate, }, }, { expireDate: { $exists: false, }, }], },
+        { $or: [{ publishDate: { $lte: publishDate, }, }, { publishDate: { $exists: false, }, }], }
+      ],
+    };
+  } else {
+    if (expireDate) {
+      dateQuery = {
+        $or: [{ expireDate: { $gte: expireDate, }, }, { expireDate: { $exists: false, }, }],
+      };
+    }
+    if (publishDate) {
+      dateQuery = {
+        $or: [{ publishDate: { $lte: publishDate, }, }, { publishDate: { $exists: false, }, }],
+      };
+    }
+  }
+  const conceptQuery = {
     ctype: 'concept',
     subjectParent: subjectID,
     globalIndex: { $gte: globalIndex, },
+    // pull concepts that don't have expire dates.
+    // if concept has expire date field, check against given expire date
+    ...dateQuery,
   };
-  if (expireDate) {
-    conceptQuery = {
-      ...conceptQuery,
-      // pull concepts that don't have expire dates.
-      // if concept has expire date field, check against given expire date
-      $or: [{ expireDate: { $gte: expireDate, }, }, { expireDate: { $exists: false, }, }],
-    };
-  }
-  if (publishDate) {
-    conceptQuery = {
-      ...conceptQuery,
-      $or: [{ publishDate: { $lte: publishDate, }, }, { publishDate: { $exists: false, }, }],
-      // publishDate: { $lte: publishDate, },
-    };
-  }
 
   return Category.findOne(conceptQuery)
     .sort({ globalIndex: 1, })

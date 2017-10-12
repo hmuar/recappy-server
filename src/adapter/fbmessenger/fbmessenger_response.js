@@ -6,6 +6,7 @@ import { NoteType, isPromptNote } from '~/core/note';
 
 import {
   generateQuestion,
+  nextPrompt,
   backToOriginalTopic,
   reviewTime,
   noNewButReview,
@@ -47,6 +48,9 @@ export function sendPossibleImage(appState, note, final) {
 function prependPendingMessages(appState, msg) {
   const { transition, } = appState;
   if (transition) {
+    if (transition.toNewPrompt) {
+      return `${nextPrompt()} ${msg}`;
+    }
     const { parentDescription, } = transition;
     if (parentDescription) {
       if (transition.queueStatus && transition.queueStatus.newToOld) {

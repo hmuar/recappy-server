@@ -121,7 +121,7 @@ test('test state transition dated early publish date', t => {
   };
   return pipeStateTransitionDated(appState).then(ns => {
     t.equal(ns.session.state, SessionState.RECALL);
-    t.equal(ns.session.noteQueue.length, 10);
+    t.equal(ns.session.noteQueue.length, 19);
   });
 });
 
