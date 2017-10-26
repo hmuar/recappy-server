@@ -13,6 +13,8 @@ import pipeStudentModel from './pipe_student_model';
 import pipeAdjustQueue from './pipe_adjust_queue';
 import pipeAddPaths from './pipe_add_paths';
 
+import { sendText } from '~/adapter/fbmessenger/fbmessenger_request';
+
 // `msg` = {
 //   timestamp  : ""
 //   senderID   : "",
@@ -94,6 +96,14 @@ export default class Controller {
   registerMsg(msg) {
     // If input is just a request to change setting, don't go through
     // normal controller flow.
+
+    return this.pipeUser(msg).then(state =>
+      sendText(
+        state,
+        "Hi! I'm no longer providing current events for now. I'm a big break contemplating my existence as a little green bot that likes news. I may or may not be back :("
+      )
+    );
+
     if (msg.input && msg.input.type === Input.Type.SETTING) {
       const appState = msg;
       return this.adapter.changeSetting(appState).then(state => this.sendResponse(state));
